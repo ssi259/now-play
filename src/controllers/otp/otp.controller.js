@@ -9,7 +9,7 @@ const fast2sms = require('fast-two-sms');
 
 AWS.config.loadFromPath(__dirname +'/../../config/aws/config.json');
 
-AWS.config.update({ region: 'us-east-1' });
+AWS.config.update({ region: 'ap-south-1' });
 
 export const generateOtp = async (req, res) => {
     try {
