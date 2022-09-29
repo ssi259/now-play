@@ -1,4 +1,4 @@
-const {Otp, User} = require('../../models'); 
+const {User, Notification} = require('../../models'); 
 const AWS = require('aws-sdk');
 
 AWS.config.loadFromPath(__dirname +'/../../config/aws/config.json');
@@ -7,27 +7,28 @@ AWS.config.update({ region: 'ap-southeast-1' });
 
 export const generateOtp = async (req, res) => {
     try {
-        const { phone_number } = req.body;
-        if (!phone_number) {
+        const { phoneNumber } = req.body;
+        if (!phoneNumber) {
             const response = { status: 'Failure', Details: 'Phone Number Not Provided' }
-            return res.statut(400).send(response);
+            return res.status(400).send(response);
         }
         const otp = otpGenerator()
         const now = new Date();
-        const expiration_time = new Date(now.getTime() + 10 * 60000);
-        const otp_instance = await Otp.create({
+        const expirationDate    = new Date(now.getTime() + 10 * 60000);
+        const otp_instance = await Notification.create({
             otp: otp,
-            expiration_time: expiration_time,
-            verified: false,
-            phone_number: phone_number,
-            userId:1,
+            expirationDate: expirationDate,
+            isOtpVerified: false,
+            phoneNumber: phoneNumber,
+            channelType: "sms",
+            notificationType:"otp"
         })
-        const phone_message =
+        const phoneMessage =
             `Dear User,\n`
             + `${otp} is your otp for Phone Number Verfication. Please enter the OTP to verify your phone number`
         const params = {
-            Message: phone_message,
-            PhoneNumber:phone_number
+            Message: phoneMessage,
+            PhoneNumber:phoneNumber
         }
         var publishTextPromise = new AWS.SNS({ apiVersion: '2010-03-31' }).publish(params).promise();
         publishTextPromise.then((data) => {
@@ -52,9 +53,9 @@ function otpGenerator(){
 
 export const verifyOtp = async (req, res) => {
     try {
-        const { phone_number, otp } = req.body;
-        const current_time = new Date();
-        if (!phone_number) {
+        const { phoneNumber, otp } = req.body;
+        const currentDate = new Date();
+        if (!phoneNumber) {
             const response = { "Status": "Failure", "Details": "Phone Number Not Provided" }
             return res.status(400).send(response)
         }
@@ -62,20 +63,18 @@ export const verifyOtp = async (req, res) => {
             const response = { "Status": "Failure", "Details": "OTP not Provided" }
             return res.status(400).send(response);
         }
-        console.log
-        const otp_instance = await Otp.findOne({ where: { phone_number: phone_number} });
-        if (otp_instance != null) {
-            if (!otp_instance.varified) {
-                console.log("otp instance",otp_instance)
-                if (otp_instance.expiration_time > current_time) {
-                    if (otp_instance.otp == otp) {
-                        otp_instance.varified = true
-                        otp_instance.save();
-                        const user_instance = await User.findOne({ where: { PhoneNumber: phone_number } })
-                        console.log("user",user_instance)
-                        user_instance.isMobileVerified = true;
-                        console.log("user",user_instance)
-                        user_instance.save();
+        const otpInstance = await Notification.findOne({ where: { phoneNumber: phoneNumber, notificationType:"otp" } });
+        if (otpInstance != null) {
+            if (!otpInstance.isOtpVerified) {
+                if (otpInstance.expirationDate > currentDate) {
+                    if (otpInstance.otp == otp) {
+                        otpInstance.isOtpVerified = true
+                        otpInstance.save();
+                        // create user instance when varified
+                        const userInstance = await User.create({
+                            phoneNumber: phoneNumber,
+                            isMobileVerified: true,
+                        });
                         const response = { "Status": "Success", "Details": "Otp Matched" }
                         return res.status(200).send(response);
                     } else {

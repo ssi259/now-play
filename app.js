@@ -26,7 +26,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use('/pub', publicRoutes);
 app.use('/api', apiMiddleware, apiRoutes);
-app.use('/otp', otpRoutes);
+app.use('/notifications/otp', otpRoutes);
 app.use('/api/admin', apiMiddleware, adminMiddleware, adminRoutes);
 
 app.use(errorHandler);
