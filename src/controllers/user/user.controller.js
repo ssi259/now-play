@@ -22,7 +22,7 @@ export const allUsers = async (req, res) => {
 export const register = async (req, res) => {
   try {
     const {
-      email, password, firstName, lastName,
+      email, password, firstName, lastName,phoneNumber
     } = req.body;
     if (process.env.IS_GOOGLE_AUTH_ENABLE === 'true') {
       if (!req.body.code) {
@@ -63,6 +63,7 @@ export const register = async (req, res) => {
       password: reqPass,
       isVerified: false,
       verifyToken: uniqueId(),
+      phoneNumber,
     };
 
     const newUser = await User.create(payload);

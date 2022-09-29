@@ -1,9 +1,9 @@
-const {Otp} = require('../../models'); 
+const {Otp, User} = require('../../models'); 
 const AWS = require('aws-sdk');
 
 AWS.config.loadFromPath(__dirname +'/../../config/aws/config.json');
 
-AWS.config.update({ region: 'ap-south-1' });
+AWS.config.update({ region: 'ap-southeast-1' });
 
 export const generateOtp = async (req, res) => {
     try {
@@ -14,7 +14,7 @@ export const generateOtp = async (req, res) => {
         }
         const otp = otpGenerator()
         const now = new Date();
-        const expiration_time = new Date(now.getTime() + 2 * 60000);
+        const expiration_time = new Date(now.getTime() + 10 * 60000);
         const otp_instance = await Otp.create({
             otp: otp,
             expiration_time: expiration_time,
@@ -24,14 +24,13 @@ export const generateOtp = async (req, res) => {
         })
         const phone_message =
             `Dear User,\n`
-            + `${otp} is your otp for Phone Number Verfication. Please enter the OTP to verify your phone number.\n`
+            + `${otp} is your otp for Phone Number Verfication. Please enter the OTP to verify your phone number`
         const params = {
             Message: phone_message,
             PhoneNumber:phone_number
         }
-        var publishTextPromise = new AWS.SNS({ apiVersion: '2012-11-05' }).publish(params).promise();
+        var publishTextPromise = new AWS.SNS({ apiVersion: '2010-03-31' }).publish(params).promise();
         publishTextPromise.then((data) => {
-            console.log("message",data)
             return res.status(200).send({"status":"Success","Details":"Otp Send to SNS"})
         }).catch((err) => {
             return res.send({status:"Failure",Details:err})
@@ -63,13 +62,20 @@ export const verifyOtp = async (req, res) => {
             const response = { "Status": "Failure", "Details": "OTP not Provided" }
             return res.status(400).send(response);
         }
-        const otp_instance = await Otp.findOne({ where: { phone_number: phone_number } });
+        console.log
+        const otp_instance = await Otp.findOne({ where: { phone_number: phone_number} });
         if (otp_instance != null) {
             if (!otp_instance.varified) {
+                console.log("otp instance",otp_instance)
                 if (otp_instance.expiration_time > current_time) {
                     if (otp_instance.otp == otp) {
                         otp_instance.varified = true
                         otp_instance.save();
+                        const user_instance = await User.findOne({ where: { PhoneNumber: phone_number } })
+                        console.log("user",user_instance)
+                        user_instance.isMobileVerified = true;
+                        console.log("user",user_instance)
+                        user_instance.save();
                         const response = { "Status": "Success", "Details": "Otp Matched" }
                         return res.status(200).send(response);
                     } else {

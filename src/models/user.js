@@ -33,6 +33,17 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
+      phoneNumber: {
+        type: DataTypes.STRING,
+      },
+      isMobileVerified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      isEmailVerified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {
       defaultScope: {
