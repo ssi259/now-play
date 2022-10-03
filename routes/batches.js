@@ -1,4 +1,4 @@
-const batch_controller = require("../controller/batches_controller.js")
+const batch_controller = require("../controllers/batches_controller.js")
 var express = require('express');
 var router = express.Router();
 
