@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import otpRoutes from './routes/otp'
+import coachRoutes from './routes/coach'
 
 dotenv.config();
 require('./config/sequelize');
@@ -16,4 +17,5 @@ app.use(
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/notifications/otp', otpRoutes);
+app.use('/coach',coachRoutes)
 module.exports = app;
