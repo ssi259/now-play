@@ -6,7 +6,6 @@ const Sequelize = require('sequelize');
 
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
-// eslint-disable-next-line import/no-dynamic-require
 const config = require(`${__dirname}/../config/config.js`)[env];
 const db = {};
 
@@ -39,14 +38,5 @@ Object.keys(db).forEach((modelName) => {
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
-
-// relationships for models
-
-//= ==============================
-// Define all relationships here below
-//= ==============================
-// db.User.hasMany(db.Address);
-// db.Address.belongsTo(db.User);
-
 
 module.exports = db;

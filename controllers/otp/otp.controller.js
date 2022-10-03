@@ -44,7 +44,7 @@ export const generateOtp = async (req, res) => {
 
 export const verifyOtp = async (req, res) => {
     try {
-        const { phoneNumber, otp, lat, lng } = req.body;
+        const { phoneNumber, otp } = req.body;
         const currentDate = new Date();
         if (!phoneNumber) {
             const response = { "Status": "Failure", "Details": "Phone Number Not Provided" }
@@ -60,7 +60,7 @@ export const verifyOtp = async (req, res) => {
                 if (otpInstance.expirationDate > currentDate) {
                     if (otpInstance.otp == otp) {
                         otpInstance.isOtpVerified = true
-                        // Please Review this line 
+                        // Please review this line 
                         await otpInstance.save();
                         const userInstance = await User.create({
                             phoneNumber: phoneNumber,
@@ -77,9 +77,9 @@ export const verifyOtp = async (req, res) => {
                             process.env.JWT_SECRET_KEY,
                         );
                         userInstance.verifyToken = token;
-                        // Please Review this line 
-                        await userInstance.save();
-                        const response = { "Status": "Success", "Details": {user:userInstance, verifyToken:token} }
+                        // Please review this line 
+                        const userUpdated = await userInstance.save();
+                        const response = { "Status": "Success", "Details": {user:userUpdated, verifyToken:token} }
                         return res.status(200).send(response);
                     } else {
                         const response={"Status":"Failure","Details":"OTP Not Matched"}
