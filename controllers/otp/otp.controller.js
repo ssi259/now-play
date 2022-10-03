@@ -60,7 +60,7 @@ export const verifyOtp = async (req, res) => {
                 if (otpInstance.expirationDate > currentDate) {
                     if (otpInstance.otp == otp) {
                         otpInstance.isOtpVerified = true
-                        //discuss about this line
+                        // Please Review this line 
                         await otpInstance.save();
                         const userInstance = await User.create({
                             phoneNumber: phoneNumber,
@@ -77,7 +77,7 @@ export const verifyOtp = async (req, res) => {
                             process.env.JWT_SECRET_KEY,
                         );
                         userInstance.verifyToken = token;
-                        //discuss about this line
+                        // Please Review this line 
                         await userInstance.save();
                         const response = { "Status": "Success", "Details": {user:userInstance, verifyToken:token} }
                         return res.status(200).send(response);
