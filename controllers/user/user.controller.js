@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import axios from 'axios';
 import { User } from '../../models';
-import { successResponse, errorResponse, uniqueId } from '../../helpers';
+import { successResponse, errorResponse, uniqueId } from '../../src/helpers';
 
 export const allUsers = async (req, res) => {
   try {
