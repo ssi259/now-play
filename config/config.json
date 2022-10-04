@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "root",
-    "password": "1234",
+    "username": "now_play_user",
+    "password": "password",
     "database": "now_play_development",
-    "host": "localhost",
+    "host": "3.111.147.217",
     "dialect": "mysql"
   },
   "test": {
