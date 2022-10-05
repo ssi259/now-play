@@ -1,6 +1,6 @@
 'use strict';
 const {
-  Model, DataTypes
+  Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Batch extends Model {
@@ -14,12 +14,13 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Batch.init({
-    id: DataTypes.INTEGER,
     arena_id: DataTypes.INTEGER,
     coach_id: DataTypes.INTEGER,
     sports_id: DataTypes.INTEGER,
     days: DataTypes.STRING,
     price: DataTypes.INTEGER,
+    img_url: DataTypes.STRING,
+    thumbnail_img: DataTypes.STRING,
     start_time: DataTypes.DATE,
     end_time: DataTypes.DATE
   }, {
