@@ -13,7 +13,7 @@
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
     "mysql2": "^2.3.3",
-    "sequelize": "^6.23.2"
+    "sequelize": "^6.24.0"
   },
   "devDependencies": {
     "sequelize-cli": "^6.5.1",
