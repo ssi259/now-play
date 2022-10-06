@@ -1,27 +1,43 @@
 'use strict';
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Coaches', {
+    await queryInterface.createTable('Batches', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      id: {
+      arena_id: {
         type: Sequelize.INTEGER
       },
-      name: {
-        type: Sequelize.STRING
+      coach_id: {
+        type: Sequelize.INTEGER
+      },
+      academy_id: {
+        type: Sequelize.INTEGER
       },
       sports_id: {
         type: Sequelize.INTEGER
       },
-      experience: {
+      days: {
         type: Sequelize.STRING
       },
-      rating: {
+      price: {
         type: Sequelize.INTEGER
+      },
+      img_url: {
+        type: Sequelize.STRING
+      },
+      thumbnail_img: {
+        type: Sequelize.STRING
+      },
+      start_time: {
+        type: Sequelize.DATE
+      },
+      end_time: {
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
@@ -34,6 +50,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Coaches');
+    await queryInterface.dropTable('Batches');
   }
 };

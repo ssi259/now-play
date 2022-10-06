@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   Batch.init({
     arena_id: DataTypes.INTEGER,
     coach_id: DataTypes.INTEGER,
+    academy_id: DataTypes.INTEGER,
     sports_id: DataTypes.INTEGER,
     days: DataTypes.STRING,
     price: DataTypes.INTEGER,
