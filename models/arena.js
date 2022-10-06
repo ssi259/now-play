@@ -14,10 +14,13 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Arena.init({
+    arena_id: DataTypes.STRING,
     name: DataTypes.STRING,
+    phone: DataTypes.INTEGER,
+    email: DataTypes.STRING,
+    address: DataTypes.STRING,
     lat: DataTypes.DECIMAL,
-    lng: DataTypes.DECIMAL,
-    landmark: DataTypes.STRING
+    long: DataTypes.DECIMAL
   }, {
     sequelize,
     modelName: 'Arena',

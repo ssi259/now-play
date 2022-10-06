@@ -9,10 +9,22 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      sports_id: {
+        type: Sequelize.INTEGER
+      },
       name: {
         type: Sequelize.STRING
       },
       type: {
+        type: Sequelize.STRING
+      },
+      thumbnail: {
+        type: Sequelize.STRING
+      },
+      images: {
+        type: Sequelize.STRING
+      },
+      about: {
         type: Sequelize.STRING
       },
       createdAt: {

@@ -29,7 +29,7 @@ exports.post_process = async(req,resp,input_response)=>{
 
 
 exports.pre_process_create_batch = async(req,resp)=>{
-    const result = await  models.Batch.create({id:req.body.id,coach_id: req.body.coach_id,sports_id: req.body.sports_id,days: req.body.date,price: req.body.price,start_time: req.body.start_time,end_time: req.body.end_time}).then(function (batch) {
+    const result = await  models.Batch.create({id:req.body.id,coach_id: req.body.coach_id,academy_id: req.body.academy_id,sports_id: req.body.sports_id,days: req.body.date,price: req.body.price,start_time: req.body.start_time,end_time: req.body.end_time}).then(function (batch) {
         if (batch) {
             resp.send(batch);
         } else {

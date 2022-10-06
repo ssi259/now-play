@@ -9,7 +9,22 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      coach_id: {
+        type: Sequelize.INTEGER
+      },
       name: {
+        type: Sequelize.STRING
+      },
+      contact_number: {
+        type: Sequelize.INTEGER
+      },
+      email: {
+        type: Sequelize.STRING
+      },
+      address: {
+        type: Sequelize.STRING
+      },
+      status: {
         type: Sequelize.STRING
       },
       sports_id: {
@@ -18,11 +33,29 @@ module.exports = {
       experience: {
         type: Sequelize.STRING
       },
-      rating: {
+      verified: {
+        type: Sequelize.STRING
+      },
+      tier: {
         type: Sequelize.INTEGER
       },
-      rating_count: {
-        type: Sequelize.INTEGER
+      awards: {
+        type: Sequelize.STRING
+      },
+      team_affiliations: {
+        type: Sequelize.STRING
+      },
+      about: {
+        type: Sequelize.STRING
+      },
+      rating: {
+        type: Sequelize.STRING
+      },
+      review: {
+        type: Sequelize.STRING
+      },
+      profile_pic: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,

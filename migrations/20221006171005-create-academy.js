@@ -2,39 +2,27 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Batches', {
+    await queryInterface.createTable('Academies', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      arena_id: {
+      academy_id: {
         type: Sequelize.INTEGER
       },
-      coach_id: {
-        type: Sequelize.INTEGER
-      },
-      sports_id: {
-        type: Sequelize.INTEGER
-      },
-      days: {
+      name: {
         type: Sequelize.STRING
       },
-      price: {
+      phone_number: {
         type: Sequelize.INTEGER
       },
-      img_url: {
+      email: {
         type: Sequelize.STRING
       },
-      thumbnail_img: {
+      sports: {
         type: Sequelize.STRING
-      },
-      start_time: {
-        type: Sequelize.DATE
-      },
-      end_time: {
-        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
@@ -47,6 +35,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Batches');
+    await queryInterface.dropTable('Academies');
   }
 };

@@ -9,17 +9,26 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      arena_id: {
+        type: Sequelize.STRING
+      },
       name: {
+        type: Sequelize.STRING
+      },
+      phone: {
+        type: Sequelize.INTEGER
+      },
+      email: {
+        type: Sequelize.STRING
+      },
+      address: {
         type: Sequelize.STRING
       },
       lat: {
         type: Sequelize.DECIMAL
       },
-      lng: {
+      long: {
         type: Sequelize.DECIMAL
-      },
-      landmark: {
-        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
