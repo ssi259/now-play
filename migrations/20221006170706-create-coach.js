@@ -9,20 +9,17 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      coach_id: {
-        type: Sequelize.INTEGER
-      },
       name: {
         type: Sequelize.STRING
       },
-      contact_number: {
+      phone_number: {
         type: Sequelize.INTEGER
       },
       email: {
         type: Sequelize.STRING
       },
-      address: {
-        type: Sequelize.STRING
+      address_id: {
+        type: Sequelize.INTEGER
       },
       status: {
         type: Sequelize.STRING
@@ -31,10 +28,10 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       experience: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       verified: {
-        type: Sequelize.STRING
+        type: Sequelize.TINYINT
       },
       tier: {
         type: Sequelize.INTEGER
@@ -46,12 +43,6 @@ module.exports = {
         type: Sequelize.STRING
       },
       about: {
-        type: Sequelize.STRING
-      },
-      rating: {
-        type: Sequelize.STRING
-      },
-      review: {
         type: Sequelize.STRING
       },
       profile_pic: {

@@ -20,10 +20,11 @@ module.exports = (sequelize, DataTypes) => {
     sports_id: DataTypes.INTEGER,
     days: DataTypes.STRING,
     price: DataTypes.INTEGER,
-    img_url: DataTypes.STRING,
     thumbnail_img: DataTypes.STRING,
-    start_time: DataTypes.DATE,
-    end_time: DataTypes.DATE
+    start_time: DataTypes.TIME,
+    end_time: DataTypes.TIME,
+    start_date: DataTypes.DATE,
+    end_date: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Batch',

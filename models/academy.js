@@ -14,11 +14,10 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Academy.init({
-    academy_id: DataTypes.INTEGER,
     name: DataTypes.STRING,
     phone_number: DataTypes.INTEGER,
     email: DataTypes.STRING,
-    sports: DataTypes.STRING
+    sports_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Academy',

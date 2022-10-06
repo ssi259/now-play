@@ -9,9 +9,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      academy_id: {
-        type: Sequelize.INTEGER
-      },
       name: {
         type: Sequelize.STRING
       },
@@ -21,8 +18,14 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
-      sports: {
-        type: Sequelize.STRING
+      sports_id: {
+        type: Sequelize.INTEGER
+      },
+      start_date: {
+        type: Sequelize.DATE
+      },
+      end_date:{
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,

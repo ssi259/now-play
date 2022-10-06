@@ -14,11 +14,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Sports.init({
-    sports_id: DataTypes.INTEGER,
     name: DataTypes.STRING,
     type: DataTypes.STRING,
     thumbnail: DataTypes.STRING,
-    images: DataTypes.STRING,
     about: DataTypes.STRING
   }, {
     sequelize,

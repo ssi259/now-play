@@ -27,16 +27,19 @@ module.exports = {
       price: {
         type: Sequelize.INTEGER
       },
-      img_url: {
-        type: Sequelize.STRING
-      },
       thumbnail_img: {
         type: Sequelize.STRING
       },
       start_time: {
-        type: Sequelize.DATE
+        type: Sequelize.TIME
       },
       end_time: {
+        type: Sequelize.TIME
+      },
+      start_date: {
+        type: Sequelize.DATE
+      },
+      end_date:{
         type: Sequelize.DATE
       },
       createdAt: {

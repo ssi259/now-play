@@ -9,25 +9,22 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      arena_id: {
-        type: Sequelize.STRING
-      },
       name: {
         type: Sequelize.STRING
       },
-      phone: {
+      phone_number: {
         type: Sequelize.INTEGER
       },
       email: {
         type: Sequelize.STRING
       },
-      address: {
-        type: Sequelize.STRING
+      address_id: {
+        type: Sequelize.INTEGER
       },
       lat: {
         type: Sequelize.DECIMAL
       },
-      long: {
+      lng: {
         type: Sequelize.DECIMAL
       },
       createdAt: {

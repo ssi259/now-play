@@ -14,21 +14,18 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Coach.init({
-    coach_id: DataTypes.INTEGER,
     name: DataTypes.STRING,
-    contact_number: DataTypes.INTEGER,
+    phone_number: DataTypes.INTEGER,
     email: DataTypes.STRING,
-    address: DataTypes.STRING,
+    address_id: DataTypes.INTEGER,
     status: DataTypes.STRING,
     sports_id: DataTypes.INTEGER,
-    experience: DataTypes.STRING,
+    experience: DataTypes.INTEGER,
     verified: DataTypes.STRING,
     tier: DataTypes.INTEGER,
     awards: DataTypes.STRING,
     team_affiliations: DataTypes.STRING,
     about: DataTypes.STRING,
-    rating: DataTypes.STRING,
-    review: DataTypes.STRING,
     profile_pic: DataTypes.STRING
   }, {
     sequelize,
