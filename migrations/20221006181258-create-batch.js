@@ -22,7 +22,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       days: {
-        type: Sequelize.STRING
+        type: Sequelize.JSON
       },
       price: {
         type: Sequelize.INTEGER

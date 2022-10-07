@@ -48,6 +48,9 @@ module.exports = {
       profile_pic: {
         type: Sequelize.STRING
       },
+      review_id: {
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

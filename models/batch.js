@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     coach_id: DataTypes.INTEGER,
     academy_id: DataTypes.INTEGER,
     sports_id: DataTypes.INTEGER,
-    days: DataTypes.STRING,
+    days: DataTypes.JSON,
     price: DataTypes.INTEGER,
     thumbnail_img: DataTypes.STRING,
     start_time: DataTypes.TIME,
