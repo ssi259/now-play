@@ -13,7 +13,7 @@ const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.p
 });
 
 exports.pre_process_params = async(req,resp)=>{
-    const result =await batch.query("SELECT batches.id , batches.price ,batches.start_time, batches.end_time,batches.days , arena.name AS arena_name, coaches.name AS coach_name , coaches.experience, coaches.rating, sports.name,sports.type, (6371 *acos(cos(radians("+ req.query.lat + ")) * cos(radians(lat)) * cos(radians(lng) - radians("+req.query.lng+")) + sin(radians("+req.query.lat+")) * sin(radians(lat)))) AS distance FROM (((Batches batches INNER JOIN Arenas arena on batches.id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) HAVING distance < 100000   ORDER BY distance LIMIT 0, 20;",{ type: Sequelize.QueryTypes.SELECT }).then((result)=>{
+const result =await batch.query("SELECT batches.id , batches.price ,batches.start_time, batches.end_time,batches.date , arena.name AS arena_name, coaches.name AS coach_name , coaches.experience, coaches.rating, sports.name,sports.type, (6371 *acos(cos(radians("+ req.query.lat + ")) * cos(radians(lat)) * cos(radians(lng) - radians("+req.query.lng+")) + sin(radians("+req.query.lat+")) * sin(radians(lat)))) AS distance FROM (((Batches batches INNER JOIN Arenas arena on batches.id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) HAVING distance < 100000   ORDER BY distance LIMIT 0, 20;",{ type: Sequelize.QueryTypes.SELECT }).then((result)=>{
         return batch;
     }).catch((error)=>{
         console.log(error)
@@ -29,7 +29,7 @@ exports.post_process = async(req,resp,input_response)=>{
 
 
 exports.pre_process_create_batch = async(req,resp)=>{
-    const result = await  models.Batch.create({id:req.body.id,coach_id: req.body.coach_id,academy_id: req.body.academy_id,sports_id: req.body.sports_id,days: req.body.date,price: req.body.price,start_time: req.body.start_time,end_time: req.body.end_time}).then(function (batch) {
+    const result = await  models.Batch.create({id:req.body.id,coach_id: req.body.coach_id,academy_id: req.body.academy_id,sports_id: req.body.sports_id,days: req.body.json,price: req.body.price,start_time: req.body.start_time,end_time: req.body.end_time,start_date: req.body.date,end_date: req.body.date}).then(function (batch) {
         if (batch) {
             resp.send(batch);
         } else {
