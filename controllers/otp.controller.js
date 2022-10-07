@@ -90,7 +90,7 @@ exports.verifyOtp = async (req, res) => {
                         );
                         userInstance.verifyToken = token;
                         var userUpdatedInstance = await userInstance.save();
-                        const response = { "Status": "Success", "Details": {user:userUpdated, verifyToken:token} }
+                        const response = { "Status": "Success", "Details": {user:userUpdatedInstance, verifyToken:token} }
                         return res.status(200).send(response);
                     } else {
                         const response={"Status":"Failure","Details":"OTP Not Matched"}
