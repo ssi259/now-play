@@ -22,5 +22,3 @@ exports.create_batch = async(req,resp) =>{
     }finally{
     }
 }
-
-
