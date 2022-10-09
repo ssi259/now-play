@@ -11,12 +11,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Arena.hasMany(models.Batch, {as: 'arenas'})
     }
   }
   Arena.init({
-    id: DataTypes.INTEGER,
     name: DataTypes.STRING,
+    phone_number: DataTypes.INTEGER,
+    email: DataTypes.STRING,
+    address_id: DataTypes.INTEGER,
     lat: DataTypes.DECIMAL,
     lng: DataTypes.DECIMAL
   }, {
