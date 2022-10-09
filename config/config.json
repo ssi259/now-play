@@ -1,6 +1,6 @@
 {
   "development": {
-    "username": "now_development_user",
+    "username": "now-play-user",
     "password": "password",
     "database": "now_play_development",
     "host": "3.111.147.217",
