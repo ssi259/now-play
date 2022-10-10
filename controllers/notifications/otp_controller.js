@@ -1,9 +1,11 @@
-const jwt =  require('jsonwebtoken')
-const { User, Notification } = require('../models'); 
+require('dotenv').config();
+const jwt = require('jsonwebtoken')
+const { User, Notification } = require('../../models'); 
 const AWS = require('aws-sdk');
+const { Op } = require("sequelize");
 
-AWS.config.loadFromPath('../config/aws_config.json');
-
+AWS.config.loadFromPath(__dirname +'/../../config/aws_config.json');
+AWS.config.update({ region: 'ap-southeast-1' });
 
 exports.generateOtp = async (req, res) => {
     try {
@@ -20,17 +22,17 @@ exports.generateOtp = async (req, res) => {
                 phoneNumber: phoneNumber,
                 notificationType: "otp",
                 expirationDate: {
-                    [op.gt]:now
+                    [Op.gt]:now
                 }
             }
         });
         if (!otpInstance) {
             otp = otpGenerator();
-            const  OtpObj = await Notification.create({
-                otp: otp,
-                expirationDate: expirationDate,
+            await Notification.create({
+                otp,
+                expirationDate,
+                phoneNumber,
                 isVerified: false,
-                phoneNumber: phoneNumber,
                 channelType: "sms",
                 notificationType: "otp"
             })
@@ -70,49 +72,53 @@ exports.verifyOtp = async (req, res) => {
             return res.status(400).send(response);
         }
         const otpInstance = await Notification.findOne({
-            where: 
+            where:
             {
                 otp: otp,
+                phoneNumber: phoneNumber,
                 notificationType: "otp",
             }
         });
-        if (otpInstance != null) {
-            if (!otpInstance.isVerified) {
-                const response={"Status":"Failure","Details":"OTP Already Used"}
-                return res.status(400).send(response);
-            }
-            if (otpInstance.expirationDate > currentDate) {
-                const response={"Status":"Failure","Details":"OTP Expired"}
-                return res.status(400).send(response);
-            }
-            if (otpInstance.otp != otp) {
-                const response={"Status":"Failure","Details":"OTP Not Matched"}
-                return res.status(400).send(response);
-            }
-            otpInstance.isVerified = true
-            var otpUpdatedInstance = await otpInstance.save();
-            const userInstance = await User.create({
-                phoneNumber: phoneNumber,
-                isMobileVerified: true,
-            });
-            const token = jwt.sign(
-                {
-                    user: {
-                    userId: userInstance.id,
-                    phoneNumber: userInstance.phoneNumber,
-                    createdAt: new Date(),
-                    },
-                },
-                process.env.JWT_SECRET_KEY,
-            );
-            userInstance.verifyToken = token;
-            var userUpdatedInstance = await userInstance.save();
-            const response = { "Status": "Success", "Details": {user:userUpdatedInstance, verifyToken:token} }
-            return res.status(200).send(response);   
-        } else {
-            const response={"Status":"Failure","Details":"Bad Request"}
-            return res.status(400).send(response);
+
+        if (!otpInstance) {
+            return res.status(400).send({ "Status": "Failure", "Details": "OTP Not Matched" });
         }
+
+        if (otpInstance.expirationDate < currentDate) {
+            return res.status(400).send({ "Status": "Failure", "Details": "OTP Expired" });
+        }
+
+        if (otpInstance.isVerified) {
+            return res.status(400).send({ "Status": "Failure", "Details": "OTP Already Used" });
+        }
+        const user = await User.findOne({
+            where:{
+            phoneNumber:phoneNumber,
+            }
+        });
+        if (!user) {
+            return res.status(200).send({ "Status": "Success", "Details": {user:user,verifyToken:user.verifyToken} });    
+        }
+
+        const newUser = await User.create({
+            phoneNumber: phoneNumber,
+            isMobileVerified: true,
+        })
+        const token = jwt.sign(
+            {
+                user: {
+                userId: user.id,
+                phoneNumber: user.phoneNumber,
+                createdAt: new Date(),
+                },
+            },
+            process.env.JWT_SECRET_KEY,
+        );
+        newUser.verifyToken = token;
+        await newUser.save();
+        otpInstance.isVerified = true
+        await otpInstance.save();
+        return res.status(200).send({ "Status": "Success", "Details": {user:newUser,verifyToken:token} });   
     } catch (error) {
         const response = { status: "Failure", Details: error.message }
         return res.status(400).send(response);

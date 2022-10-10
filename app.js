@@ -7,7 +7,7 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var batchesRouter = require('./routes/batches.js')
-var otpRouter = require('./routes/otp')
+var otpRouter = require('./routes/notifications/otp')
 var app = express();
 
 // view engine setup
