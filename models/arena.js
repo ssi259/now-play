@@ -15,6 +15,9 @@ module.exports = (sequelize, DataTypes) => {
   }
   Arena.init({
     name: DataTypes.STRING,
+    phone_number: DataTypes.INTEGER,
+    email: DataTypes.STRING,
+    address_id: DataTypes.INTEGER,
     lat: DataTypes.DECIMAL,
     lng: DataTypes.DECIMAL,
     landmark: DataTypes.STRING

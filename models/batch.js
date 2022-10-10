@@ -16,13 +16,15 @@ module.exports = (sequelize, DataTypes) => {
   Batch.init({
     arena_id: DataTypes.INTEGER,
     coach_id: DataTypes.INTEGER,
+    academy_id: DataTypes.INTEGER,
     sports_id: DataTypes.INTEGER,
-    days: DataTypes.STRING,
+    days: DataTypes.JSON,
     price: DataTypes.INTEGER,
-    img_url: DataTypes.STRING,
     thumbnail_img: DataTypes.STRING,
-    start_time: DataTypes.DATE,
-    end_time: DataTypes.DATE
+    start_time: DataTypes.TIME,
+    end_time: DataTypes.TIME,
+    start_date: DataTypes.DATE,
+    end_date: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Batch',
