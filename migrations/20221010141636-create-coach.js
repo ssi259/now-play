@@ -12,13 +12,10 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      contact_number: {
+      phone_number: {
         type: Sequelize.INTEGER
       },
       email: {
-        type: Sequelize.STRING
-      },
-      address: {
         type: Sequelize.STRING
       },
       city: {
@@ -43,7 +40,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       verified: {
-        type: Sequelize.STRING
+        type: Sequelize.TINYINT
       },
       tier: {
         type: Sequelize.INTEGER
@@ -57,7 +54,7 @@ module.exports = {
       about: {
         type: Sequelize.STRING
       },
-      review: {
+      review_id: {
         type: Sequelize.STRING
       },
       profile_pic: {

@@ -12,13 +12,10 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      phone: {
+      phone_number: {
         type: Sequelize.INTEGER
       },
       email: {
-        type: Sequelize.STRING
-      },
-      address: {
         type: Sequelize.STRING
       },
       city: {
@@ -36,7 +33,7 @@ module.exports = {
       lat: {
         type: Sequelize.DECIMAL
       },
-      long: {
+      lng: {
         type: Sequelize.DECIMAL
       },
       createdAt: {
