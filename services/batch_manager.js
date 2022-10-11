@@ -1,12 +1,12 @@
 const dbConfig = require("../config/db_config.js");
 
-const Sequelize = require("sequelize");
+const S = require("sequelize");
 const models = require("../models");
 const batch = require("../models/batch.js");
 const coach = require("../models/coach.js");
 const { Router } = require("express");
 const { router } = require("../app.js");
-const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
+const sequelize = new S(dbConfig.database, dbConfig.username, dbConfig.password, {
   host: dbConfig.host,
   dialect: dbConfig.dialect,
 
