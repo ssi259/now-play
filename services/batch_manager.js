@@ -1,6 +1,7 @@
 const dbConfig = require("../config/db_config.js");
 
-const Sequelize = require("sequelize");const models = require("../models");
+const Sequelize = require("sequelize");
+const models = require("../models");
 const batch = require("../models/batch.js");
 const coach = require("../models/coach.js");
 const { Router } = require("express");
