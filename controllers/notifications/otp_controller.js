@@ -21,6 +21,7 @@ exports.generateOtp = async (req, res) => {
             where: {
                 phoneNumber: phoneNumber,
                 notificationType: "otp",
+                isVerified:false,
                 expirationDate: {
                     [Op.gt]:now
                 }
