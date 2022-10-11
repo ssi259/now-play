@@ -12,19 +12,31 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      phone_number: {
+      phone: {
         type: Sequelize.INTEGER
       },
       email: {
         type: Sequelize.STRING
       },
-      address_id: {
+      address: {
+        type: Sequelize.STRING
+      },
+      city: {
+        type: Sequelize.STRING
+      },
+      state: {
+        type: Sequelize.STRING
+      },
+      pincode: {
         type: Sequelize.INTEGER
+      },
+      country: {
+        type: Sequelize.STRING
       },
       lat: {
         type: Sequelize.DECIMAL
       },
-      lng: {
+      long: {
         type: Sequelize.DECIMAL
       },
       createdAt: {

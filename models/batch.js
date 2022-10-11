@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     days: DataTypes.JSON,
     price: DataTypes.INTEGER,
     thumbnail_img: DataTypes.STRING,
+    banner_img: DataTypes.STRING,
     start_time: DataTypes.TIME,
     end_time: DataTypes.TIME,
     start_date: DataTypes.DATE,
