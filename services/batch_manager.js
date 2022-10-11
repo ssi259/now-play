@@ -1,12 +1,11 @@
 const dbConfig = require("../config/db_config.js");
 
-const S = require("sequelize");
-const models = require("../models");
+const Sequelize = require("sequelize");const models = require("../models");
 const batch = require("../models/batch.js");
 const coach = require("../models/coach.js");
 const { Router } = require("express");
 const { router } = require("../app.js");
-const sequelize = new S(dbConfig.database, dbConfig.username, dbConfig.password, {
+const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
   host: dbConfig.host,
   dialect: dbConfig.dialect,
 
@@ -66,7 +65,7 @@ exports.pre_process_create_batch = async(req,resp)=>{
             resp.send(batch);
         } else {
             resp.status(400).send('Error in insert new record');
-        } 
+        }
     });
 }
 exports.process_batch_create_input_req = async(input_response)=>{
