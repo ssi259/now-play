@@ -92,18 +92,21 @@ exports.verifyOtp = async (req, res) => {
         if (otpInstance.isVerified) {
             return res.status(400).send({ "Status": "Failure", "Details": "OTP Already Used" });
         }
+        
+        otpInstance.isVerified = true
+        await otpInstance.save();
+
         const user = await User.findOne({
             where:{
             phoneNumber:phoneNumber,
             }
         });
-        if (user!=null) {
+        if (user != null) {
             return res.status(200).send({ "Status": "Success", "Details": {user:user,verifyToken:user.verifyToken} });    
         }
-
         const newUser = await User.create({
             phoneNumber: phoneNumber,
-            isMobileVerified: true,
+            isPhoneVerified: true,
         })
         const token = jwt.sign(
             {
@@ -117,8 +120,6 @@ exports.verifyOtp = async (req, res) => {
         );
         newUser.verifyToken = token;
         await newUser.save();
-        otpInstance.isVerified = true
-        await otpInstance.save();
         return res.status(200).send({ "Status": "Success", "Details": {user:newUser,verifyToken:token} });   
     } catch (error) {
         const response = { status: "Failure", Details: error.message }
