@@ -66,7 +66,7 @@ exports.pre_process_create_batch = async(req,resp)=>{
             resp.send(batch);
         } else {
             resp.status(400).send('Error in insert new record');
-        }
+        } 
     });
 }
 exports.process_batch_create_input_req = async(input_response)=>{
