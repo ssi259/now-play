@@ -8,7 +8,6 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var batchesRouter = require('./routes/batches.js');
-
 var otpRouter = require('./routes/otp')
 var arenasRouter = require('./routes/arenas.js');
 var coachRouter = require('./routes/coaches')
@@ -32,7 +31,6 @@ app.use('/users', usersRouter);
 app.use('/batches', batchesRouter);
 app.use('/notifications/otp', otpRouter);
 app.use('/coach', coachRouter);
-
 app.use('/arenas', arenasRouter);
 app.use('/academies', academiesRouter);
 // catch 404 and forward to error handler
