@@ -3,6 +3,6 @@ const coachController = require('../controllers/coaches_controller');
 
 const routes = express.Router();
 
-routes.post('/create', coachController.createCoach);
+routes.post('/', coachController.createCoach);
 
 module.exports = routes;
