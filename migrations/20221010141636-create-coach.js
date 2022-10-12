@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Arenas', {
+    await queryInterface.createTable('Coaches', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -18,14 +18,32 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
-      address_id: {
+      status: {
+        type: Sequelize.STRING
+      },
+      sports_id: {
         type: Sequelize.INTEGER
       },
-      lat: {
-        type: Sequelize.DECIMAL
+      experience: {
+        type: Sequelize.INTEGER
       },
-      lng: {
-        type: Sequelize.DECIMAL
+      verified: {
+        type: Sequelize.TINYINT
+      },
+      tier: {
+        type: Sequelize.INTEGER
+      },
+      awards: {
+        type: Sequelize.STRING
+      },
+      team_affiliations: {
+        type: Sequelize.STRING
+      },
+      about: {
+        type: Sequelize.STRING
+      },
+      profile_pic: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -38,6 +56,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Arenas');
+    await queryInterface.dropTable('Coaches');
   }
 };

@@ -30,6 +30,9 @@ module.exports = {
       thumbnail_img: {
         type: Sequelize.STRING
       },
+      banner_img: {
+        type: Sequelize.STRING
+      },
       start_time: {
         type: Sequelize.TIME
       },
