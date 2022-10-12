@@ -9,8 +9,11 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var batchesRouter = require('./routes/batches.js');
 var otpRouter = require('./routes/otp')
+<<<<<<< HEAD
 var arenasRouter = require('./routes/arenas.js');
 var coachRouter = require('./routes/coaches')
+=======
+>>>>>>> create_academy_api-completed
 var academiesRouter = require('./routes/academies.js');
 var app = express();
 
@@ -31,7 +34,10 @@ app.use('/batches', batchesRouter);
 app.use('/notifications/otp', otpRouter);
 app.use('/coach', coachRouter);
 
+<<<<<<< HEAD
 app.use('/arenas', arenasRouter);
+=======
+>>>>>>> create_academy_api-completed
 app.use('/academies', academiesRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

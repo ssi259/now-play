@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Academy.init({
     name: DataTypes.STRING,
-    phone_number: DataTypes.INTEGER,
+    phone_number: DataTypes.STRING,
     email: DataTypes.STRING,
     sports_id: DataTypes.INTEGER
   }, {
