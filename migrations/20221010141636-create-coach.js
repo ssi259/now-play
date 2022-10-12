@@ -18,18 +18,6 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
-      city: {
-        type: Sequelize.STRING
-      },
-      state: {
-        type: Sequelize.STRING
-      },
-      pincode: {
-        type: Sequelize.INTEGER
-      },
-      country: {
-        type: Sequelize.STRING
-      },
       status: {
         type: Sequelize.STRING
       },
@@ -37,7 +25,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       experience: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       verified: {
         type: Sequelize.TINYINT

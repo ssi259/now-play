@@ -18,18 +18,6 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
-      city: {
-        type: Sequelize.STRING
-      },
-      state: {
-        type: Sequelize.STRING
-      },
-      pincode: {
-        type: Sequelize.INTEGER
-      },
-      country: {
-        type: Sequelize.STRING
-      },
       lat: {
         type: Sequelize.DECIMAL
       },
