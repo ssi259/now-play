@@ -10,6 +10,7 @@ var usersRouter = require('./routes/users');
 var batchesRouter = require('./routes/batches.js');
 var otpRouter = require('./routes/otp')
 var arenasRouter = require('./routes/arenas.js');
+var coachRouter = require('./routes/coaches')
 var app = express();
 
 
@@ -27,6 +28,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/batches', batchesRouter);
 app.use('/notifications/otp', otpRouter);
+app.use('/coach', coachRouter);
 
 app.use('/arenas', arenasRouter);
 // catch 404 and forward to error handler
