@@ -12,6 +12,7 @@ var otpRouter = require('./routes/otp')
 var arenasRouter = require('./routes/arenas.js');
 var coachRouter = require('./routes/coaches')
 var academiesRouter = require('./routes/academies.js');
+var sportsRouter = require('./routes/sports.js');
 var app = express();
 
 
@@ -32,6 +33,8 @@ app.use('/notifications/otp', otpRouter);
 app.use('/coach', coachRouter);
 app.use('/arenas', arenasRouter);
 app.use('/academies', academiesRouter);
+app.use('/sports', sportsRouter);
+// catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
