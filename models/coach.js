@@ -25,7 +25,6 @@ module.exports = (sequelize, DataTypes) => {
     awards: DataTypes.STRING,
     team_affiliations: DataTypes.STRING,
     about: DataTypes.STRING,
-    review_id: DataTypes.INTEGER,
     profile_pic: DataTypes.STRING
   }, {
     sequelize,

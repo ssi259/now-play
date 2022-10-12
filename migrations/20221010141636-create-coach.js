@@ -42,9 +42,6 @@ module.exports = {
       about: {
         type: Sequelize.STRING
       },
-      review_id: {
-        type: Sequelize.STRING
-      },
       profile_pic: {
         type: Sequelize.STRING
       },
