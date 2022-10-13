@@ -15,6 +15,8 @@ var coachRouter = require('./routes/coaches')
 =======
 >>>>>>> create_academy_api-completed
 var academiesRouter = require('./routes/academies.js');
+var arenasRouter = require('./routes/arenas.js');
+var coachRouter = require('./routes/coaches')
 var app = express();
 
 
@@ -39,6 +41,7 @@ app.use('/arenas', arenasRouter);
 =======
 >>>>>>> create_academy_api-completed
 app.use('/academies', academiesRouter);
+app.use('/arenas', arenasRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
