@@ -1,4 +1,5 @@
 const BatchManager = require("../services/batch_manager")
+var lib = require('../lib/upload_images')
 
 exports.search_batch = async(req,resp)=>{
         
@@ -21,4 +22,11 @@ exports.create_batch = async(req,resp) =>{
         console.log(e)
     }finally{
     }
+}
+exports.uploadedImage = async(req,resp)=>{
+    lib.uploadedImage(req.files.files_name),
+    resp.send({
+    success: true,
+    message:"file Uploaded"                                                                                                                                                                                                
+  })
 }
