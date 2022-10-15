@@ -20,9 +20,6 @@ module.exports = {
       review_text: {
         type: Sequelize.STRING
       },
-      review_time: {
-        type: Sequelize.DATE
-      },
       type: {
         type: Sequelize.STRING
       },
