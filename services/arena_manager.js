@@ -3,8 +3,6 @@ const dbConfig = require("../config/db_config.js");
 const Sequelize = require("sequelize");
 const models = require("../models");
 const batch = require("../models/arena.js");
-const { Router } = require("express");
-const { router } = require("../app.js");
 
 
 exports.pre_process_create_arena = async(req,resp)=>{

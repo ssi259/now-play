@@ -13,19 +13,13 @@ module.exports = {
         type: Sequelize.STRING
       },
       phone_number: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       email: {
         type: Sequelize.STRING
       },
       sports_id: {
         type: Sequelize.INTEGER
-      },
-      start_date: {
-        type: Sequelize.DATE
-      },
-      end_date:{
-        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
