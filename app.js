@@ -13,6 +13,7 @@ var arenasRouter = require('./routes/arenas.js');
 var coachRouter = require('./routes/coaches')
 var academiesRouter = require('./routes/academies.js');
 var sportsRouter = require('./routes/sports.js');
+var reviewRouter = require('./routes/reviews.js');
 var app = express();
 
 
@@ -34,6 +35,7 @@ app.use('/coach', coachRouter);
 app.use('/arenas', arenasRouter);
 app.use('/academies', academiesRouter);
 app.use('/sports', sportsRouter);
+app.use('/reviews',reviewRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
