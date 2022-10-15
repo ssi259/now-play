@@ -11,7 +11,7 @@ exports.pre_process_create_academy = async(req,resp)=>{
         if (academy) {
             resp.send(academy);
         } else {
-            resp.status(200).send('Error in insert new academy');
+            resp.status(400).send('Error in insert new academy');
         }
     });
 }
