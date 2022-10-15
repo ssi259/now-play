@@ -1,8 +1,6 @@
 const dbConfig = require("../config/db_config.js");
 const models = require("../models");
 const academy = require("../models/academy.js");
-const { Router } = require("express");
-const { router } = require("../app.js");
 
 exports.pre_process_create_academy = async(req,resp)=>{
     const result = await  models.Academy.create({name: req.body.name,phone_number: req.body.phone_number,email: req.body.email,sports_id: req.body.sports_id}).then(function (academy) {
