@@ -1,6 +1,4 @@
 const dbConfig = require("../config/db_config.js");
-
-const Sequelize = require("sequelize");
 const models = require("../models");
 const academy = require("../models/academy.js");
 const { Router } = require("express");
@@ -11,7 +9,7 @@ exports.pre_process_create_academy = async(req,resp)=>{
         if (academy) {
             resp.send(academy);
         } else {
-            resp.status(400).send('Error in insert new academy');
+            resp.status(400).send('Error in creating new academy');
         }
     });
 }
