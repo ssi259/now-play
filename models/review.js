@@ -18,7 +18,6 @@ module.exports = (sequelize, DataTypes) => {
     coach_id: DataTypes.INTEGER,
     user_id: DataTypes.INTEGER,
     review_text: DataTypes.STRING,
-    review_time: DataTypes.DATE,
     type: DataTypes.STRING
   }, {
     sequelize,

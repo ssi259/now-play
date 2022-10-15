@@ -3,8 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
-
+var fileUpload = require("express-fileupload");
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var batchesRouter = require('./routes/batches.js');
@@ -12,7 +11,10 @@ var otpRouter = require('./routes/otp')
 var arenasRouter = require('./routes/arenas.js');
 var coachRouter = require('./routes/coaches')
 var academiesRouter = require('./routes/academies.js');
+var sportsRouter = require('./routes/sports.js');
+var reviewRouter = require('./routes/reviews.js');
 var app = express();
+app.use(fileUpload());
 
 
 // view engine setup
@@ -32,6 +34,9 @@ app.use('/notifications/otp', otpRouter);
 app.use('/coach', coachRouter);
 app.use('/arenas', arenasRouter);
 app.use('/academies', academiesRouter);
+app.use('/sports', sportsRouter);
+app.use('/reviews',reviewRouter);
+// catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
