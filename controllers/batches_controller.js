@@ -1,7 +1,6 @@
 const BatchManager = require("../services/batch_manager")
 const models = require('../models');
 
-var lib = require('../lib/upload_files_s3')
 
 exports.search_batch = async(req,resp)=>{
         
@@ -26,15 +25,11 @@ exports.create_batch = async(req,resp) =>{
     }
 }
 exports.uploadImage = async(req,resp)=>{
-    console.log(req.files)
-    if(req.files.files_name!=null){
-        for(each_file of req.files.files_name){
-            var image_location = await lib.uploadFile(each_file)
-            const result = await  models.BatchPhotos.create({batch_id: req.query.batch_id,img_url: image_location}).then(function (arena) {
-                console.log("batch photos updated")
-                resp.send("file uploaded successfuly")
-            })
-            
-        }
-    }   
+    try{
+        var input_request = await BatchManager.pre_process_image_upload_request(req,resp)
+        await BatchManager.process_image_upload_request(input_request,resp)
+    }catch(error){
+        console.log(error)
+        resp.status(500).send("Error while uploading image "+error)
+    }
 }
