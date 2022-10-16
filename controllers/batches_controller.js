@@ -1,4 +1,6 @@
 const BatchManager = require("../services/batch_manager")
+const models = require('../models');
+
 
 exports.search_batch = async(req,resp)=>{
         
@@ -20,5 +22,14 @@ exports.create_batch = async(req,resp) =>{
     }catch(e){
         console.log(e)
     }finally{
+    }
+}
+exports.uploadImage = async(req,resp)=>{
+    try{
+        var input_request = await BatchManager.pre_process_image_upload_request(req,resp)
+        await BatchManager.process_image_upload_request(input_request,resp)
+    }catch(error){
+        console.log(error)
+        resp.status(500).send("Error while uploading image "+error)
     }
 }
