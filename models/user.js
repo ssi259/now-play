@@ -11,10 +11,12 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     profilePic: DataTypes.STRING,
     verifyToken: DataTypes.STRING,
-    isVerified: DataTypes.BOOLEAN,
     phoneNumber: DataTypes.STRING,
     isPhoneVerified: DataTypes.BOOLEAN,
-    isEmailVerified: DataTypes.BOOLEAN
+    isEmailVerified: DataTypes.BOOLEAN,
+    gender:DataTypes.STRING,
+    type:DataTypes.STRING,
+    status:DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'User',
