@@ -1,9 +1,6 @@
 const dbConfig = require("../config/db_config.js");
 const { uploadFile }= require('../lib/upload_files_s3');
-
-const Sequelize = require("sequelize");
 const models = require("../models");
-const batch = require("../models/arena.js");
 const {ArenaFile} = require('../models')
 
 
@@ -41,7 +38,7 @@ exports.process_file_upload_request = async (req, resp) => {
   const type = req.query.type
 
   if (!(file instanceof Array)) {
-    var a = await upload_and_create_data(file, arena_id,type)
+    await upload_and_create_data(file, arena_id,type)
   }
   else {
     await upload_multiple_files(files,arena_id,type)
@@ -55,5 +52,5 @@ async function upload_multiple_files(files, arena_id,type) {
 }
 async function upload_and_create_data(file, arena_id,type) {
   let file_url = await uploadFile(file)
-  const newArenaFile = await ArenaFile.create({ arenaId: arena_id, file_url: file_url, type: type, status:"active" })
+  await ArenaFile.create({ arenaId: arena_id, file_url: file_url, type: type, status:"active" })
 }
