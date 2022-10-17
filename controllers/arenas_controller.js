@@ -1,5 +1,4 @@
 const ArenaManager = require("../services/arena_manager")
-
 exports.create_arena = async(req,resp)=>{
         
     try{
@@ -9,5 +8,19 @@ exports.create_arena = async(req,resp)=>{
     }catch(e){
         console.log(e)
     }finally{
+    }
+}
+
+
+
+
+exports.arena_image_upload = async (req, res) =>{
+    try {
+        const file = req.file
+        console.log("file", file);
+        return res.send({ message: 'File uploaded successfully.', file });
+        // res.send({ "details": "file received", "req":req.body });
+    } catch (e) {
+        console.log(e)
     }
 }
