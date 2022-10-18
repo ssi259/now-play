@@ -38,7 +38,7 @@ exports.batch_details = async(req,resp) =>{
     try{
         var input_response = await BatchManager.pre_process_batch_details(req,resp)
         var processed_reponse =  await BatchManager.process_batch_details_input_req(input_response)
-       resp.send(input_response)
+
     }catch(e){
         console.log(e)
     }finally{

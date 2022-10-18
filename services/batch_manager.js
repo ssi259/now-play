@@ -111,9 +111,9 @@ async function upload_and_create_data(each_file,request_batch_id){
 
   
 exports.pre_process_batch_details = async(req,resp)=>{
-    const details = await models.Batch.findOne({where: {id:req.params.id}});
-        if (details) {
-            return details
+    const batch_details = await models.Batch.findOne({where: {id:req.params.id}});
+        if (batch_details) {
+            return batch_details
         } else {
             resp.status(400).send('details not found');
         }
@@ -125,17 +125,21 @@ exports.process_batch_details_input_req = async(input_response)=>{
  const academy_details = await models.Academy.findOne({where:{id:input_response["academy_id"]}})
  const sports_details = await models.Sports.findOne({where:{id:input_response["sports_id"]}})
    var processed_reponse = []
-  // const data2 = {"rating_count":ratings.length,"average_rating":overall_ratings/ratings.length};
+    const arena_data = {"arena_name":arena_details["name"],"lat":arena_details["lat"],"lng":arena_details[lng]}
     const coach_data = {"coach_name":coach_details["name"],"coach_experience":coach_details["experience"],"coach_profile_pic":coach_details["profile_pic"]}
-  //  const academy_data = (academy_details["name"],academy_details["phone_number"])
-    //Object.assign(input_response,arena_details);
-    Object.assign(input_response,coach_data);
-  //  Object.assign(input_response,academy_data);
-    //Object.assign(input_response,sports_details);
-   console.log(input_response)
-   input_response= input_response
-   return  JSON.stringify(input_response)
+    const academy_data = {"academy_name":academy_details["name"],"academy_phone_number":academy_details["phone_number"]}
+    const sports_data = {"sports_name":sports_details["name"],"sports_type":sports_details["type"],"sports_about":sports_details["about"]}
+    Object.assign(input_response.dataValues,arena_data);
+    Object.assign(input_response.dataValues,coach_data);
+    Object.assign(input_response.dataValues,academy_data);
+    Object.assign(input_response.dataValues,sports_data);
+
+    resp.send(input_response)
 }
+
+    
+
+
 
 
 
