@@ -3,6 +3,9 @@ const dbConfig = require("../config/db_config.js");
 const Sequelize = require("sequelize");
 const models = require("../models");
 var lib = require('../lib/upload_files_s3');
+const router = require("../routes/batches.js");
+const { Batch, Route53RecoveryCluster } = require("aws-sdk");
+const { Router } = require("express");
 
 const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
   host: dbConfig.host,
@@ -107,3 +110,32 @@ async function upload_and_create_data(each_file,request_batch_id){
 }
 
   
+exports.pre_process_batch_details = async(req,resp)=>{
+    const details = await models.Batch.findOne({where: {id:req.params.id}});
+        if (details) {
+            return details
+        } else {
+            resp.status(400).send('details not found');
+        }
+     
+}
+exports.process_batch_details_input_req = async(input_response)=>{
+ const arena_details = await models.Arena.findOne({where:{id:input_response["arena_id"]}})
+ const coach_details = await models.Coach.findOne({where:{id:input_response["coach_id"]}})
+ const academy_details = await models.Academy.findOne({where:{id:input_response["academy_id"]}})
+ const sports_details = await models.Sports.findOne({where:{id:input_response["sports_id"]}})
+   var processed_reponse = []
+  // const data2 = {"rating_count":ratings.length,"average_rating":overall_ratings/ratings.length};
+    const coach_data = {"coach_name":coach_details["name"],"coach_experience":coach_details["experience"],"coach_profile_pic":coach_details["profile_pic"]}
+  //  const academy_data = (academy_details["name"],academy_details["phone_number"])
+    //Object.assign(input_response,arena_details);
+    Object.assign(input_response,coach_data);
+  //  Object.assign(input_response,academy_data);
+    //Object.assign(input_response,sports_details);
+   console.log(input_response)
+   input_response= input_response
+   return  JSON.stringify(input_response)
+}
+
+
+
