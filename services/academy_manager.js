@@ -53,6 +53,7 @@ exports.post_process_image_upload = async (resp) => {
   async function upload_and_create_data(image, academy_id) {
     let img_url = await uploadFile(image)
     await models.AcademyImage.create({ academyId: academy_id, img_url: img_url})
+<<<<<<< HEAD
   }
 
   exports.pre_process_academy_details = async(req,resp)=>{
@@ -67,12 +68,34 @@ exports.post_process_image_upload = async (resp) => {
   exports.process_academy_details_input_req = async(input_response)=>{
     const sports_details = await models.Sports.findOne({where:{id:input_response["sports_id"]}})
     var sports_data = {"sports_name":sports_details["name"]}
+=======
+exports.pre_process_academy_list = async(req,resp)=>{
+    const academy_list = await models.Academy.findAll();
+        if (academy_list) {
+            return academy_list
+        } else {
+            resp.status(400).send('academy_list not found');
+        }
+  }   
+
+  }
+
+  exports.process_academy_list_input_req = async(input_response)=>{
+    const sports_details = await models.Sports.findOne({where:{id:input_response["sports_id"]}})
+    const sports_data = {"sports_name":sports_details["name"]}
+>>>>>>> academy_list
     Object.assign(input_response.dataValues,sports_data);
 
     return input_response
   }
+<<<<<<< HEAD
   
 
 exports.post_process_academy_details = async(req,resp,input_response)=>{
   resp.send(input_response)
 }
+=======
+  exports.post_academy_list_process = async(req,resp,input_response)=>{
+    resp.send(input_response)
+  }
+>>>>>>> academy_list
