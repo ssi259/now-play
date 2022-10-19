@@ -134,7 +134,7 @@ exports.process_batch_details_input_req = async(input_response)=>{
     const academy_details = await models.Academy.findOne({where:{id:input_response["academy_id"]}})
     const sports_details = await models.Sports.findOne({where:{id:input_response["sports_id"]}})
         var processed_reponse = []
-        const arena_data = {"arena_name":arena_details["name"],"lat":arena_details["lat"],"lng":arena_details[lng]}
+        const arena_data = {"arena_name":arena_details["name"],"lat":arena_details["lat"],"lng":arena_details["lng"]}
         const coach_data = {"coach_name":coach_details["name"],"coach_experience":coach_details["experience"],"coach_profile_pic":coach_details["profile_pic"]}
         const academy_data = {"academy_name":academy_details["name"],"academy_phone_number":academy_details["phone_number"]}
         const sports_data = {"sports_name":sports_details["name"],"sports_type":sports_details["type"],"sports_about":sports_details["about"]}
