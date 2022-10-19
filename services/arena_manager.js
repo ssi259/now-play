@@ -19,30 +19,30 @@ exports.post_arena_process = async(req,resp,input_response)=>{
   resp.send(input_response)
 }
 
-exports.pre_process_image_upload_request = async (req, resp) => {
+exports.process_image_upload_request = async (req, resp) => {
   if (req.files == null || req.files.image == null) {
-    resp.status(400).send("Image Not Provided")
+    return resp.status(400).send("Image Not Provided")
   }
   if (req.query == null || req.query.arena_id == null){
-    resp.status(400).send("Arena ID Not Provided")
+    return resp.status(400).send("Arena ID Not Provided")
   }
-  return req
-}
-exports.process_image_upload_request = async (req, resp) => {
   const image = req.files.image
   const arena_id = req.query.arena_id
-  if (!(image instanceof Array)) {
-    await upload_and_create_data(image, arena_id)
-  }else {
+
+  if (image instanceof Array) {
     await upload_multiple_images(image,arena_id)
+  }else {
+    await upload_and_create_data(image, arena_id)
   }
   return resp.status(201).send({status:"Success",Details:"Image Uploaded Successfully"})
 }
+
 async function upload_multiple_images(images, arena_id) {
   for(let image of images){
     await upload_and_create_data(image, arena_id)
   }
 }
+
 async function upload_and_create_data(image, arena_id) {
   let img_url = await uploadFile(image)
   await ArenaImage.create({ arenaId: arena_id, img_url: img_url})
