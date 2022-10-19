@@ -119,4 +119,35 @@ async function upload_and_create_data(each_file,request_batch_id){
     models.BatchPhotos.create({batchId: request_batch_id,img_url: image_location})
 }
 
+exports.pre_process_batch_details = async(req,resp)=>{
+    const batch_details = await models.Batch.findOne({where: {id:req.params.id}});
+        if (batch_details) {
+            return batch_details
+        } else {
+            resp.status(400).send('details not found');
+        }
+
+}
+exports.process_batch_details_input_req = async(input_response)=>{
+    const arena_details = await models.Arena.findOne({where:{id:input_response["arena_id"]}})
+    const coach_details = await models.Coach.findOne({where:{id:input_response["coach_id"]}})
+    const academy_details = await models.Academy.findOne({where:{id:input_response["academy_id"]}})
+    const sports_details = await models.Sports.findOne({where:{id:input_response["sports_id"]}})
+        var processed_reponse = []
+        const arena_data = {"arena_name":arena_details["name"],"lat":arena_details["lat"],"lng":arena_details[lng]}
+        const coach_data = {"coach_name":coach_details["name"],"coach_experience":coach_details["experience"],"coach_profile_pic":coach_details["profile_pic"]}
+        const academy_data = {"academy_name":academy_details["name"],"academy_phone_number":academy_details["phone_number"]}
+        const sports_data = {"sports_name":sports_details["name"],"sports_type":sports_details["type"],"sports_about":sports_details["about"]}
+        Object.assign(input_response.dataValues,arena_data);
+        Object.assign(input_response.dataValues,coach_data);
+        Object.assign(input_response.dataValues,academy_data);
+        Object.assign(input_response.dataValues,sports_data);
+
+    return input_response
+}  
+
+exports.post_process = async(req,resp,input_response)=>{
+    resp.send(input_response)
+}
+
 
