@@ -1,5 +1,6 @@
 const ArenaManager = require("../services/arena_manager")
 
+
 exports.create_arena = async(req,resp)=>{
         
     try{
@@ -9,5 +10,13 @@ exports.create_arena = async(req,resp)=>{
     }catch(e){
         console.log(e)
     }finally{
+    }
+}
+
+exports.uploadArenaImages = async (req, resp) =>{
+    try {
+        var processed_response = await ArenaManager.process_image_upload_request(req,resp);
+    } catch (error) { 
+        resp.status(500).send({status:"Failure","Details":error.message})
     }
 }

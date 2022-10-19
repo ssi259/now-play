@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+var fileUpload = require("express-fileupload");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -14,7 +14,6 @@ var coachRouter = require('./routes/coaches')
 var academiesRouter = require('./routes/academies.js');
 var sportsRouter = require('./routes/sports.js');
 var reviewRouter = require('./routes/reviews.js');
-var fileUpload = require("express-fileupload");
 var sportsRouter = require('./routes/sports.js');
 var app = express();
 app.use(fileUpload());
