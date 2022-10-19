@@ -4,4 +4,5 @@ var router = express.Router();
 
 /* GET users listing. */
 router.post('/', academy_controller.create_academy);
+router.get('')
 module.exports = router;

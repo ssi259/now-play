@@ -139,6 +139,8 @@ exports.process_batch_details_input_req = async(input_response)=>{
         const academy_data = {"academy_name":academy_details["name"],"academy_phone_number":academy_details["phone_number"]}
         const sports_data = {"sports_name":sports_details["name"],"sports_type":sports_details["type"],"sports_about":sports_details["about"]}
         Object.assign(input_response.dataValues,arena_data);
+        Object.assign(input_response.dataValues, { "address": { "city": arena_details["city"], "locality":arena_details["locality"], "state": arena_details["state"] } })
+
         Object.assign(input_response.dataValues,coach_data);
         Object.assign(input_response.dataValues,academy_data);
         Object.assign(input_response.dataValues,sports_data);

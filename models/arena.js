@@ -18,7 +18,11 @@ module.exports = (sequelize, DataTypes) => {
     phone_number: DataTypes.INTEGER,
     email: DataTypes.STRING,
     lat: DataTypes.DECIMAL,
-    lng: DataTypes.DECIMAL
+    lng: DataTypes.DECIMAL,
+    city: DataTypes.STRING,
+    locality: DataTypes.STRING,
+    state: DataTypes.STRING
+
   }, {
     sequelize,
     modelName: 'Arena',
