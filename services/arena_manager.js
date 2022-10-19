@@ -1,7 +1,6 @@
-const dbConfig = require("../config/db_config.js");
 const { uploadFile }= require('../lib/upload_files_s3');
 const models = require("../models");
-const {ArenaFile} = require('../models')
+const {ArenaImage} = require('../models')
 
 
 exports.pre_process_create_arena = async(req,resp)=>{
@@ -20,37 +19,31 @@ exports.post_arena_process = async(req,resp,input_response)=>{
   resp.send(input_response)
 }
 
-exports.pre_process_file_upload_request = async (req, resp) => {
-  if (req.files == null || req.files.file == null) {
+exports.pre_process_image_upload_request = async (req, resp) => {
+  if (req.files == null || req.files.image == null) {
     resp.status(400).send("Image Not Provided")
   }
   if (req.query == null || req.query.arena_id == null){
     resp.status(400).send("Arena ID Not Provided")
   }
-  if (req.query == null || req.query.type == null){
-    resp.status(400).send("type Not Provided")
-  }
   return req
 }
-exports.process_file_upload_request = async (req, resp) => {
-  const file = req.files.file
+exports.process_image_upload_request = async (req, resp) => {
+  const image = req.files.image
   const arena_id = req.query.arena_id
-  const type = req.query.type
-
-  if (!(file instanceof Array)) {
-    await upload_and_create_data(file, arena_id,type)
+  if (!(image instanceof Array)) {
+    await upload_and_create_data(image, arena_id)
+  }else {
+    await upload_multiple_images(image,arena_id)
   }
-  else {
-    await upload_multiple_files(files,arena_id,type)
-  }
-  return resp.status(200).send({status:"Success",Details:"File Uploaded Successfully"})
+  return resp.status(201).send({status:"Success",Details:"Image Uploaded Successfully"})
 }
-async function upload_multiple_files(files, arena_id,type) {
-  for(let file of files){
-    await upload_and_create_data(file,arena_id,type)
+async function upload_multiple_images(images, arena_id) {
+  for(let image of images){
+    await upload_and_create_data(image, arena_id)
   }
 }
-async function upload_and_create_data(file, arena_id,type) {
-  let file_url = await uploadFile(file)
-  await ArenaFile.create({ arenaId: arena_id, file_url: file_url, type: type, status:"active" })
+async function upload_and_create_data(image, arena_id) {
+  let img_url = await uploadFile(image)
+  await ArenaImage.create({ arenaId: arena_id, img_url: img_url})
 }
