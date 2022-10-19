@@ -140,6 +140,7 @@ exports.process_batch_details_input_req = async(input_response)=>{
     var overall_ratings = 0,rating_json={};
     await models.Review.findAll({
         where: {
+            
             coach_id: input_response["coach_id"]
         }
     }).then((ratings) => {
