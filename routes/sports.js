@@ -5,5 +5,6 @@ var router = express.Router();
 
 /* GET users listing. */
 router.post('/', sport_controller.create_sport);
+router.get('/',sport_controller.sports_list);
 module.exports = router;
 
