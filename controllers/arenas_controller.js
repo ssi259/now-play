@@ -1,5 +1,4 @@
 const ArenaManager = require("../services/arena_manager")
-const {uploadFile} = require('../lib/upload_files_s3')
 
 
 exports.create_arena = async(req,resp)=>{
