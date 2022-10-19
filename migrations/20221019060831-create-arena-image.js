@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('ArenaFiles', {
+    await queryInterface.createTable('ArenaImages', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -12,13 +12,7 @@ module.exports = {
       arenaId: {
         type: Sequelize.INTEGER
       },
-      file_url: {
-        type: Sequelize.STRING
-      },
-      type: {
-        type: Sequelize.STRING
-      },
-      status: {
+      img_url: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -32,6 +26,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('ArenaFiles');
+    await queryInterface.dropTable('ArenaImages');
   }
 };

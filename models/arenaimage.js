@@ -2,18 +2,16 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class ArenaFile extends Model {
+  class ArenaImage extends Model {
     static associate(models) {
     }
   }
-  ArenaFile.init({
+  ArenaImage.init({
     arenaId: DataTypes.INTEGER,
-    file_url: DataTypes.STRING,
-    type: DataTypes.STRING,
-    status: DataTypes.STRING
+    img_url: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'ArenaFile',
+    modelName: 'ArenaImage',
   });
-  return ArenaFile;
+  return ArenaImage;
 };

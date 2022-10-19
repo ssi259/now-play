@@ -14,11 +14,11 @@ exports.create_arena = async(req,resp)=>{
     }
 }
 
-exports.uploadArenaFiles = async (req, resp) =>{
+exports.uploadArenaImages = async (req, resp) =>{
     try {
-        var input_response = await ArenaManager.pre_process_file_upload_request(req, resp);
-        var processed_response = await ArenaManager.process_file_upload_request(input_response,resp);
-    } catch (error) {
+        var input_response = await ArenaManager.pre_process_image_upload_request(req, resp);
+        var processed_response = await ArenaManager.process_image_upload_request(input_response,resp);
+    } catch (error) { 
         resp.status(500).send({status:"Failure","Details":error.message})
     }
 }
