@@ -75,10 +75,10 @@ exports.post_process_create_batch = async(req,resp,input_response)=>{
 }
 exports.pre_process_image_upload_request = async(req,resp)=>{
     if (req.files==null || req.files.files_name==null){
-        resp.status(400).send("Image is not present")
+        resp.status(400).send("Image Not Provided")
     }
     if(req.query==null || req.query.batch_id==null){
-        resp.status(400).send("Batch Id not provided")
+        resp.status(400).send("Batch ID Not Provided")
     }
     return req
 }
