@@ -14,7 +14,6 @@ var coachRouter = require('./routes/coaches')
 var academiesRouter = require('./routes/academies.js');
 var sportsRouter = require('./routes/sports.js');
 var reviewRouter = require('./routes/reviews.js');
-var sportsRouter = require('./routes/sports.js');
 var app = express();
 app.use(fileUpload());
 
