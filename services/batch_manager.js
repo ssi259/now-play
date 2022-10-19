@@ -87,17 +87,13 @@ exports.post_process_create_batch = async (req, resp, input_response) => {
     resp.send(input_response)
 }
 exports.pre_process_image_upload_request = async(req,resp)=>{
-    var input_files = req.files.files_name;
-    var request_batch_id = req.query.batch_id;
-    if (req.files==null || input_files==null){
-        resp.status(400).send("Image is not present")
+    if (req.files==null || req.files.files_name==null){
+        resp.status(400).send("Image Not Provided")
     }
-    if(req.query==null || request_batch_id==null){
-        resp.status(400).send("Batch Id not provided")
+    if(req.query==null || req.query.batch_id==null){
+        resp.status(400).send("Batch ID Not Provided")
     }
-    else{
-        return req
-    }
+    return req
 }
 exports.process_image_upload_request = async(req,resp)=>{
     var input_files = req.files.files_name;
@@ -107,7 +103,7 @@ exports.process_image_upload_request = async(req,resp)=>{
     }else{
         await upload_multiple_files(input_files,request_batch_id)
     }
-    resp.status(200).send("File Uploaded successfuly")
+    resp.status(201).send("File Uploaded successfuly")
 }
 async function upload_multiple_files(input_files,request_batch_id){
     for(each_file of input_files){
@@ -116,7 +112,7 @@ async function upload_multiple_files(input_files,request_batch_id){
 }
 async function upload_and_create_data(each_file,request_batch_id){
     const image_location = await lib.uploadFile(each_file)
-    models.BatchPhotos.create({batchId: request_batch_id,img_url: image_location})
+    await models.BatchPhotos.create({batchId: request_batch_id,img_url: image_location})
 }
 
 
