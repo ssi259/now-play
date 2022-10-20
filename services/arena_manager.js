@@ -64,3 +64,19 @@ exports.process_arena_details_input_req = async(input_response)=>{
 exports.post_arena_details_process = async(req,resp,input_response)=>{
   resp.send(input_response)
 }
+
+
+exports.pre_process_arenas_detail = async(req,resp)=>{
+  const arenas_detail = await  models.Arena.findOne({where: {id:req.params.id}})
+      if (arenas_detail) {
+          resp.send(arenas_detail);
+      } else {
+        throw new Api400Error('Error in finding arena_detail');
+      }
+}
+exports.process_arenas_detail_input_req = async(input_response)=>{
+  return input_response
+}
+exports.post_arenas_detail_process = async(req,resp,input_response)=>{
+  resp.send(input_response)
+}
