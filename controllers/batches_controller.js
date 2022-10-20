@@ -9,7 +9,7 @@ exports.search_batch = async(req,resp)=>{
         var processed_reponse =  await BatchManager.process_batch_search_input_req(input_response)
         var post_process_response = await BatchManager.post_process_search_batch(req,resp,processed_reponse)
     }catch(e){
-        console.log(e)
+        resp.status(error.statusCode).send(error.name)
     }finally{
     }
 }
@@ -20,7 +20,7 @@ exports.create_batch = async(req,resp) =>{
         var processed_reponse =  await BatchManager.process_batch_create_input_req(input_response)
         var post_process_response = await BatchManager.post_process_create_batch(req,resp,processed_reponse)
     }catch(e){
-        console.log(e)
+        resp.status(error.statusCode).send(error.name)
     }finally{
     }
 }
@@ -29,8 +29,7 @@ exports.uploadImage = async(req,resp)=>{
         var input_request = await BatchManager.pre_process_image_upload_request(req,resp)
         await BatchManager.process_image_upload_request(input_request,resp)
     }catch(error){
-        console.log(error)
-        resp.status(500).send("Error while uploading image "+error)
+        resp.status(error.statusCode).send(error.name)
     }
 }
 exports.batch_details = async(req,resp) =>{
@@ -41,7 +40,7 @@ exports.batch_details = async(req,resp) =>{
         var post_process_response = await BatchManager.post_process_create_batch(req,resp,processed_reponse)
 
     }catch(e){
-        console.log(e)
+        resp.status(e.statusCode).send(e.name)
     }finally{
     }
 }
