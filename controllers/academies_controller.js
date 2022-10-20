@@ -14,8 +14,11 @@ exports.create_academy = async(req,resp)=>{
 
 exports.uploadAcademyImages = async (req, resp) =>{
     try {
-        var processed_response = await AcademyManager.process_image_upload_request(req,resp);
+        var input_response = await AcademyManager.pre_process_image_upload_request(req,resp)
+        await AcademyManager.process_image_upload_request(input_response, resp)
+        await AcademyManager.post_process_image_upload(req,resp)
     } catch (error) { 
-        resp.status(500).send({status:"Failure","Details":error.message})
+        console.log("error",error)
+        resp.status(error.statusCode).send(error)
     }
 }
