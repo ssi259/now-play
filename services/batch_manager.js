@@ -3,6 +3,9 @@ const dbConfig = require("../config/db_config.js");
 const Sequelize = require("sequelize");
 const models = require("../models");
 var lib = require('../lib/upload_files_s3');
+const Api400Error = require('./../error/api400Error')
+const Api500Error = require('./../error/api500Error')
+
 
 const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
     host: dbConfig.host,
@@ -18,16 +21,16 @@ exports.pre_process_params = async (req, resp) => {
     if (req.query.sports_id != null) {
         const results = await sequelize.query(`SELECT batches.id , batches.price ,batches.start_time, batches.end_time,batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type, (6371 *acos(cos(radians("+ req.query.lat + ")) * cos(radians(lat)) * cos(radians(lng) - radians("+req.query.lng+")) + sin(radians("+req.query.lat+")) * sin(radians(lat)))) AS distance FROM ((((Batches batches INNER JOIN Arenas arena on batches.id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.id = academy.id) where sports.id = ${req.query.sports_id} HAVING distance < 100000   ORDER BY distance LIMIT 0, 20;`, { type: Sequelize.QueryTypes.SELECT }).then((result) => {
             return result;
-        }).catch((error) => {
-            console.log(error)
+        }).catch(() => {
+            throw new Api500Error(`Error in batch search`)
         })
         return results;
 
     } else {
         const results = await sequelize.query("SELECT batches.id , batches.price ,batches.start_time, batches.end_time,batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type, (6371 *acos(cos(radians(" + req.query.lat + ")) * cos(radians(lat)) * cos(radians(lng) - radians(" + req.query.lng + ")) + sin(radians(" + req.query.lat + ")) * sin(radians(lat)))) AS distance FROM ((((Batches batches INNER JOIN Arenas arena on batches.id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.id = academy.id) HAVING distance < 100000   ORDER BY distance LIMIT 0, 20;", { type: Sequelize.QueryTypes.SELECT }).then((result) => {
             return result;
-        }).catch((error) => {
-            console.log(error)
+        }).catch(() => {
+            throw new Api500Error(`Error in batch search`)
         })
         return results;
     }
@@ -88,10 +91,10 @@ exports.post_process_create_batch = async (req, resp, input_response) => {
 }
 exports.pre_process_image_upload_request = async(req,resp)=>{
     if (req.files==null || req.files.files_name==null){
-        resp.status(400).send("Image Not Provided")
+        throw new Api400Error(`image not found`)
     }
     if(req.query==null || req.query.batch_id==null){
-        resp.status(400).send("Batch ID Not Provided")
+        throw new Api400Error(`BAD REQUEST`)
     }
     return req
 }
@@ -120,7 +123,7 @@ exports.pre_process_batch_details = async(req,resp)=>{
         if (batch_details) {
             return batch_details
         } else {
-            resp.status(400).send('details not found');
+            throw new Api400Error(`BAD REQUEST`)
         }
 
 }
