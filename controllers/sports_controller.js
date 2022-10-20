@@ -34,3 +34,14 @@ exports.uploadSportImages = async (req, resp) =>{
     }
 }
 
+exports.sport_list = async(req,resp)=>{
+
+    try{
+        var input_response =  await SportManager.pre_process_sport_list(req,resp)
+        var processed_reponse =  await SportManager.process_sport_list_input_req(input_response)
+        var post_process_response = await SportManager.post_sport_list_process(req,resp,processed_reponse)
+    }catch(e){
+        console.log(e)
+    }finally{
+    }
+}
