@@ -7,22 +7,21 @@ exports.process_create_coach = async (req, resp) => {
         locality, city, state, pincode
     } = req.body;
 
-    if (!phone_number) {
-        throw new Error('Phone Number Not Provided');
+    if (phone_number == null) {
+        return resp.status(400).send({ status: "Failure", details: "Phone Number Not Provided" })
     }
-   
     const coach = await Coach.findOne({
         where: {
             phone_number: phone_number,
         }
-    });
+    })
     if (coach) {
-        return coach
+        return resp.status(409).send({ status: "Failure", details: "Phone Number Already Registed" })
     }
-    const newCoach= await Coach.create({
+    const newCoach = await Coach.create({
         name, phone_number, email, status, sports_id, experience,
         verified, tier, awards, team_affiliations, about, profile_pic,
         locality, city, state, pincode
     })
-    return newCoach;
+    return resp.status(201).send({ status: "Success", coach: newCoach });
 }
