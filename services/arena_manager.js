@@ -47,3 +47,18 @@ async function upload_and_create_data(image, arena_id) {
   let img_url = await uploadFile(image)
   await ArenaImage.create({ arenaId: arena_id, img_url: img_url})
 }
+
+exports.pre_process_arena_details = async(req,resp)=>{
+  const arena_details = await  models.Arena.findAll()
+      if (arena_details) {
+          resp.send(arena_details);
+      } else {
+          resp.status(200).send('Error in finding arena_details');
+      }
+}
+exports.process_arena_details_input_req = async(input_response)=>{
+  return input_response
+}
+exports.post_arena_details_process = async(req,resp,input_response)=>{
+  resp.send(input_response)
+}
