@@ -8,3 +8,11 @@ exports.createCoach = async (req, resp) => {
         return resp.status(400).send({"status":"Failure","Details":e.message})
     }
 }
+
+exports.uploadCoachImages = async (req, resp) =>{
+    try {
+        var processed_response = await coachManager.process_image_upload_request(req,resp);
+    } catch (error) { 
+        resp.status(500).send({status:"Failure","Details":error.message})
+    }
+}
