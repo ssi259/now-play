@@ -1,5 +1,5 @@
 const dbConfig = require("../config/db_config.js");
-
+const axios = require('axios')
 const Sequelize = require("sequelize");
 const models = require("../models");
 var lib = require('../lib/upload_files_s3');
@@ -68,7 +68,11 @@ exports.process_batch_search_input_req = async (input_response) => {
 }
 exports.post_process_search_batch = async (req, resp, input_response) => {
     var formatted_response = {}
-    formatted_response["address"] = "Delhi"
+    var lat = req.query.lat
+    var lng = req.query.lng
+    const revgeocode_data = await axios.get(`https://revgeocode.search.hereapi.com/v1/revgeocode?at=${lat}%2C${lng}&lang=en-US&apiKey=${process.env.HERE_MAP_API_KEY}`);
+    const revgeocode_address_label = revgeocode_data.data.items.length > 0 ? revgeocode_data.data.items[0].address.label : ""
+    formatted_response["address"] = revgeocode_address_label
     formatted_response["batchList"] = input_response
     resp.send(formatted_response)
 }
