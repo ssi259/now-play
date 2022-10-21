@@ -8,6 +8,7 @@ exports.create_arena = async(req,resp)=>{
         var processed_reponse =  await ArenaManager.process_arena_input_req(input_response)
         var post_process_response = await ArenaManager.post_arena_process(req,resp,processed_reponse)
     }catch(e){
+        console.log(e)
         const status_code = e.statusCode ? e.statusCode : 500
         return resp.status(status_code).send({ status: "Failure", message: e.name })
     }finally{
@@ -29,7 +30,8 @@ exports.arena_details = async(req,resp)=>{
         var processed_reponse =  await ArenaManager.process_arena_details_input_req(input_response)
         var post_process_response = await ArenaManager.post_arena_details_process(req,resp,processed_reponse)
     }catch(e){
-        const status_code = e.statusCode ? e.statusCode : 400
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
         return resp.status(status_code).send({ status: "Failure", message: e.name })
     }finally{
     }
