@@ -19,7 +19,7 @@ exports.sports_list = async(req,resp)=>{
         var processed_reponse =  await SportManager.process_sports_list_input_req(input_response)
         var post_process_response = await SportManager.post_sports_list_process(req,resp,processed_reponse)
     }catch(e){
-        const status_code = e.statusCode ? e.statusCode : 400
+        const status_code = e.statusCode ? e.statusCode : 500
         return resp.status(status_code).send({ status: "Failure", message: e.name })
     }finally{
     }
@@ -43,7 +43,7 @@ exports.sport_list = async(req,resp)=>{
         var processed_reponse =  await SportManager.process_sport_list_input_req(input_response)
         var post_process_response = await SportManager.post_sport_list_process(req,resp,processed_reponse)
     }catch(e){
-        const status_code = e.statusCode ? e.statusCode : 400
+        const status_code = e.statusCode ? e.statusCode : 500
         return resp.status(status_code).send({ status: "Failure", message: e.name })
     }finally{
     }
