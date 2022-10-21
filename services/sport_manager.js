@@ -1,5 +1,6 @@
 const models = require("../models");
 const {uploadFile} = require('../lib/upload_files_s3')
+const Api400Error = require('../error/api400Error')
 
 exports.pre_process_create_sport = async(req,resp)=>{
   const result = await  models.Sports.create({name: req.body.name,type: req.body.type,thumbnail: req.body.thumbnail,about: req.body.about}).then(function (sport) {
@@ -32,22 +33,28 @@ exports.post_sports_list_process = async(req,resp,input_response)=>{
 }
 
 
-exports.process_image_upload_request = async (req, resp) => {
+exports.pre_process_image_upload_request = async(req) => {
   if (req.files == null || req.files.image == null) {
-    return resp.status(400).send("Image Not Provided")
+    throw new Api400Error('Image Not Provided')
   }
-  if (req.query == null || req.query.sport_id == null){
-    return resp.status(400).send("Sport ID Not Provided")
+  if (req.query == null || req.query.sport_id == null) {
+    throw new Api400Error('Sport ID Not Provided')
   }
+  return req
+}
+
+exports.process_image_upload_request = async (req) => {
   const image = req.files.image
   const sport_id = req.query.sport_id
-
   if (image instanceof Array) {
     await upload_multiple_images(image,sport_id)
   }else {
     await upload_and_create_data(image, sport_id)
   }
-  return resp.status(201).send({status:"Success",Details:"Image Uploaded Successfully"})
+}
+
+exports.post_process_image_upload_request = async (resp) => {
+  resp.status(201).send({status:"Success",message:"Image Uploaded Successfully"})
 }
 
 async function upload_multiple_images(images, sport_id) {

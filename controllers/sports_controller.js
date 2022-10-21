@@ -25,9 +25,12 @@ exports.sports_list = async(req,resp)=>{
 
 exports.uploadSportImages = async (req, resp) =>{
     try {
-        var processed_response = await SportManager.process_image_upload_request(req,resp);
-    } catch (error) { 
-        resp.status(500).send({status:"Failure","Details":error.message})
+        var input_response = await SportManager.pre_process_image_upload_request(req)
+        await SportManager.process_image_upload_request(input_response)
+        await SportManager.post_process_image_upload_request(resp)
+    } catch (e) { 
+        const status_code = e.statusCode ? e.statusCode : 500
+        resp.status(status_code).send({status:"Failure",message:e.name})
     }
 }
 
