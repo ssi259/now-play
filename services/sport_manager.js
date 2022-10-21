@@ -22,7 +22,7 @@ exports.pre_process_sports_list = async(req,resp)=>{
       if (sports_list) {
           return sports_list
       } else {
-        throw new Api400Error(`Bad request`)
+        throw new Api400Error(`Error In Showing Sports List`)
       }
 }   
 exports.process_sports_list_input_req = async(input_response)=>{
@@ -72,7 +72,7 @@ exports.pre_process_sport_list = async(req,resp)=>{
       if (sport_list) {
           return sport_list
       } else {
-          resp.status(400).send('details not found');
+        throw new Api400Error(`Error In Showing Sports List`)
       }
 }   
 exports.process_sport_list_input_req = async(input_response)=>{
@@ -83,17 +83,3 @@ exports.post_sport_list_process = async(req,resp,input_response)=>{
 }
 
 
-exports.pre_process_sports_list = async(req,resp)=>{
-  const sport_list = await models.Sports.findOne({where: {id:req.params.id}});
-      if (sport_list) {
-          return sport_list
-      } else {
-        throw new Api400Error(`Bad Request`)
-      }
-}   
-exports.process_sport_list_input_req = async(input_response)=>{
-  return input_response
-}
-exports.post_sport_list_process = async(req,resp,input_response)=>{
-  resp.send(input_response)
-}
