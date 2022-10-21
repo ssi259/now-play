@@ -148,11 +148,15 @@ exports.process_batch_details_input_req = async(input_response)=>{
     
     }
     var image_list = {"img_list":batch_images}
-    var reviews = []
+    var reviews = [],review_list = {}
     for(each_reviews_detail of reviews_details){
-        await reviews.push(each_reviews_detail.dataValues.review_text)
+        await review_list.push(each_reviews_detail.dataValues.review_text,each_reviews_detail.dataValues.createdAt)
+        var user_details = await models.User.findAll({where:{id: reviews_details["user_id"]}})
+        review_list.push(user_details["name"],user_details["profile_pic"])
+
     } 
-    var review = {"reviews":reviews}
+    reviews.push(review_list)
+    var review = {"coach_reviews":reviews}
     var overall_ratings = 0,rating_json={};
     await models.Review.findAll({
         where: {

@@ -40,10 +40,7 @@ exports.batch_details = async(req,resp) =>{
         var post_process_response = await BatchManager.post_process_create_batch(req,resp,processed_reponse)
 
     }catch(e){
-        console.log(e)
-        var statusCode = [e.statusCode == null]?500:e.statusCode
-        var name = [e.name == null]?"internal server error":e.name
-        resp.status(statusCode).send(name)
+        resp.status(e.statusCode).send(e.name)
     }finally{
     }
 }
