@@ -10,8 +10,11 @@ exports.createCoach = async (req, resp) => {
 
 exports.uploadCoachImages = async (req, resp) =>{
     try {
-        var processed_response = await coachManager.process_image_upload_request(req,resp);
-    } catch (error) { 
-        resp.status(500).send({status:"Failure","Details":error.message})
+        var input_response = await coachManager.pre_process_image_upload_request(req)
+        await coachManager.process_image_upload_request(input_response);
+        await coachManager.post_process_image_upload_request(resp)
+    } catch (e) { 
+        const status_code = e.statusCode ? e.statusCode: 500
+        resp.status(status_code).send({status:"Failure",message:e.name})
     }
 }
