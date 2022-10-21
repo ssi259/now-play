@@ -72,7 +72,8 @@ exports.post_process_search_batch = async (req, resp, input_response) => {
     var lng = req.query.lng
     const revgeocode_data = await axios.get(`https://revgeocode.search.hereapi.com/v1/revgeocode?at=${lat}%2C${lng}&lang=en-US&apiKey=${process.env.HERE_MAP_API_KEY}`);
     const revgeocode_address_label = revgeocode_data.data.items.length > 0 ? revgeocode_data.data.items[0].address.label : ""
-    formatted_response["address"] = revgeocode_address_label
+    const revgeocode_address_district = revgeocode_data.data.items.length > 0 ? revgeocode_data.data.items[0].address.district : ""    
+    formatted_response["address"] = {label:revgeocode_address_label,district:revgeocode_address_district}
     formatted_response["batchList"] = input_response
     resp.send(formatted_response)
 }
