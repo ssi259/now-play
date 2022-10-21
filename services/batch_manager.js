@@ -147,16 +147,16 @@ exports.process_batch_details_input_req = async(input_response)=>{
      await   batch_images.push(each_batch_pic.dataValues.img_url)
     
     }
-    var image_list = {"img_list":batch_images}
-    var reviews = [],review_list = {}
+    var image_list = {"batch_img_list":batch_images}
+    review_list = []
     for(each_reviews_detail of reviews_details){
-        await review_list.push(each_reviews_detail.dataValues.review_text,each_reviews_detail.dataValues.createdAt)
-        var user_details = await models.User.findAll({where:{id: reviews_details["user_id"]}})
-        review_list.push(user_details["name"],user_details["profile_pic"])
-
+        var review_data = {"review_text":each_reviews_detail.dataValues.review_text, "review_time":each_reviews_detail.dataValues.createdAt}
+        var user_detail = await models.User.findOne({where:{id: each_reviews_detail["user_id"]}})
+        var reviewer_user_detail = {"reviewer_name":user_detail["name"],"reviewer_profile_pic":user_detail["profilePic"]}
+        await Object.assign(review_data,reviewer_user_detail)
+        review_list.push(review_data)
     } 
-    reviews.push(review_list)
-    var review = {"coach_reviews":reviews}
+    var coach_reviews = {"coach_reviews":review_list}
     var overall_ratings = 0,rating_json={};
     await models.Review.findAll({
         where: {
@@ -170,7 +170,6 @@ exports.process_batch_details_input_req = async(input_response)=>{
         rating_json = { "rating_count": ratings.length, "average_rating": overall_ratings / ratings.length };
 
     });
-    Object.assign(input_response.dataValues,review);
     Object.assign(input_response.dataValues,rating_json);
     Object.assign(input_response.dataValues,arena_data);
     Object.assign(input_response.dataValues, { "address": { "city": arena_details["city"], "locality":arena_details["locality"], "state": arena_details["state"] } })
@@ -179,9 +178,10 @@ exports.process_batch_details_input_req = async(input_response)=>{
     Object.assign(input_response.dataValues,academy_data);
     Object.assign(input_response.dataValues,sports_data);
     Object.assign(input_response.dataValues,image_list);
+    Object.assign(input_response.dataValues,coach_reviews);
+
     return input_response
 }  
-
 exports.post_process = async(req,resp,input_response)=>{
     resp.send(input_response)
 }

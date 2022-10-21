@@ -40,7 +40,8 @@ exports.batch_details = async(req,resp) =>{
         var post_process_response = await BatchManager.post_process_create_batch(req,resp,processed_reponse)
 
     }catch(e){
-        resp.status(e.statusCode).send(e.name)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "Failure", message: e.name })
     }finally{
     }
 }
