@@ -38,7 +38,7 @@ exports.pre_process_image_upload_request = async (req) => {
   return req
 }
 
-exports.process_image_upload_request = async (req, resp) => {
+exports.process_image_upload_request = async (req) => {
     const image = req.files.image
     const coach_id = req.query.coach_id
     if (image instanceof Array) {
