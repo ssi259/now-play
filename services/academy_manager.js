@@ -30,8 +30,7 @@ exports.pre_process_image_upload_request = async (req, res) => {
   return req
 }
 
-
-exports.process_image_upload_request = async (req, resp) => {
+exports.process_image_upload_request = async (req) => {
     const image = req.files.image
     const academy_id = req.query.academy_id
     if (image instanceof Array) {
@@ -41,8 +40,8 @@ exports.process_image_upload_request = async (req, resp) => {
     }
 }
   
-exports.post_process_image_upload = async (req, resp) => {
-  return resp.status(201).send({status:"Success",Details:"Image Uploaded Successfully"})
+exports.post_process_image_upload = async (resp) => {
+  return resp.status(201).send({status:"Success",message:"Image Uploaded Successfully"})
 } 
   
   async function upload_multiple_images(images, academy_id) {
