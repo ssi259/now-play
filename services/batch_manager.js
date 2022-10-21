@@ -137,6 +137,7 @@ exports.process_batch_details_input_req = async(input_response)=>{
     const academy_details = await models.Academy.findOne({where:{id:input_response["academy_id"]}})
     const sports_details = await models.Sports.findOne({where:{id:input_response["sports_id"]}})
     const batch_pics = await models.BatchPhotos.findAll({where: {batchId: input_response["id"]}})
+    const reviews_details = await models.Review.findAll({where: {coach_id: input_response["coach_id"]}}) 
     const arena_data = {"arena_name":arena_details["name"],"lat":arena_details["lat"],"lng":arena_details["lng"]}
     const coach_data = {"coach_name":coach_details["name"],"coach_experience":coach_details["experience"],"coach_profile_pic":coach_details["profile_pic"],"about_coach":coach_details["about"]}
     const academy_data = {"academy_name":academy_details["name"],"academy_phone_number":academy_details["phone_number"]}
@@ -147,6 +148,11 @@ exports.process_batch_details_input_req = async(input_response)=>{
     
     }
     var image_list = {"img_list":batch_images}
+    var reviews = []
+    for(each_reviews_detail of reviews_details){
+        await reviews.push(each_reviews_detail.dataValues.review_text)
+    } 
+    var review = {"reviews":reviews}
     var overall_ratings = 0,rating_json={};
     await models.Review.findAll({
         where: {
@@ -160,7 +166,7 @@ exports.process_batch_details_input_req = async(input_response)=>{
         rating_json = { "rating_count": ratings.length, "average_rating": overall_ratings / ratings.length };
 
     });
-    
+    Object.assign(input_response.dataValues,review);
     Object.assign(input_response.dataValues,rating_json);
     Object.assign(input_response.dataValues,arena_data);
     Object.assign(input_response.dataValues, { "address": { "city": arena_details["city"], "locality":arena_details["locality"], "state": arena_details["state"] } })
