@@ -1,6 +1,8 @@
 const { uploadFile }= require('../lib/upload_files_s3');
 const models = require("../models");
 const {ArenaImage} = require('../models')
+const Api400Error = require('../error/api400Error')
+const Api500Error = require('../error/api500Error')
 
 
 exports.pre_process_create_arena = async(req,resp)=>{
@@ -8,7 +10,7 @@ exports.pre_process_create_arena = async(req,resp)=>{
       if (arena) {
           resp.send(arena);
       } else {
-          resp.status(200).send('Error in insert new arena');
+        throw new Api500Error(`Error In Creating Arena`)
       }
   });
 }
@@ -53,7 +55,7 @@ exports.pre_process_arena_details = async(req,resp)=>{
       if (arena_details) {
           resp.send(arena_details);
       } else {
-          resp.status(200).send('Error in finding arena_details');
+        throw new Api400Error(`Bad Request`)
       }
 }
 exports.process_arena_details_input_req = async(input_response)=>{
