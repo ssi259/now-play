@@ -81,20 +81,12 @@ exports.pre_process_academy_list = async(req,resp)=>{
   }
 
   exports.process_academy_list_input_req = async(input_response)=>{
-    for (each_input_response of input_response) {
-        sports_details = await models.Sports.findOne({
-            where: {
-                sports_id: each_input_response["sports_id"]
-            }
-        }).then((sports_details) => {
-            sports_details.forEach((sports_details) => {
-                overall_sports_details = overall_sports_details + overall_sports_details["rating"]
-            })
+    const sports_details = await models.Sports.findAll({where:{ id: input_response["sports_id"]}})
     const sports_data = {"sports_name":sports_details["name"]}
 >>>>>>> academy_list
     Object.assign(input_response.dataValues,sports_data);
-
     return input_response
+
   }
 <<<<<<< HEAD
   
