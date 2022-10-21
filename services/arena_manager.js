@@ -55,7 +55,7 @@ exports.pre_process_arena_details = async(req,resp)=>{
       if (arena_details) {
           resp.send(arena_details);
       } else {
-        throw new Api400Error(`Bad Request`)
+        throw new Api500Error(`Bad Request`)
       }
 }
 exports.process_arena_details_input_req = async(input_response)=>{
