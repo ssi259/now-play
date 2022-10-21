@@ -1,13 +1,13 @@
 const models = require("../models");
 const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
-
+const Api500Error = require('../error/api500Error')
 exports.pre_process_create_sport = async(req,resp)=>{
   const result = await  models.Sports.create({name: req.body.name,type: req.body.type,thumbnail: req.body.thumbnail,about: req.body.about}).then(function (sport) {
       if (sport) {
           resp.send(sport);
       } else {
-          resp.status(400).send('Error in insert new sport');
+        throw new Api500Error(`Error In Creating Sports`)
       }
   });
 }
@@ -22,7 +22,7 @@ exports.pre_process_sports_list = async(req,resp)=>{
       if (sports_list) {
           return sports_list
       } else {
-          resp.status(400).send('list not found');
+        throw new Api400Error(`Bad request`)
       }
 }   
 exports.process_sports_list_input_req = async(input_response)=>{
@@ -73,6 +73,22 @@ exports.pre_process_sport_list = async(req,resp)=>{
           return sport_list
       } else {
           resp.status(400).send('details not found');
+      }
+}   
+exports.process_sport_list_input_req = async(input_response)=>{
+  return input_response
+}
+exports.post_sport_list_process = async(req,resp,input_response)=>{
+  resp.send(input_response)
+}
+
+
+exports.pre_process_sports_list = async(req,resp)=>{
+  const sport_list = await models.Sports.findOne({where: {id:req.params.id}});
+      if (sport_list) {
+          return sport_list
+      } else {
+        throw new Api400Error(`Bad Request`)
       }
 }   
 exports.process_sport_list_input_req = async(input_response)=>{
