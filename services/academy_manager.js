@@ -54,6 +54,7 @@ exports.post_process_image_upload = async (resp) => {
     let img_url = await uploadFile(image)
     await models.AcademyImage.create({ academyId: academy_id, img_url: img_url})
 <<<<<<< HEAD
+<<<<<<< HEAD
   }
 
   exports.pre_process_academy_details = async(req,resp)=>{
@@ -69,22 +70,36 @@ exports.post_process_image_upload = async (resp) => {
     const sports_details = await models.Sports.findOne({where:{id:input_response["sports_id"]}})
     var sports_data = {"sports_name":sports_details["name"]}
 =======
+=======
+  }
+
+>>>>>>> academy_manager
 exports.pre_process_academy_list = async(req,resp)=>{
     const academy_list = await models.Academy.findAll();
         if (academy_list) {
             return academy_list
         } else {
-            resp.status(400).send('academy_list not found');
+          throw new Api400Error(`BAD REQUEST`)
         }
   }   
 
-  }
+
 
   exports.process_academy_list_input_req = async(input_response)=>{
+<<<<<<< HEAD
     const sports_details = await models.Sports.findAll({where:{ id: input_response["sports_id"]}})
     const sports_data = {"sports_name":sports_details["name"]}
 >>>>>>> academy_list
     Object.assign(input_response.dataValues,sports_data);
+=======
+    for (each_input_response of input_response){
+        var sports_details = await models.Sports.findOne({where:{id:each_input_response["sports_id"]}})
+        var sports_data = {"sports_name":sports_details["name"]}
+    Object.assign(each_input_response.dataValues,sports_data)
+    Object.assign(input_response,each_input_response.dataValues)
+
+    }
+>>>>>>> academy_manager
     return input_response
 
   }
