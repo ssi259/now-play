@@ -103,15 +103,15 @@ async function upload_and_create_document_data(document, coach_id,document_type)
 }
 
 
-exports.process_fetch_coaches_list= async () => {
-  const coachesList = await Coach.findAll({
+exports.process_get_coaches= async () => {
+  const coaches = await Coach.findAll({
     where: {
       status: "active",
     }
   })
-  return coachesList;
+  return coaches;
 }
 
-exports.post_process_fetch_coaches_list = async ( coachesList, resp) => {
-  resp.status(200).send({status:"Success",data:coachesList})
+exports.post_process_get_coaches = async ( coaches, resp) => {
+  resp.status(200).send({status:"Success",data:coaches})
 }
