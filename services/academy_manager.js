@@ -75,16 +75,15 @@ exports.post_process_image_upload = async (resp) => {
 
 >>>>>>> academy_manager
 exports.pre_process_academy_list = async(req,resp)=>{
-    const academy_list = await models.Academy.findAll();
-        if (academy_list) {
-            return academy_list
-        } else {
-          throw new Api400Error(`BAD REQUEST`)
-        }
-  }   
+  const academy_list = await models.Academy.findAll();
+  if (academy_list) {
+      return academy_list
+  } else {
+    throw new Api400Error(`BAD REQUEST`)
+  }
+}
 
-
-
+<<<<<<< HEAD
   exports.process_academy_list_input_req = async(input_response)=>{
 <<<<<<< HEAD
     const sports_details = await models.Sports.findAll({where:{ id: input_response["sports_id"]}})
@@ -95,9 +94,18 @@ exports.pre_process_academy_list = async(req,resp)=>{
     for (each_input_response of input_response){
         var sports_details = await models.Sports.findOne({where:{id:each_input_response["sports_id"]}})
         var sports_data = {"sports_name":sports_details["name"]}
+=======
+exports.process_academy_list_input_req = async(input_response)=>{
+  for (each_input_response of input_response){
+    var sports_details = await models.Sports.findOne({where:{id:each_input_response["sports_id"]}})
+    var sports_data = {"sports_name":sports_details["name"]}
+>>>>>>> review_changes
     Object.assign(each_input_response.dataValues,sports_data)
     Object.assign(input_response,each_input_response.dataValues)
+  }
+  return input_response
 
+<<<<<<< HEAD
     }
 >>>>>>> academy_manager
     return input_response
@@ -114,3 +122,10 @@ exports.post_process_academy_details = async(req,resp,input_response)=>{
     resp.send(input_response)
   }
 >>>>>>> academy_list
+=======
+}
+
+exports.post_academy_list_process = async(req,resp,input_response)=>{
+  resp.send(input_response)
+}
+>>>>>>> review_changes
