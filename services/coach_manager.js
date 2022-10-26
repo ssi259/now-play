@@ -101,3 +101,17 @@ async function upload_and_create_document_data(document, coach_id,document_type)
   let document_url = await uploadFile(document)
   await CoachDocument.create({ coachId: coach_id,document_url,document_type})
 }
+
+
+exports.process_fetch_coaches_list= async () => {
+  const coachesList = await Coach.findAll({
+    where: {
+      status: "active",
+    }
+  })
+  return coachesList;
+}
+
+exports.post_process_fetch_coaches_list = async ( coachesList, resp) => {
+  resp.status(200).send({status:"Success",data:coachesList})
+}

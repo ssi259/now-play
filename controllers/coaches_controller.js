@@ -29,3 +29,13 @@ exports.uploadCoachDocuments = async (req, resp) =>{
         resp.status(status_code).send({status:"Failure",message:e.name})
     }
 }
+
+exports.fetchCoachesList = async (req, resp) => {
+    try {
+        var process_response = await coachManager.process_fetch_coaches_list()
+        var post_process_response = await coachManager.post_process_fetch_coaches_list(process_response,resp)
+    } catch (e) {
+        const status_code = e.statusCode ? e.statusCode : 500
+        resp.status(status_code).send({status:"Failure",message:e.name})
+    }
+}
