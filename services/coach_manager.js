@@ -104,11 +104,7 @@ async function upload_and_create_document_data(document, coach_id,document_type)
 
 
 exports.process_get_coaches= async () => {
-  const coaches = await Coach.findAll({
-    where: {
-      status: "active",
-    }
-  })
+  const coaches = await Coach.findAll()
   return coaches;
 }
 
