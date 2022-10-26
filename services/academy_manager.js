@@ -54,3 +54,25 @@ exports.post_process_image_upload = async (resp) => {
     let img_url = await uploadFile(image)
     await models.AcademyImage.create({ academyId: academy_id, img_url: img_url})
   }
+
+  exports.pre_process_academy_details = async(req,resp)=>{
+    const academy_details = await models.Academy.findOne({where: {id:req.params.id}});
+        if (academy_details) {
+            return academy_details
+        } else {
+          throw new Api400Error(`BAD REQUEST`)
+        }
+  }
+
+  exports.process_academy_details_input_req = async(input_response)=>{
+    const sports_details = await models.Sports.findOne({where:{id:input_response["sports_id"]}})
+    var sports_data = {"sports_name":sports_details["name"]}
+    Object.assign(input_response.dataValues,sports_data);
+
+    return input_response
+  }
+  
+
+exports.post_process_academy_details = async(req,resp,input_response)=>{
+  resp.send(input_response)
+}

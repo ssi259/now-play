@@ -22,3 +22,18 @@ exports.uploadAcademyImages = async (req, resp) =>{
         return resp.status(status_code).send({ status: "Failure", message: e.name })
     }
 }
+
+
+exports.academy_details = async(req,resp) =>{
+
+    try{
+        var input_response = await AcademyManager.pre_process_academy_details(req,resp)
+        var processed_reponse =  await AcademyManager.process_academy_details_input_req(input_response)
+        var post_process_response = await AcademyManager.post_process_academy_details(req,resp,processed_reponse)
+
+    }catch(e){
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "Failure", message: e.name })
+    }finally{
+    }
+}
