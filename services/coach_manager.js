@@ -111,3 +111,22 @@ exports.process_get_coaches= async () => {
 exports.post_process_get_coaches = async ( coaches, resp) => {
   resp.status(200).send({status:"Success",data:coaches})
 }
+
+exports.pre_process_get_coach_by_id = (req) => {
+  if (req.params == null || req.params.id == null) {
+    throw new Api400Error("Coach ID Not Provided")
+  }
+  return req.params.id
+}
+
+exports.process_get_coach_by_id = async (coach_id) => {
+  const coach = await Coach.findByPk(coach_id)
+  if (!coach) {
+    throw new Api400Error(`Bad Request`)
+  }
+  return coach;
+}
+
+exports.post_process_get_coach_by_id = async ( coach, resp) => {
+  resp.status(200).send({status:"Success",data:coach})
+}
