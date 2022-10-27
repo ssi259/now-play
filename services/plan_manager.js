@@ -22,3 +22,25 @@ exports.process_create = async (input_data) => {
 exports.post_process_create = async (subscriptio_plan,resp) => {
     resp.status(200).send({status:"Success",data:subscriptio_plan})
 }
+
+
+exports.pre_process_get_plan_by_batch_id = async (req) => {
+    if (req.query == null ||  req.query.batch_id == null) {
+        throw new Api400Error("Batch ID Not Provided")
+    }
+    return req.query.batch_id
+}
+
+exports.process_get_plan_by_batch_id = async (batch_id) => {
+    const plan = await models.SubscriptionPlan.findAll({
+        where: {
+            batch_id : batch_id
+        }
+    })
+    return plan
+}
+
+exports.post_process_get_plan_by_batch_id = async (plan,resp) => {
+    resp.status(200).send({status:"Success",data:plan})
+}
+
