@@ -1,7 +1,6 @@
 const { Coach, CoachImage, CoachDocument } = require('../models');
 const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
-const Api404Error = require('../error/api404Error')
 
 exports.process_create_coach = async (req, resp) => {
     const {
@@ -123,7 +122,7 @@ exports.pre_process_get_coach_by_id = (req) => {
 exports.process_get_coach_by_id = async (coach_id) => {
   const coach = await Coach.findByPk(coach_id)
   if (!coach) {
-    throw new Api404Error(`Coach Not Found`)
+    throw new Api400Error(`Bad Request`)
   }
   return coach;
 }
