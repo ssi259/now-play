@@ -68,7 +68,7 @@ exports.process_academy_details_input_req = async(input_response)=>{
   const sports_details = await models.Sports.findOne({where:{id:input_response["sports_id"]}})
   var sports_data = {"sports_name":sports_details["name"]}
   Object.assign(input_response.dataValues,sports_data);
-
+  return input_response
 }
 
 exports.post_process_academy_details = async(req,resp,input_response)=>{
