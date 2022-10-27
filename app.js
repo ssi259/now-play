@@ -40,7 +40,7 @@ app.use('/academies', academiesRouter);
 app.use('/sports', sportsRouter);
 app.use('/reviews',reviewRouter);
 app.use('/sports', sportsRouter);
-app.use('/plan',planRouter)
+app.use('/plans',planRouter)
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
