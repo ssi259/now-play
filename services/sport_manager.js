@@ -83,22 +83,20 @@ exports.post_sport_list_process = async(req,resp,input_response)=>{
   resp.send(input_response)
 }
 
-exports.pre_process_update_sports = async(req,resp)=>{
-    const update_sports = new models.Sports({name: req.body.name,type: req.body.type,thumbnail: req.body.thumbnail,about: req.body.about});
-    models.Sports.updateOne({id: req.params.id}, update_sports).then(
-      () => {
-        res.status(201).json({
-          message: 'Sports updated successfully!'
-        });
-      }
-    ).catch(
-      (error) => {
-        res.status(400).json({
-          error: error
-        });
-      }
-    );
-  };
+ exports.pre_process_update_sports = async(req,resp)=>{
+  const update_sports = await models.Sports.update({id: req.body.id }, {where: {id:req.params.id}})
+  .then(() => {return models.Sports.findOne({where: {id:req.params.id}})})
+  .then(function (update_sports) {
+    if (update_sports) {
+        resp.send(update_sports);
+    } else {
+      throw new Api500Error(`Error In updating Sports`)
+    } 
+});
+
+}
+  
+
 
 exports.process_update_sports_input_req = async(input_response)=>{
   return input_response
