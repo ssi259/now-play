@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   SubscriptionPlan.init({
-    batchId: DataTypes.INTEGER,
+    batch_id: DataTypes.INTEGER,
     plan_name: DataTypes.STRING,
     description: DataTypes.STRING,
     status: DataTypes.STRING,
