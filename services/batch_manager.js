@@ -234,6 +234,25 @@ exports.process_batch_details_input_req = async(req,input_response)=>{
     resp.send(input_response)
 }
 
+exports.pre_process_update_batch = async (req, resp) => {
+    const update_batch = await models.Batch.update(req.body, {where: {id:req.params.id}})
+    .then(() => {return models.Batch.findOne({where: {id:req.params.id}})})
+    .then(function (update_batch) {
+        if (update_batch) {
+            resp.send(update_batch);
+        } else {
+            resp.status(400).send('Error in updating record');
+        }
+    });
+}
+exports.process_update_batch_input_req = async (input_response) => {
+    return input_response
+}
+exports.post_process_update_batch = async (req, resp, input_response) => {
+    resp.send(input_response)
+}
+
+
 
 exports.pre_process_upcoming_classes = async (req) => {
     return req.user.user_id
