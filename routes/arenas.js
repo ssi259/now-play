@@ -6,5 +6,6 @@ var router = express.Router();
 router.post('/', arena_controller.create_arena);
 router.post('/upload_images',arena_controller.uploadArenaImages);
 router.get('/',arena_controller.arena_details);
+router.get('/:id',arena_controller.arenas_detail);
 
 module.exports = router;
