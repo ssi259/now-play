@@ -19,8 +19,8 @@ exports.process_create = async (input_data) => {
     return await models.SubscriptionPlan.create(input_data)
 }
 
-exports.post_process_create = async (subscriptio_plan,resp) => {
-    resp.status(200).send({status:"Success",data:subscriptio_plan})
+exports.post_process_create = async (subscription_plan,resp) => {
+    resp.status(200).send({status:"Success",data:subscription_plan})
 }
 
 
