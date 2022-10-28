@@ -1,14 +1,14 @@
 const { Coach, CoachImage, CoachDocument } = require('../models');
 const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
+var lib = require('../lib/upload_files_s3');
 
 exports.process_create_coach = async (req, resp) => {
     const {
         name, phone_number, email, status, sports_id, experience,
-        verified, tier, awards, team_affiliations, about, profile_pic,
+        verified, tier, awards, team_affiliations, about,
         locality, city, state, pincode
     } = req.body;
-
     if (phone_number == null) {
         return resp.status(400).send({ status: "Failure", details: "Phone Number Not Provided" })
     }
@@ -20,11 +20,15 @@ exports.process_create_coach = async (req, resp) => {
     if (coach) {
         return resp.status(409).send({ status: "Failure", details: "Phone Number Already Registed" })
     }
+    var profile_image = req.files.profile_pic
+        profile_pic = await lib.uploadFile(profile_image)
+    
     const newCoach = await Coach.create({
         name, phone_number, email, status, sports_id, experience,
         verified, tier, awards, team_affiliations, about, profile_pic,
         locality, city, state, pincode
     })
+
     return resp.status(201).send({ status: "Success", coach: newCoach });
 }
 
@@ -101,10 +105,8 @@ async function upload_and_create_document_data(document, coach_id,document_type)
   let document_url = await uploadFile(document)
   await CoachDocument.create({ coachId: coach_id,document_url,document_type})
 }
-async function upload_and_create_data(each_file, coach_id){
-  const image_location = await lib.uploadFile(each_file)
-  await models.Coach.create({profile_pic: coach_id,img_url: image_location})
-}
+
+
 
 
 exports.process_get_coaches= async () => {
