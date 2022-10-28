@@ -101,6 +101,10 @@ async function upload_and_create_document_data(document, coach_id,document_type)
   let document_url = await uploadFile(document)
   await CoachDocument.create({ coachId: coach_id,document_url,document_type})
 }
+async function upload_and_create_data(each_file, coach_id){
+  const image_location = await lib.uploadFile(each_file)
+  await models.Coach.create({profile_pic: coach_id,img_url: image_location})
+}
 
 
 exports.process_get_coaches= async () => {
