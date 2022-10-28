@@ -11,8 +11,7 @@ exports.generateOtp = async (req, res) => {
     try {
         const { phoneNumber } = req.body;
         if (!phoneNumber) {
-            const response = { status: 'Failure', Details: 'Phone Number Not Provided' }
-            return res.status(400).send(response);
+            return res.status(400).send({ status: 'failure', message: 'phone number not provided'});
         }
         const now = new Date();
         let otp;
@@ -48,15 +47,15 @@ exports.generateOtp = async (req, res) => {
             Message: phoneMessage,
             PhoneNumber:phoneNumber
         }
-        var publishTextPromise = new AWS.SNS({ apiVersion: '2010-03-31' }).publish(params).promise();
+        let publishTextPromise = new AWS.SNS({ apiVersion: '2010-03-31' }).publish(params).promise();
+
         publishTextPromise.then((data) => {
-            return res.status(200).send({"status":"Success","Details":"OTP Sent Successfully"})
+            return res.status(200).send({status:"success",message:"otp sent successfully"})
         }).catch((err) => {
-            return res.send({status:"Failure",Details:err})
+            return res.send({status:"failure",message:err.message})
         })
-    } catch (error) {
-        const response = { status: "Failure", Details: error.message }
-        return res.status(400).send(response);
+    }catch (error) {
+        return res.status(500).send({ status: "failure", message: error.message });
     }
 };
 
@@ -65,12 +64,10 @@ exports.verifyOtp = async (req, res) => {
         const { phoneNumber, otp } = req.body;
         const currentDate = new Date();
         if (!phoneNumber) {
-            const response = { "Status": "Failure", "Details": "Phone Number Not Provided" }
-            return res.status(400).send(response)
+            return res.status(400).send({ status: "failure", message: "phone number not provided", data:{} })
         }
         if (!otp) {
-            const response = { "Status": "Failure", "Details": "OTP not Provided" }
-            return res.status(400).send(response);
+            return res.status(400).send({ status: "failure", message: "otp not provided", data : {} });
         }
         const otpInstance = await Notification.findOne({
             where:
@@ -80,29 +77,24 @@ exports.verifyOtp = async (req, res) => {
                 notificationType: "otp",
             }
         });
-
         if (!otpInstance) {
-            return res.status(400).send({ "Status": "Failure", "Details": "OTP Not Matched" });
+            return res.status(400).send({ status: "failure", message: "otp not matched" , data:{}});
         }
-
         if (otpInstance.expirationDate < currentDate) {
-            return res.status(400).send({ "Status": "Failure", "Details": "OTP Expired" });
+            return res.status(400).send({ status: "failure", message: "otp exprired" , data : {}});
         }
-
         if (otpInstance.isVerified) {
-            return res.status(400).send({ "Status": "Failure", "Details": "OTP Already Used" });
+            return res.status(400).send({ status: "failure", message: "otp already used", data : {} });
         }
-        
         otpInstance.isVerified = true
         await otpInstance.save();
-
         const user = await User.findOne({
             where:{
             phoneNumber:phoneNumber,
             }
         });
         if (user != null) {
-            return res.status(200).send({ "Status": "Success", "Details": {user:user,verifyToken:user.verifyToken} });    
+            return res.status(200).send({ status: "success",message:"otp matched", data: {jwt_token:user.verifyToken} });    
         }
         const newUser = await User.create({
             phoneNumber: phoneNumber,
@@ -110,20 +102,14 @@ exports.verifyOtp = async (req, res) => {
         })
         const token = jwt.sign(
             {
-                user: {
                 userId: newUser.id,
-                phoneNumber: phoneNumber,
-                createdAt: new Date(),
-                },
+                iat: new Date(),
             },
             process.env.JWT_SECRET_KEY,
         );
-        newUser.verifyToken = token;
-        await newUser.save();
-        return res.status(200).send({ "Status": "Success", "Details": {user:newUser,verifyToken:token} });   
+        return res.status(200).send({ status: "success", message:"otp matched", data: {jwt_token:token} });   
     } catch (error) {
-        const response = { status: "Failure", Details: error.message }
-        return res.status(400).send(response);
+        return res.status(500).send({ status: "failure", message: error.message, data:{}});
     }
 }
 
