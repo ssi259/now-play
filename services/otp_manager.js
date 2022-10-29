@@ -81,6 +81,7 @@ exports.pre_process_verify = async (req) => {
 exports.process_verify = async (input) => {
     const { phone_number, otp } = input 
     const currentDate = new Date();
+    let user_id;
     const otp_instance = await Notification.findOne({
         where:
         {
@@ -100,21 +101,17 @@ exports.process_verify = async (input) => {
     }
     otp_instance.isVerified = true
     await otp_instance.save();
-    const user = await User.findOne({
-        where:{
-        phoneNumber:phone_number,
+
+    const [user, created] = await User.findOrCreate({
+        where: {
+            phoneNumber: phone_number,
+            isPhoneVerified: true,
         }
-    });
-    if (user != null) {
-        return user.verifyToken
-    }
-    const new_user = await User.create({
-        phoneNumber: phone_number,
-        isPhoneVerified: true,
     })
+    user_id = user.id
     const token = jwt.sign(
         {
-            userId: new_user.id
+            user_id: user_id
         },
         process.env.JWT_SECRET_KEY,
     );
