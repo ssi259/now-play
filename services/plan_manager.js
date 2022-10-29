@@ -44,3 +44,20 @@ exports.post_process_get_plan_by_batch_id = async (plan,resp) => {
     resp.status(200).send({status:"Success",data:plan})
 }
 
+exports.pre_process_update = async(req,resp)=>{
+    const update_plan = await  models.SubscriptionPlan.update(req.body, {where: {id:req.params.id}})
+    .then(() => {return models.SubscriptionPlan.findOne({where: {id:req.params.id}})})
+    .then(function (update_plan) {
+        if (update_plan) {
+            resp.send(update_plan);
+        } else {
+            resp.status(400).send('Error in Updating plan');
+        }
+    });
+}
+  exports.process_update = async(input_response)=>{
+    return input_response
+  }
+  exports.post_process_update = async(req,resp,input_response)=>{
+    resp.send(input_response)
+  }
