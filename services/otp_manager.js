@@ -7,7 +7,7 @@ const Api400Error = require('../error/api400Error')
 const Api500Error = require('../error/api500Error')
 
 AWS.config.loadFromPath(__dirname +'/../config/aws_config.json');
-AWS.config.update({ region: 'ap-southeast-1' });
+AWS.config.update({ region: 'ap-south-1' });
 
 exports.pre_process_generate = async (req) => {
     const { phone_number } = req.body;
