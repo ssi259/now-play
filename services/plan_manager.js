@@ -67,11 +67,11 @@ exports.pre_process_update = async(req,resp)=>{
 exports.pre_process_update_plan = async (req, resp) => {
     const update_plan = await models.SubscriptionPlan.update(req.body, {where: {id:req.params.id}})
     .then(() => {return models.SubscriptionPlan.findOne({where: {id:req.params.id}})})
-       if (update_plan) {
-        return resp.status(400).send({ status: "Failure", details: "plan is not updated" })
-       } else {
-        return resp.status(200).send({ status: "success", details: "plan is updated" })
-       }
+    if (update_plan) {
+        return update_plan
+    } else {
+    throw new Api400Error(`Error In Updating plan `)
+    }
     }
    exports.process_update_plan_input_req = async (input_response) => {
        return input_response
