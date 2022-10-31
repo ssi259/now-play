@@ -6,7 +6,6 @@ const { Op } = require("sequelize");
 const Api400Error = require('../error/api400Error')
 const Api500Error = require('../error/api500Error')
 
-
 AWS.config.loadFromPath(__dirname +'/../config/aws_config.json');
 AWS.config.update({ region: 'ap-southeast-1' });
 
@@ -21,9 +20,9 @@ exports.pre_process_generate = async (req) => {
 exports.process_generate = async (input) => {
     const { phone_number } = input
     const now = new Date();
-    let otp;
     const expiration_date = new Date(now.getTime() + 10 * 60000);
-    const otp_instance = await Notification.findOne({
+    let otp;
+    const [otp_instance , created] = await Notification.findOrCreate({
         where: {
             phoneNumber: phone_number,
             notificationType: "otp",
@@ -31,22 +30,14 @@ exports.process_generate = async (input) => {
             expirationDate: {
                 [Op.gt]:now
             }
+        },
+        defaults: {
+            expirationDate: expiration_date,
+            otp: otp_generator(),
+            channelType: "sms",
         }
     });
-    if (!otp_instance) {
-        otp = otp_generator();
-        await Notification.create({
-            otp:otp,
-            expirationDate:expiration_date,
-            phoneNumber:phone_number,
-            isVerified: false,
-            channelType: "sms",
-            notificationType: "otp"
-        })
-    }
-    else {
-        otp=otp_instance.otp
-    }
+    otp = otp_instance.otp
     return {phone_number, otp}
 }
 
@@ -105,6 +96,8 @@ exports.process_verify = async (input) => {
     const [user, created] = await User.findOrCreate({
         where: {
             phoneNumber: phone_number,
+        },
+        defaults: {
             isPhoneVerified: true,
         }
     })
