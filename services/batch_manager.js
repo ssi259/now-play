@@ -238,9 +238,9 @@ exports.pre_process_update_batch = async (req, resp) => {
  const update_batch = await models.Batch.update(req.body, {where: {id:req.params.id}})
  .then(() => {return models.Batch.findOne({where: {id:req.params.id}})})
     if (update_batch) {
-        resp.send(update_batch);
+        return update_batch
     } else {
-        resp.status(400).send('Error in updating record');
+    throw new Api400Error(`Error In Updating Batch `)
     }
 }
 exports.process_update_batch_input_req = async (input_response) => {
