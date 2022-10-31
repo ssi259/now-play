@@ -10,14 +10,16 @@ exports.create = async (req, resp) => {
         return resp.status(status_code).send({ status: "Failure", message: e.name })
     }
 }
-exports.update = async (req, resp) => {
-    try {
-        var input_response = await plan_manager.pre_process_update(req)
-        var process_response = await plan_manager.process_update(input_response)
-        var post_process_response = await plan_manager.post_process_update(process_response, resp)
-    } catch (e) {
+exports.update_plan = async(req,resp) =>{
+
+    try{
+        var input_response = await plan_manager.pre_process_update_plan(req,resp)
+        var processed_reponse =  await plan_manager.process_update_plan_input_req(input_response)
+        var post_process_response = await plan_manager.post_process_plan_batch(req,resp,processed_reponse)
+    }catch(e){
         const status_code = e.statusCode ? e.statusCode : 500
         return resp.status(status_code).send({ status: "Failure", message: e.name })
+    }finally{
     }
 }
 

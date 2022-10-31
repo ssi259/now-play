@@ -1,6 +1,7 @@
 const models = require('../models')
 const Api400Error = require('../error/api400Error')
 
+
 exports.pre_process_create = async (req) => {
     const { batch_id, plan_name, price } = req.body
     if (!batch_id) {
@@ -22,6 +23,7 @@ exports.process_create = async (input_data) => {
 exports.post_process_create = async (subscription_plan,resp) => {
     resp.status(200).send({status:"Success",data:subscription_plan})
 }
+<<<<<<< HEAD
 
 
 exports.pre_process_get_plan_by_batch_id = async (req) => {
@@ -61,3 +63,20 @@ exports.pre_process_update = async(req,resp)=>{
   exports.post_process_update = async(req,resp,input_response)=>{
     resp.send(input_response)
   }
+=======
+exports.pre_process_update_plan = async (req, resp) => {
+    const update_plan = await models.SubscriptionPlan.update(req.body, {where: {id:req.params.id}})
+    .then(() => {return models.SubscriptionPlan.findOne({where: {id:req.params.id}})})
+       if (update_plan) {
+        return resp.status(400).send({ status: "Failure", details: "plan is not updated" })
+       } else {
+        return resp.status(200).send({ status: "success", details: "plan is updated" })
+       }
+    }
+   exports.process_update_plan_input_req = async (input_response) => {
+       return input_response
+   }
+   exports.post_process_update_plan = async (req, resp, input_response) => {
+       resp.send(input_response)
+   }
+>>>>>>> update_plan
