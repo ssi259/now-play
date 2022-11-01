@@ -5,7 +5,6 @@ const router = express.Router();
 
 router.post('/',plans_controller.create)
 router.get('/', plans_controller.getPlanByBatchId)   
- 
-router.put('/:id',plans_controller.update)
+router.put('/:id',plans_controller.update_plan)
     
 module.exports = router
