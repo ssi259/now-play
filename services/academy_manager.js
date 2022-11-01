@@ -101,12 +101,11 @@ exports.post_academy_list_process = async(req,resp,input_response)=>{
 exports.pre_process_update_academy = async(req,resp)=>{
   const update_academy = await  models.Academy.update(req.body, {where: {id:req.params.id}})
   .then(() => {return models.Academy.findOne({where: {id:req.params.id}})})
-   
-      if (update_academy) {
-          resp.send(update_academy);
-      } else {
-          resp.status(400).send('Error in Updating academy');
-      }
+  if (update_academy) {
+      return update_academy
+  } else {
+    throw new Api400Error(`Error In Updating academy`)
+  }
 }
 exports.process_update_academy_input_req = async(input_response)=>{
   return input_response
