@@ -88,10 +88,10 @@ exports.pre_process_update_sports = async(req,resp)=>{
   const update_sports = await models.Sports.update(req.body, {where: {id:req.params.id}})
   .then(() => {return models.Sports.findOne({where: {id:req.params.id}})})
     if (update_sports) {
-        resp.send(update_sports);
-    } else {
-      throw new Api500Error(`Error In updating Sports`)
-    } 
+      return update_sports
+  } else {
+    throw new Api400Error(`Error In Updating Sports`)
+  }
 }
 
 exports.process_update_sports_input_req = async(input_response)=>{
