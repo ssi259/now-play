@@ -81,10 +81,15 @@ exports.post_arenas_detail_process = async(req,resp,input_response)=>{
   resp.send(input_response)
 }
 
-exports.process_update_arena_by_id = async (req) => {
-  const [affected_rows] = await models.Arena.update(req.body, {
+exports.pre_process_update_arena_by_id = async (req) => {
+  return {arena_id:req.params.id, data:req.body}
+}
+
+exports.process_update_arena_by_id = async (input_data) => {
+  const { arena_id, data } = input_data
+  const [affected_rows] = await models.Arena.update(data, {
     where: {
-        id:req.params.id
+        id:arena_id
     },
   })
   if (!affected_rows) {
