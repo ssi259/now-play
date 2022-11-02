@@ -16,7 +16,6 @@ var sportsRouter = require('./routes/sports.js');
 var reviewRouter = require('./routes/reviews.js');
 var sportsRouter = require('./routes/sports.js');
 var planRouter = require('./routes/plans')
-var enrollmentRouter = require('./routes/enrollment.js');
 
 var app = express();
 app.use(fileUpload());
@@ -42,7 +41,6 @@ app.use('/sports', sportsRouter);
 app.use('/reviews',reviewRouter);
 app.use('/sports', sportsRouter);
 app.use('/plans',planRouter)
-app.use('/enrollments',enrollmentRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
