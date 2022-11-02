@@ -1,0 +1,123 @@
+require('dotenv').config();
+const jwt = require('jsonwebtoken')
+const { User, Notification } = require('../models'); 
+const AWS = require('aws-sdk');
+const { Op } = require("sequelize");
+const Api400Error = require('../error/api400Error')
+const Api500Error = require('../error/api500Error')
+
+AWS.config.loadFromPath(__dirname +'/../config/aws_config.json');
+AWS.config.update({ region: 'ap-south-1' });
+
+exports.pre_process_generate = async (req) => {
+    const { phone_number } = req.body;
+    if (!phone_number) {
+        throw new Api400Error("phone number not provided")
+    }
+    return req.body
+}
+
+exports.process_generate = async (input) => {
+    const { phone_number } = input
+    const now = new Date();
+    const expiration_date = new Date(now.getTime() + 10 * 60000);
+    let otp;
+    const [otp_instance , created] = await Notification.findOrCreate({
+        where: {
+            phoneNumber: phone_number,
+            notificationType: "otp",
+            isVerified:false,
+            expirationDate: {
+                [Op.gt]:now
+            }
+        },
+        defaults: {
+            expirationDate: expiration_date,
+            otp: otp_generator(),
+            channelType: "sms",
+        }
+    });
+    otp = otp_instance.otp
+    return {phone_number, otp}
+}
+
+exports.post_process_generate = async (input, resp) => {
+    const {phone_number , otp} = input
+    const phone_message =
+        `Dear User,\n`
+        + `${otp} is your OTP for Phone Number Verfication. Please enter the OTP to verify your phone number`
+    const params = {
+        Message: phone_message,
+        PhoneNumber:`+91${phone_number}`
+    }
+    const publishTextPromise = new AWS.SNS({ apiVersion: '2010-03-31' }).publish(params).promise();
+    publishTextPromise.then((data) => {
+        resp.status(200).send({status:"success",message:"otp sent successfully"})
+    }).catch((err) => {
+        throw new Api500Error('error while sending otp')
+    })
+}
+
+exports.pre_process_verify = async (req) => {
+    const { phone_number, otp } = req.body;
+    if (!phone_number) {
+        throw new Api400Error("phone number not provided")
+    }
+    if (!otp) {
+        throw new Api400Error("otp not provided")
+    }
+    return req.body
+}
+
+exports.process_verify = async (input) => {
+    const { phone_number, otp } = input 
+    const currentDate = new Date();
+    const otp_instance = await Notification.findOne({
+        where:
+        {
+            otp: otp,
+            phoneNumber: phone_number,
+            notificationType: "otp",
+        }
+    });
+    if (!otp_instance) {
+        throw new Api400Error("otp not matched")
+    }
+    if (otp_instance.expirationDate < currentDate) {
+        throw new Api400Error("otp exprired")
+    }
+    if (otp_instance.isVerified) {
+        throw new Api400Error("otp already used")
+    }
+    otp_instance.isVerified = true
+    await otp_instance.save();
+
+    const [user, created] = await User.findOrCreate({
+        where: {
+            phoneNumber: phone_number,
+        },
+        defaults: {
+            isPhoneVerified: true,
+        }
+    })
+    const token = jwt.sign(
+        {
+            user_id: user.id
+        },
+        process.env.JWT_SECRET_KEY,
+    );
+    return token
+}
+
+exports.post_process_verify = async (token,resp) => {
+    resp.status(200).send({ status: "success", message:"otp matched", data: {jwt_token:token} }); 
+}
+
+function otp_generator() {
+    var digits = '0123456789';
+    let otp = '';
+    for (let i = 0; i < 4; i++ ) {
+        otp += digits[Math.floor(Math.random() * 10)];
+    }
+    return otp;
+}
