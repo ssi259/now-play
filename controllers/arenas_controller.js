@@ -51,3 +51,13 @@ exports.arenas_details = async(req,resp)=>{
     }finally{
     }
 }
+
+exports.update_arena_by_id = async (req, resp) => {
+    try {
+        await ArenaManager.process_update_arena_by_id(req)
+        await ArenaManager.post_process_update_arena_by_id(resp)
+    } catch (e) {
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name})
+    }
+}

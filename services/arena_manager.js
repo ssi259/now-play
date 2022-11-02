@@ -80,3 +80,18 @@ exports.process_arenas_detail_input_req = async(input_response)=>{
 exports.post_arenas_detail_process = async(req,resp,input_response)=>{
   resp.send(input_response)
 }
+
+exports.process_update_arena_by_id = async (req) => {
+  const [affected_rows] = await models.Arena.update(req.body, {
+    where: {
+        id:req.params.id
+    },
+  })
+  if (!affected_rows) {
+    throw new Api400Error("invalid request")
+  }
+}
+
+exports.post_process_update_arena_by_id = async (resp) => {
+  resp.status(200).send({status:"success",message:"arena updated successfully"})
+}
