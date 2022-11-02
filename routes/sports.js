@@ -6,5 +6,6 @@ router.post('/', sport_controller.create_sport);
 router.get('/', sport_controller.sports_list);
 router.post('/upload_images',sport_controller.uploadSportImages);
 router.get('/:id',sport_controller.sport_list);
+router.put('/:id',sport_controller.update_sports);
 module.exports = router;
 

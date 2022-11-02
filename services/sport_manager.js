@@ -1,7 +1,9 @@
 const models = require("../models");
 const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
-const Api500Error = require('../error/api500Error')
+const Api500Error = require('../error/api500Error');
+
+
 exports.pre_process_create_sport = async(req,resp)=>{
   const result = await  models.Sports.create({name: req.body.name,type: req.body.type,thumbnail: req.body.thumbnail,about: req.body.about}).then(function (sport) {
       if (sport) {
@@ -82,4 +84,15 @@ exports.post_sport_list_process = async(req,resp,input_response)=>{
   resp.send(input_response)
 }
 
+exports.pre_process_update_sports = async(req,resp)=>{
+  const update_sports = await models.Sports.update(req.body, {where: {id:req.params.id}})
+  .then(() => {return models.Sports.findOne({where: {id:req.params.id}})})
+}
+
+exports.process_update_sports_input_req = async(input_response)=>{
+  return input_response
+}
+exports.post_update_sports_process = async(req,resp,input_response)=>{
+  resp.send(input_response)
+}
 
