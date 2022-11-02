@@ -86,7 +86,13 @@ exports.post_sport_list_process = async(req,resp,input_response)=>{
 
 exports.pre_process_update_sports = async(req,resp)=>{
   const update_sports = await models.Sports.update(req.body, {where: {id:req.params.id}})
-  .then(() => {return models.Sports.findOne({where: {id:req.params.id}})})
+  then(function (update_sports) {
+    if (update_sports) {
+        resp.send(update_sports);
+    } else {
+      throw new Api500Error(`Error In updating Sports`)
+    }
+});
 }
 
 exports.process_update_sports_input_req = async(input_response)=>{
