@@ -53,7 +53,8 @@ exports.getCoachById = async (req, resp) => {
 
 exports.update_coach_by_id = async (req, resp) => {
     try {
-        await coachManager.process_update_coach_by_id(req)
+        var input_response = await coachManager.pre_process_update_coach_by_id(req)
+        await coachManager.process_update_coach_by_id(input_response)
         await coachManager.post_process_update_coach_by_id(resp)
     } catch (e) {
         const status_code = e.statusCode ? e.statusCode : 500

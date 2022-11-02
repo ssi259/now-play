@@ -131,10 +131,15 @@ exports.post_process_get_coach_by_id = async ( coach, resp) => {
   resp.status(200).send({status:"Success",data:coach})
 }
 
-exports.process_update_coach_by_id = async (req)=> {
-  const [affected_rows] = await Coach.update(req.body, {
+exports.pre_process_update_coach_by_id = async (req) => {
+  return {coach_id:req.params.id, data: req.body}
+}
+
+exports.process_update_coach_by_id = async (input_data) => {
+  const {coach_id , data } = input_data
+  const [affected_rows] = await Coach.update(data, {
     where: {
-      id:req.params.id
+      id:coach_id
     }
   })
   if (!affected_rows) {
