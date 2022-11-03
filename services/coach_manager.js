@@ -130,3 +130,23 @@ exports.process_get_coach_by_id = async (coach_id) => {
 exports.post_process_get_coach_by_id = async ( coach, resp) => {
   resp.status(200).send({status:"Success",data:coach})
 }
+
+exports.pre_process_update_coach_by_id = async (req) => {
+  return {coach_id:req.params.id, data: req.body}
+}
+
+exports.process_update_coach_by_id = async (input_data) => {
+  const {coach_id , data } = input_data
+  const [affected_rows] = await Coach.update(data, {
+    where: {
+      id:coach_id
+    }
+  })
+  if (!affected_rows) {
+    throw new Api400Error("invalid request")
+  }
+}
+
+exports.post_process_update_coach_by_id = async (resp) => {
+  resp.status(200).send({status:"success",message:"coach updated successfully"})
+}
