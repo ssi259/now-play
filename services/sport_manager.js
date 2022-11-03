@@ -84,17 +84,22 @@ exports.post_sport_list_process = async(req,resp,input_response)=>{
   resp.send(input_response)
 }
 
-exports.pre_process_update_sports = async(req,resp)=>{
-  const update_sports = await models.Sports.update(req.body, {where: {id:req.params.id}})
-  if (update_sports){
-  resp.status(200).send({status:"Success",message:"Sports Updated Successfully"})
-}
+exports.pre_process_update_sports = async (req) => {
+  return {sport_id:req.params.id, data:req.body}
 }
 
-exports.process_update_sports_input_req = async(input_response)=>{
-  return input_response
-}
-exports.post_update_sports_process = async(req,resp,input_response)=>{
-  resp.send(input_response)
+exports.process_update_sports = async (input_data) => {
+  const { sport_id, data } = input_data
+  const [affected_rows] = await models.Sports.update(data, {
+    where: {
+        id:sport_id
+    },
+  })
+  if (!affected_rows) {
+    throw new Api400Error("invalid request")
+  }
 }
 
+exports.post_process_sport = async (resp) => {
+  resp.status(200).send({status:"success",message:"sport updated successfully"})
+}
