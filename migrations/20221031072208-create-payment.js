@@ -21,6 +21,9 @@ module.exports = {
       user_id: {
         type: Sequelize.INTEGER
       },
+      payment_mode: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
