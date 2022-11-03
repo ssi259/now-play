@@ -38,7 +38,7 @@ exports.arena_details = async(req,resp)=>{
 }
 
 
-exports.arenas_detail = async(req,resp)=>{
+exports.arenas_details = async(req,resp)=>{
         
     try{
         var input_response =  await ArenaManager.pre_process_arenas_details(req,resp)
