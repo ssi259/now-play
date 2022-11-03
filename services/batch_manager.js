@@ -234,17 +234,26 @@ exports.process_batch_details_input_req = async(req,input_response)=>{
     resp.send(input_response)
 }
 
-exports.pre_process_update_batch = async (req, resp) => {
- const update_batch = await models.Batch.update(req.body, {where: {id:req.params.id}})
- .then(() => {return models.Batch.findOne({where: {id:req.params.id}})})
+exports.pre_process_update_batch = async (req) => {
+    return {batch_id:req.params.id, data:req.body}
 }
-exports.process_update_batch_input_req = async (input_response) => {
-    return input_response
+  
+exports.process_update_batch_input_req = async (input_data) => {
+ const { batch_id, data } = input_data
+ const [affected_rows] = await models.Batch.update(data, {
+  where: {
+    id:batch_id
+ }, 
+ })
+ if (!affected_rows) {
+   throw new Api400Error("invalid request")
+  }
 }
-exports.post_process_update_batch = async (req, resp, input_response) => {
-    resp.send(input_response)
+  
+exports.post_process_update_batch = async (resp) => {
+    resp.status(200).send({status:"success",message:"batch updated successfully"})
 }
-
+  
 
 
 exports.pre_process_upcoming_classes = async (req) => {
