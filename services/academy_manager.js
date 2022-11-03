@@ -98,13 +98,21 @@ exports.post_academy_list_process = async(req,resp,input_response)=>{
   resp.send(input_response)
 }
 
-exports.pre_process_update_academy = async(req,resp)=>{
-  const update_academy = await  models.Academy.update(req.body, {where: {id:req.params.id}})
-  .then(() => {return models.Academy.findOne({where: {id:req.params.id}})})
+exports.pre_process_update_academy = async (req) => {
+  return {academy_id:req.params.id, data:req.body}
 }
-exports.process_update_academy_input_req = async(input_response)=>{
-  return input_response
+exports.process_update_academy_input_req = async (input_data) => {
+  const { academy_id, data } = input_data
+  const [affected_rows] = await models.Academy.update(data, {
+    where: {
+        id:academy_id
+    },
+  })
+  if (!affected_rows) {
+    throw new Api400Error("invalid request")
+  }
 }
-exports.post_update_academy_process = async(req,resp,input_response)=>{
-  resp.send(input_response)
+exports.post_update_academy_process = async (resp) => {
+  resp.status(200).send({status:"success",message:"academy updated successfully"})
 }
+
