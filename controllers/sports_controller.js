@@ -56,8 +56,8 @@ exports.update_sports = async(req,resp)=>{
 
     try{
         var input_response =  await SportManager.pre_process_update_sports(req,resp)
-        var processed_reponse =  await SportManager.process_update_sports_input_req(input_response)
-        var post_process_response = await SportManager.post_update_sports_process(req,resp,processed_reponse)
+        var processed_reponse =  await SportManager.process_update_sports(input_response)
+        var post_process_response = await SportManager.post_process_sport(req,resp,processed_reponse)
     }catch(e){
         console.log(e)
         const status_code = e.statusCode ? e.statusCode : 500
