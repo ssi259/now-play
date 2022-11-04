@@ -21,3 +21,14 @@ exports.update_user_by_id = async (req, resp) => {
         return resp.status(status_code).send({ status: "failure", message: e.name})
     }
 }
+
+exports.get_upcoming_classes = async (req, resp) => {
+    try {
+        var input_response = await user_manager.pre_process_upcoming_classes(req)
+        var processed_response = await user_manager.process_upcoming_classes(input_response)
+        await user_manager.post_process_upcoming_classes(processed_response,resp)
+    } catch (e) {
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name})
+    }
+}

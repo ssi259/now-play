@@ -1,5 +1,6 @@
 const models = require('../models')
 const Api400Error = require('../error/api400Error')
+const { Batch } = require('aws-sdk')
 
 exports.pre_process_get_user_by_id = async (req) => {
     return req.params.id
@@ -36,4 +37,29 @@ exports.process_update_user_by_id = async (input_data, req) => {
 
 exports.post_process_update_user_by_id = async (resp) => {
     resp.status(200).send({status:"success",message:"user updated successfully"})
+}
+
+
+exports.pre_process_upcoming_classes = async (req) => {
+    return req.params.id
+}
+
+exports.process_upcoming_classes = async (user_id) => {
+    const batches = await models.Enrollment.findAll({
+        where: {
+            user_id:user_id
+        },
+        attributes: ['batch_id']
+    })
+
+    let upcoming_classes
+
+    await Promise.all(batches.map(async (batches) => {
+        upcoming_classes= await models.Batch(batch_id)
+    }));
+    return batches
+}
+
+exports.post_process_upcoming_classes = async (data, resp) => {
+    resp.status(200).send({status:"success",message:"retrieved upcoming classes successfully", data:data})
 }
