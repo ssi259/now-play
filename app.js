@@ -5,7 +5,7 @@ var cors = require('cors');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var fileUpload = require("express-fileupload");
-
+const {auth} = require('./middlewares/authentication')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var batchesRouter = require('./routes/batches.js');
@@ -33,16 +33,16 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/users',auth, usersRouter);
 app.use('/batches', batchesRouter);
 app.use('/notifications/otp', otpRouter);
-app.use('/coach', coachRouter);
-app.use('/arenas', arenasRouter);
-app.use('/academies', academiesRouter);
-app.use('/sports', sportsRouter);
-app.use('/reviews',reviewRouter);
-app.use('/sports', sportsRouter);
-app.use('/plans',planRouter)
+app.use('/coach',auth, coachRouter);
+app.use('/arenas',auth, arenasRouter);
+app.use('/academies',auth, academiesRouter);
+app.use('/sports',auth, sportsRouter);
+app.use('/reviews',auth,reviewRouter);
+app.use('/sports', auth,sportsRouter);
+app.use('/plans',auth,planRouter)
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
