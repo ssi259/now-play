@@ -2,7 +2,6 @@ const batch_controller = require("../controllers/batches_controller.js")
 var express = require('express');
 const { Sequelize, DataTypes } = require("sequelize");
 var router = express.Router();
-const {auth} = require('../middlewares/authentication')
 
 
 /* GET users listing. */
