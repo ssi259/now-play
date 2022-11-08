@@ -37,3 +37,26 @@ exports.process_update_user_by_id = async (input_data, req) => {
 exports.post_process_update_user_by_id = async (resp) => {
     resp.status(200).send({status:"success",message:"user updated successfully"})
 }
+
+
+exports.pre_process_get_user_enrollments = async (req) => {
+    console.log("user_id",req.params.id)
+    return req.params.id
+}
+
+exports.process_get_user_enrollments = async (user_id) => {
+    console.log("user_id 1",user_id)
+    const enrollments = await models.Enrollment.findAll({
+        where: {
+            user_id: user_id,
+            status:"active"
+        }
+    })
+
+    
+    return enrollments;
+}
+
+exports.post_process_get_user_enrollments = async (data, resp) => {
+    resp.status(200).send({status:"success",message:"retrieved enrollments successfully", data : data})
+}
