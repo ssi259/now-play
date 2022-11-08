@@ -21,3 +21,15 @@ exports.update_user_by_id = async (req, resp) => {
         return resp.status(status_code).send({ status: "failure", message: e.name})
     }
 }
+
+
+exports.upload_profile_pic = async (req, resp) => {
+    try {
+        var input_response = await user_manager.pre_process_upload_profile_pic(req)
+        var processed_response = await user_manager.process_upload_profile_pic(input_response)
+        await user_manager.post_process_upload_profile_pic(processed_response,resp)
+    } catch (e) {
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
+    }
+}

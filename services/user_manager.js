@@ -1,5 +1,6 @@
 const models = require('../models')
 const Api400Error = require('../error/api400Error')
+const {uploadFile} = require('../lib/upload_files_s3')
 
 exports.pre_process_get_user_by_id = async (req) => {
     return req.params.id
@@ -36,4 +37,26 @@ exports.process_update_user_by_id = async (input_data, req) => {
 
 exports.post_process_update_user_by_id = async (resp) => {
     resp.status(200).send({status:"success",message:"user updated successfully"})
+}
+
+exports.pre_process_upload_profile_pic = async (req) => {
+    if (req.files == null || req.files.image == null) {
+        throw new Api400Error("Image Not Provided")
+    }
+    return {user_id:req.params.id ,image:req.files.image }
+}
+
+exports.process_upload_profile_pic = async (input_data) => {
+    const { user_id, image } = input_data
+    const img_url = await uploadFile(image)
+    const user = await models.User.update({ profilePic: img_url }, {
+        where: {
+            id:user_id
+        }
+    })
+    return {img_url}
+}
+
+exports.post_process_upload_profile_pic = async (data,resp) => {
+    resp.status(200).send({status:"success",message:"profile pic updated successfully ", data:data})
 }
