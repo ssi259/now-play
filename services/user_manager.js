@@ -1,6 +1,5 @@
 const models = require('../models')
 const Api400Error = require('../error/api400Error')
-const { Batch } = require('aws-sdk')
 
 exports.pre_process_get_user_by_id = async (req) => {
     return req.params.id
@@ -45,19 +44,40 @@ exports.pre_process_upcoming_classes = async (req) => {
 }
 
 exports.process_upcoming_classes = async (user_id) => {
+    const weekly_classes = [[], [], [], [], [], [], []]
     const batches = await models.Enrollment.findAll({
         where: {
-            user_id:user_id
+            user_id: user_id,
+            status: "active",
         },
         attributes: ['batch_id']
     })
+    for (const batch of batches) {
+        const batch_data = await models.Batch.findByPk(batch.dataValues.batch_id)
+        const days_arr = JSON.parse(batch_data.days)
+        for (let i = 0; i < 7; i++){
+            if (days_arr[i] == 1) {
+                weekly_classes[(i+1)%7].push(batch_data)
+            }
+        }
+    }
+    let j = 0;
+    const data = [];
+    const curr_day_index = (new Date()).getDay();
+    for (let i = curr_day_index; i < 7 + curr_day_index; i++){
+        data.push({
+            date: ist_formate_date(j) ,
+            classes :weekly_classes[(i % 7)]
+        })
+        j++;
+    }   
+    return data
+}
 
-    let upcoming_classes
-
-    await Promise.all(batches.map(async (batches) => {
-        upcoming_classes= await models.Batch(batch_id)
-    }));
-    return batches
+function ist_formate_date (days_gap) {
+    const date = new Date()
+    date.setDate(date.getDate() + days_gap)
+    return date.toLocaleDateString()
 }
 
 exports.post_process_upcoming_classes = async (data, resp) => {
