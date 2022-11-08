@@ -8,7 +8,7 @@ const Api500Error = require('../error/api500Error')
 exports.pre_process_create_arena = async(req,resp)=>{
   const result = await  models.Arena.create({name: req.body.name,phone_number: req.body.phone_number,email: req.body.email,city: req.body.city,state: req.body.state,pincode: req.body.pincode,country: req.body.country,lat: req.body.lat,lng: req.body.lng}).then(function (arena) {
       if (arena) {
-          resp.send(arena);
+          return result;
       } else {
         throw new Api500Error(`Error In Creating Arena`)
       }
@@ -53,7 +53,7 @@ async function upload_and_create_data(image, arena_id) {
 exports.pre_process_arena_details = async(req,resp)=>{
   const arena_details = await  models.Arena.findAll()
       if (arena_details) {
-          resp.send(arena_details);
+          return arena_details;
       } else {
         throw new Api500Error(`Bad Request`)
       }
