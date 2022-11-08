@@ -5,7 +5,6 @@ var cors = require('cors');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var fileUpload = require("express-fileupload");
-
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var batchesRouter = require('./routes/batches.js');
@@ -41,7 +40,7 @@ app.use('/arenas', arenasRouter);
 app.use('/academies', academiesRouter);
 app.use('/sports', sportsRouter);
 app.use('/reviews',reviewRouter);
-app.use('/sports', sportsRouter);
+app.use('/sports',sportsRouter);
 app.use('/plans',planRouter)
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
