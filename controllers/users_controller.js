@@ -30,6 +30,6 @@ exports.get_user_enrollments = async (req, resp) => {
         await user_manager.post_process_get_user_enrollments(processed_response, resp)
     } catch (e) {
         const status_code = e.statusCode ? e.statusCode : 500
-        return resp.status(status_code).send({ status: "failure", message: e.name})
+        return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
     }
 }
