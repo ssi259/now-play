@@ -1,4 +1,4 @@
-const payment_controller = require("../controllers/payment_controller.js")
+const payment_controller = require("../controllers/payments_controller.js")
 var express = require('express');
 var router = express.Router();
 
