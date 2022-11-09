@@ -40,20 +40,16 @@ exports.post_process_update_user_by_id = async (resp) => {
 
 
 exports.pre_process_get_user_enrollments = async (req) => {
-    console.log("user_id",req.params.id)
-    return req.params.id
+    return req.query.user_id
 }
 
 exports.process_get_user_enrollments = async (user_id) => {
-    console.log("user_id 1",user_id)
     const enrollments = await models.Enrollment.findAll({
         where: {
             user_id: user_id,
             status:"active"
         }
     })
-
-    
     return enrollments;
 }
 
