@@ -15,7 +15,8 @@ var academiesRouter = require('./routes/academies.js');
 var sportsRouter = require('./routes/sports.js');
 var reviewRouter = require('./routes/reviews.js');
 var sportsRouter = require('./routes/sports.js');
-var planRouter = require('./routes/plans')
+var planRouter = require('./routes/plans');
+var paymentRouter = require('./routes/payment.js');
 var app = express();
 app.use(fileUpload());
 app.use(cors());
@@ -40,7 +41,8 @@ app.use('/academies', academiesRouter);
 app.use('/sports', sportsRouter);
 app.use('/reviews',reviewRouter);
 app.use('/sports',sportsRouter);
-app.use('/plans',planRouter)
+app.use('/plans',planRouter);
+app.use('/payments', paymentRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
