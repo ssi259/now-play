@@ -44,6 +44,7 @@ exports.pre_process_upcoming_classes = async (req) => {
 }
 
 exports.process_upcoming_classes = async (user_id) => {
+    const week_days = ['Sunday','Monday', 'Tuesday', 'Wednesday', 'Thursday','Friday','Saturday']
     const weekly_classes = [[], [], [], [], [], [], []]
     const batches = await models.Enrollment.findAll({
         where: {
@@ -54,7 +55,24 @@ exports.process_upcoming_classes = async (user_id) => {
     })
     for (const batch of batches) {
         const batch_data = await models.Batch.findByPk(batch.dataValues.batch_id)
+
+        const arena_details = await models.Arena.findByPk(batch_data.dataValues.arena_id)
+        const coach_details = await models.Coach.findByPk(batch_data.dataValues.coach_id)
+        const academy_details = await models.Academy.findByPk(batch_data.dataValues.academy_id)
+        const sports_details = await models.Sports.findByPk(batch_data.dataValues.sports_id)
+        
+        const arena_data = arena_details != null ? { "name": arena_details["name"], "lat": arena_details["lat"], "lng": arena_details["lng"] } : null
+        const coach_data = coach_details != null ?  {"name":coach_details["name"],"experience":coach_details["experience"],"profile_pic":coach_details["profile_pic"],"about":coach_details["about"]} :null
+        const academy_data = academy_details != null ?  { "name": academy_details["name"], "phone_number": academy_details["phone_number"] } : null
+        const sports_data = sports_details !=null ? {"name":sports_details["name"],"type":sports_details["type"],"about":sports_details["about"]} : null
+        
+        batch_data.dataValues['arena_data'] = arena_data
+        batch_data.dataValues['coach_data'] = coach_data
+        batch_data.dataValues['academy_data'] = academy_data
+        batch_data.dataValues['sports_data'] = sports_data
+        
         const days_arr = JSON.parse(batch_data.days)
+        
         for (let i = 0; i < 7; i++){
             if (days_arr[i] == 1) {
                 weekly_classes[(i+1)%7].push(batch_data)
@@ -62,16 +80,17 @@ exports.process_upcoming_classes = async (user_id) => {
         }
     }
     let j = 0;
-    const data = [];
+    const response_data = [];
     const curr_day_index = (new Date()).getDay();
     for (let i = curr_day_index; i < 7 + curr_day_index; i++){
-        data.push({
+        response_data.push({
+            day:week_days[(i%7)],
             date: ist_formate_date(j) ,
             classes :weekly_classes[(i % 7)]
         })
         j++;
     }   
-    return data
+    return response_data
 }
 
 function ist_formate_date (days_gap) {
