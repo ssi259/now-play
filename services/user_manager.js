@@ -2,11 +2,11 @@ const models = require('../models')
 const Api400Error = require('../error/api400Error')
 const {uploadFile} = require('../lib/upload_files_s3')
 
-exports.pre_process_get_user_by_id = async (req) => {
-    return req.params.id
+exports.pre_process_get_user = async (req) => {
+    return req.user.user_id
 }
 
-exports.process_get_user_by_id = async (user_id) => {
+exports.process_get_user = async (user_id) => {
     const user = await models.User.findByPk(user_id)
     if (!user) {
         throw new Api400Error("bad request")
@@ -14,16 +14,16 @@ exports.process_get_user_by_id = async (user_id) => {
     return user;
 } 
 
-exports.post_process_get_user_by_id = async (user, resp) => {
+exports.post_process_get_user = async (user, resp) => {
     resp.status(200).send({status:"success",message:"user retrieved successfully",data:user})
 }
 
 
-exports.pre_process_update_user_by_id = async (req) => {
-    return {user_id:req.params.id , data:req.body}
+exports.pre_process_update_user = async (req) => {
+    return {user_id: req.user.user_id , data:req.body}
 }
 
-exports.process_update_user_by_id = async (input_data, req) => {
+exports.process_update_user = async (input_data, req) => {
     const { user_id, data } = input_data
     const [affected_rows] = await models.User.update(data, {
         where: {
@@ -35,7 +35,7 @@ exports.process_update_user_by_id = async (input_data, req) => {
     }
 }
 
-exports.post_process_update_user_by_id = async (resp) => {
+exports.post_process_update_user = async (resp) => {
     resp.status(200).send({status:"success",message:"user updated successfully"})
 }
 
@@ -43,7 +43,7 @@ exports.pre_process_upload_profile_pic = async (req) => {
     if (req.files == null || req.files.image == null) {
         throw new Api400Error("Image Not Provided")
     }
-    return {user_id:req.params.id ,image:req.files.image }
+    return {user_id:req.user.user_id,image:req.files.image }
 }
 
 exports.process_upload_profile_pic = async (input_data) => {
