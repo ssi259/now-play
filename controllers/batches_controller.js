@@ -1,6 +1,4 @@
 const BatchManager = require("../services/batch_manager")
-const models = require('../models');
-
 
 exports.search_batch = async(req,resp)=>{
         
@@ -45,5 +43,16 @@ exports.batch_details = async(req,resp) =>{
         const status_code = e.statusCode ? e.statusCode : 500
         return resp.status(status_code).send({ status: "Failure", message: e.name })
     }finally{
+    }
+}
+
+exports.get_upcoming_classes = async (req, resp) => {
+    try {
+        var input_response = await BatchManager.pre_process_upcoming_classes(req)
+        var processed_response = await BatchManager.process_upcoming_classes(input_response)
+        await BatchManager.post_process_upcoming_classes(processed_response, resp)
+    } catch (e) {
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name })
     }
 }
