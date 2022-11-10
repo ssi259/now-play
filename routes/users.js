@@ -5,8 +5,8 @@ const {auth} = require('../middlewares/authentication')
 var router = express.Router();
 
 router.get('/upcoming-classes', auth, user_controller.get_upcoming_classes)
-router.get('/:id', auth, user_controller.get_user_by_id)
-router.put('/:id', auth, user_controller.update_user_by_id)
-router.put('/profile-upload/:id', auth, user_controller.upload_profile_pic)
+router.put('/profile-upload', auth, user_controller.upload_profile_pic)
+router.get('/', auth , user_controller.get_user)
+router.put('/', auth , user_controller.update_user)
 
 module.exports = router;

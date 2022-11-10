@@ -2,11 +2,11 @@ const models = require('../models')
 const Api400Error = require('../error/api400Error')
 const {uploadFile} = require('../lib/upload_files_s3')
 
-exports.pre_process_get_user_by_id = async (req) => {
-    return req.params.id
+exports.pre_process_get_user = async (req) => {
+    return req.user.user_id
 }
 
-exports.process_get_user_by_id = async (user_id) => {
+exports.process_get_user = async (user_id) => {
     const user = await models.User.findByPk(user_id)
     if (!user) {
         throw new Api400Error("bad request")
@@ -14,16 +14,16 @@ exports.process_get_user_by_id = async (user_id) => {
     return user;
 } 
 
-exports.post_process_get_user_by_id = async (user, resp) => {
+exports.post_process_get_user = async (user, resp) => {
     resp.status(200).send({status:"success",message:"user retrieved successfully",data:user})
 }
 
 
-exports.pre_process_update_user_by_id = async (req) => {
-    return {user_id:req.params.id , data:req.body}
+exports.pre_process_update_user = async (req) => {
+    return {user_id: req.user.user_id , data:req.body}
 }
 
-exports.process_update_user_by_id = async (input_data, req) => {
+exports.process_update_user = async (input_data, req) => {
     const { user_id, data } = input_data
     const [affected_rows] = await models.User.update(data, {
         where: {
@@ -35,7 +35,7 @@ exports.process_update_user_by_id = async (input_data, req) => {
     }
 }
 
-exports.post_process_update_user_by_id = async (resp) => {
+exports.post_process_update_user = async (resp) => {
     resp.status(200).send({status:"success",message:"user updated successfully"})
 }
 
@@ -47,6 +47,8 @@ exports.pre_process_upcoming_classes = async (req) => {
 exports.process_upcoming_classes = async (user_id) => {
     const week_days = ['Sunday','Monday', 'Tuesday', 'Wednesday', 'Thursday','Friday','Saturday']
     const weekly_classes = [[], [], [], [], [], [], []]
+    let days_arr_length = 7; 
+
     const batches = await models.Enrollment.findAll({
         where: {
             user_id: user_id,
@@ -79,23 +81,25 @@ exports.process_upcoming_classes = async (user_id) => {
                     "sports_data": sports_data
         }
         const days_arr = JSON.parse(batch_data.days)
-        for (let i = 0; i < 7; i++){
+        for (let i = 0; i < days_arr_length; i++){
             if (days_arr[i] == 1) {
-                weekly_classes[(i+1)%7].push(obj)
+                weekly_classes[(i+1)% days_arr_length].push(obj)
             }
         }
     }
     let j = 0;
     const response_data = [];
     const curr_day_index = (new Date()).getDay();
-    for (let i = curr_day_index; i < 7 + curr_day_index; i++){
+
+    for (let i = curr_day_index; i < (days_arr_length + curr_day_index); i++){
         response_data.push({
-            day:week_days[(i%7)],
+            day:week_days[(i % days_arr_length)],
             date: ist_formate_date(j) ,
-            classes :weekly_classes[(i % 7)]
+            classes :weekly_classes[(i % days_arr_length)]
         })
         j++;
-    }   
+    }
+
     return response_data
 }
 
@@ -112,7 +116,7 @@ exports.pre_process_upload_profile_pic = async (req) => {
     if (req.files == null || req.files.image == null) {
         throw new Api400Error("Image Not Provided")
     }
-    return {user_id:req.params.id ,image:req.files.image }
+    return {user_id:req.user.user_id,image:req.files.image }
 }
 
 exports.process_upload_profile_pic = async (input_data) => {
