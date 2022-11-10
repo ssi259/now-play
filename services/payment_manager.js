@@ -3,8 +3,8 @@ const Api500Error = require('../error/api500Error')
 
 
 exports.pre_process_create = async(req,resp)=>{
-  const result = await  models.Payment.create({plan_id: req.body.plan_id,price: req.body.price,status: req.body.status,user_id: req.body.user_id})
-  return result
+  const result = await  models.Payment.create({plan_id: req.body.plan_id,price: req.body.price,status: req.body.status,user_id: req.body.user_id,coach_id: req.body.coach_id})
+  .then(() => {return models.Enrollment.create({batch_id:req.body.batch_id,user_id: req.body.user_id, subscription_id: req.body.subscription_id,status: req.body.status})})
 }
 exports.process_create_input_req = async(input_response)=>{
   return input_response
