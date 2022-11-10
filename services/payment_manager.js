@@ -28,3 +28,24 @@ exports.post_create_process = async(req,resp,input_response)=>{
 
   resp.status(200).send(formatted_response)
 }
+  resp.status(200).send(input_response)
+
+
+exports.pre_process_update_payment = async (req) => {
+  return {payment_id:req.params.id, data:req.body}
+}
+exports.process_update_payment = async (input_data) => {
+  const { payment_id, data } = input_data
+  const [affected_rows] = await models.Payment.update(data, {
+    where: {
+        id:payment_id
+    },
+  })
+  if (!affected_rows) {
+    throw new Api400Error("invalid request")
+  }
+}
+
+exports.post_process_payment = async (resp) => {
+  resp.status(200).send({status:"success",message:"payment updated successfully"})
+}
