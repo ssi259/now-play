@@ -21,8 +21,7 @@ exports.update_user = async (req, resp) => {
         return resp.status(status_code).send({ status: "failure", message: e.name})
     }
 }
-
-
+    
 exports.upload_profile_pic = async (req, resp) => {
     try {
         var input_response = await user_manager.pre_process_upload_profile_pic(req)
