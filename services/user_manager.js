@@ -41,7 +41,7 @@ exports.post_process_update_user_by_id = async (resp) => {
 
 
 exports.pre_process_upcoming_classes = async (req) => {
-    return req.params.id
+    return req.user.user_id
 }
 
 exports.process_upcoming_classes = async (user_id) => {
