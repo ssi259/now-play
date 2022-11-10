@@ -61,7 +61,7 @@ exports.process_upcoming_classes = async (user_id) => {
         const academy_details = await models.Academy.findByPk(batch_data.dataValues.academy_id)
         const sports_details = await models.Sports.findByPk(batch_data.dataValues.sports_id)
         
-        const arena_data = arena_details != null ? { "name": arena_details["name"], "lat": arena_details["lat"], "lng": arena_details["lng"] } : null
+        const arena_data = arena_details != null ? { "name": arena_details["name"], "lat": arena_details["lat"], "lng": arena_details["lng"], "city":arena_details["city"],"locality":arena_details["locality"],"state":arena_details["state"] } : null
         const coach_data = coach_details != null ?  {"name":coach_details["name"],"experience":coach_details["experience"],"profile_pic":coach_details["profile_pic"],"about":coach_details["about"]} :null
         const academy_data = academy_details != null ?  { "name": academy_details["name"], "phone_number": academy_details["phone_number"] } : null
         const sports_data = sports_details !=null ? {"name":sports_details["name"],"type":sports_details["type"],"about":sports_details["about"]} : null
