@@ -58,25 +58,30 @@ exports.process_upcoming_classes = async (user_id) => {
         const batch_data = await models.Batch.findByPk(batch.dataValues.batch_id)
 
         const arena_details = await models.Arena.findByPk(batch_data.dataValues.arena_id)
-        const coach_details = await models.Coach.findByPk(batch_data.dataValues.coach_id)
         const academy_details = await models.Academy.findByPk(batch_data.dataValues.academy_id)
         const sports_details = await models.Sports.findByPk(batch_data.dataValues.sports_id)
         
         const arena_data = arena_details != null ? { "name": arena_details["name"], "lat": arena_details["lat"], "lng": arena_details["lng"], "city":arena_details["city"],"locality":arena_details["locality"],"state":arena_details["state"] } : null
-        const coach_data = coach_details != null ?  {"name":coach_details["name"],"experience":coach_details["experience"],"profile_pic":coach_details["profile_pic"],"about":coach_details["about"]} :null
-        const academy_data = academy_details != null ?  { "name": academy_details["name"], "phone_number": academy_details["phone_number"] } : null
-        const sports_data = sports_details !=null ? {"name":sports_details["name"],"type":sports_details["type"],"about":sports_details["about"]} : null
+        const academy_data = academy_details != null ?  { "name": academy_details["name"]} : null
+        const sports_data = sports_details !=null ? {"id":sports_details["id"],"name":sports_details["name"],"type":sports_details["type"]} : null
         
-        batch_data.dataValues['arena_data'] = arena_data
-        batch_data.dataValues['coach_data'] = coach_data
-        batch_data.dataValues['academy_data'] = academy_data
-        batch_data.dataValues['sports_data'] = sports_data
-        
+        const obj = {
+                    "id": batch_data.dataValues["id"],
+                    "arena_id": batch_data.dataValues["arena_id"],
+                    "coach_id": batch_data.dataValues["coach_id"],
+                    "academy_id": batch_data.dataValues["academy_id"],
+                    "sports_id": batch_data.dataValues["sports_id"],
+                    "days": batch_data.dataValues["days"],
+                    "start_time": batch_data.dataValues["start_time"],
+                    "end_time": batch_data.dataValues["end_time"],
+                    "arena_data":arena_data,
+                    "academy_data":academy_data,
+                    "sports_data": sports_data
+        }
         const days_arr = JSON.parse(batch_data.days)
-        
         for (let i = 0; i < 7; i++){
             if (days_arr[i] == 1) {
-                weekly_classes[(i+1)%7].push(batch_data)
+                weekly_classes[(i+1)%7].push(obj)
             }
         }
     }
