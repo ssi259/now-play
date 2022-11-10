@@ -52,7 +52,7 @@ exports.post_process_generate = async (input, resp) => {
     }
     const publishTextPromise = new AWS.SNS({ apiVersion: '2010-03-31' }).publish(params).promise();
     publishTextPromise.then((data) => {
-        resp.status(200).send({status:"success",message:"otp sent successfully"})
+        resp.status(200).send({status:"success",message:"otp sent successfully",data:{otp:otp}})
     }).catch((err) => {
         throw new Api500Error('error while sending otp')
     })

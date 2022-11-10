@@ -1,7 +1,6 @@
 const models = require('../models')
 const Api400Error = require('../error/api400Error')
 
-
 exports.pre_process_create = async (req) => {
     const { batch_id, plan_name, price } = req.body
     if (!batch_id) {
@@ -63,5 +62,4 @@ exports.process_update_plan_input_req = async (input_data) => {
   
 exports.post_process_plan_batch = async (resp) => {
     resp.status(200).send({status:"success",message:"plan updated successfully"})
-}
-  
+}  
