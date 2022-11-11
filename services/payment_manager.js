@@ -1,5 +1,7 @@
 const models = require("../models");
 const Api500Error = require('../error/api500Error')
+const Api400Error = require('../error/api400Error')
+
 
 
 exports.pre_process_create = async(req,resp)=>{
@@ -39,7 +41,7 @@ exports.process_update_payment = async (input_data) => {
   const [affected_rows] = await models.Payment.update(data, {
     where: {
         id:payment_id
-    },
+    } .then(() => {return models.Enrollment.update({where: {id:req.user_id}})})
   })
   if (!affected_rows) {
     throw new Api400Error("invalid request")
