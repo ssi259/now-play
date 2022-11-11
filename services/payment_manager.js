@@ -33,18 +33,12 @@ exports.post_create_process = async(req,resp,input_response)=>{
   resp.status(200).send(input_response)
 
   exports.pre_process_update = async(req,resp)=>{
-    var plan = await models.SubscriptionPlan.findOne({
-      where: {
-          id: req.body.plan_id
-      }
-  })
-    return {user_id: req.user.user_id , data:req.body, price: plan.price}  
   }
   exports.process_update_input_req = async(req,input_response)=>{
     const { user_id ,price} = input_response
-    const result = await  models.Payment.update({plan_id: req.body.plan_id,price: price,status: "active",user_id: user_id})
+    const result = await  models.Payment.update({plan_id: req.body.plan_id,price: price,status: "success",user_id: user_id})
     if(result){
-      await models.Enrollment.update({status: "active"})
+      await models.Enrollment.update({user_id: user_id,status: "active"})
     }
     return result
   }
@@ -53,7 +47,6 @@ exports.post_create_process = async(req,resp,input_response)=>{
     var formatted_response = {}
     formatted_response["status"]="success"
     formatted_response["message"]="payment request updated"
-    delete input_response.dataValues.user_id
     formatted_response["data"]=input_response
   
     resp.status(200).send(formatted_response)
