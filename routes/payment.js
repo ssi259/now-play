@@ -5,5 +5,5 @@ const {auth} = require('../middlewares/authentication')
 
 
 router.post('/', auth, payment_controller.create_payment);
-router.get('/',payment_controller.transaction_details);
+router.get('/', auth ,payment_controller.transaction_details);
 module.exports = router;
