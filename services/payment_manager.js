@@ -42,14 +42,14 @@ exports.post_create_process = async(req,resp,input_response)=>{
   }
   exports.process_update_input_req = async(req,input_response)=>{
     const { user_id ,price} = input_response
-    const result = await  models.Payment.update({plan_id: req.body.plan_id,price: price,status: "active",user_id: user_id,coach_id: req.body.coach_id})
+    const result = await  models.Payment.update({plan_id: req.body.plan_id,price: price,status: "active",user_id: user_id})
     if(result){
       await models.Enrollment.update({status: "active"})
     }
     return result
   }
     
-  exports.post_create_process = async(req,resp,input_response)=>{
+  exports.post_update_process = async(req,resp,input_response)=>{
     var formatted_response = {}
     formatted_response["status"]="success"
     formatted_response["message"]="payment request updated"
