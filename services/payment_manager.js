@@ -30,7 +30,7 @@ exports.post_create_process = async(req,resp,input_response)=>{
   resp.status(200).send(input_response)
 }
 exports.pre_process_transaction_details = async(req,resp)=>{
-  const transaction_details = await  models.Payment.findAll({where: { id:user_id}})
+  const transaction_details = await  models.Payment.findAll({where: { id:req.body.user_id}})
       if (transaction_details) {
           return transaction_details;
       } else {
