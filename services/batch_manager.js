@@ -138,10 +138,10 @@ exports.process_batch_details_input_req = async(input_response)=>{
     const sports_details = await models.Sports.findOne({where:{id:input_response["sports_id"]}})
     const batch_pics = await models.BatchPhotos.findAll({where: {batchId: input_response["id"]}})
     const reviews_details = await models.Review.findAll({where: {coach_id: input_response["coach_id"]}}) 
-    const arena_data = {"arena_name":arena_details["name"],"lat":arena_details["lat"],"lng":arena_details["lng"]}
-    const coach_data = {"coach_name":coach_details["name"],"coach_experience":coach_details["experience"],"coach_profile_pic":coach_details["profile_pic"],"about_coach":coach_details["about"]}
-    const academy_data = {"academy_name":academy_details["name"],"academy_phone_number":academy_details["phone_number"]}
-    const sports_data = {"sports_name":sports_details["name"],"sports_type":sports_details["type"],"sports_about":sports_details["about"]}
+    const arena_data = arena_details != null ? {"arena_name":arena_details["name"],"lat":arena_details["lat"],"lng":arena_details["lng"]} : null
+    const coach_data = coach_details !=null ? {"coach_name":coach_details["name"],"coach_experience":coach_details["experience"],"coach_profile_pic":coach_details["profile_pic"],"about_coach":coach_details["about"]} : null
+    const academy_data =  academy_details != null ? {"academy_name":academy_details["name"],"academy_phone_number":academy_details["phone_number"]} : null
+    const sports_data =  sports_details !=null ? {"sports_name":sports_details["name"],"sports_type":sports_details["type"],"sports_about":sports_details["about"]} : null
     var batch_images = []
     for (each_batch_pic of batch_pics){
      await   batch_images.push(each_batch_pic.dataValues.img_url)
