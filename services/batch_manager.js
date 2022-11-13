@@ -1,11 +1,11 @@
 const dbConfig = require("../config/db_config.js");
 const axios = require('axios')
-const Sequelize = require("sequelize");
+const {Sequelize , Op} = require("sequelize");
 const models = require("../models");
 var lib = require('../lib/upload_files_s3');
 const Api400Error = require('./../error/api400Error')
 const Api500Error = require('./../error/api500Error')
-const Op = require('Sequelize').Op
+
 
 const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
     host: dbConfig.host,
