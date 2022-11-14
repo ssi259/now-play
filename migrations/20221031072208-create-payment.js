@@ -12,6 +12,9 @@ module.exports = {
       plan_id: {
         type: Sequelize.INTEGER
       },
+      coach_id: {
+        type: Sequelize.INTEGER
+      },
       price: {
         type: Sequelize.INTEGER
       },
