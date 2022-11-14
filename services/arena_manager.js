@@ -6,7 +6,7 @@ const Api500Error = require('../error/api500Error')
 
 
 exports.pre_process_create_arena = async(req,resp)=>{
-  await  models.Arena.create({name: req.body.name,phone_number: req.body.phone_number,email: req.body.email,city: req.body.city,state: req.body.state,pincode: req.body.pincode,country: req.body.country,lat: req.body.lat,lng: req.body.lng}).then(function (arena) {
+  await  models.Arena.create({name: req.body.name,phone_number: req.body.phone_number,email: req.body.email,locality: req.body.locality,city: req.body.city,state: req.body.state,pincode: req.body.pincode,country: req.body.country,lat: req.body.lat,lng: req.body.lng}).then(function (arena) {
       if (arena) {
           return arena;
       } else {
