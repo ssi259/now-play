@@ -1,5 +1,6 @@
 const models = require('../models')
 const Api400Error = require('../error/api400Error')
+const {Op} = require('sequelize')
 
 exports.pre_process_create = async (req) => {
     const { batch_id, plan_name, price } = req.body
@@ -9,7 +10,7 @@ exports.pre_process_create = async (req) => {
     if (!plan_name) {
         throw new Api400Error("Plan Name Not Provided")
     }
-    if (!price) {
+    if (price == null ) {
         throw new Api400Error("Price Not Provided")
     }
     return req.body
@@ -25,19 +26,35 @@ exports.post_process_create = async (subscription_plan,resp) => {
 
 
 exports.pre_process_get_plan_by_batch_id = async (req) => {
+    console.log("called")
     if (req.query == null ||  req.query.batch_id == null) {
         throw new Api400Error("Batch ID Not Provided")
     }
-    return req.query.batch_id
+    return {user_id : req.user.user_id , batch_id :req.query.batch_id}
 }
 
-exports.process_get_plan_by_batch_id = async (batch_id) => {
-    const plan = await models.SubscriptionPlan.findAll({
+exports.process_get_plan_by_batch_id = async (input_data) => {
+    const { user_id, batch_id } = input_data
+    const enrollment = await models.Enrollment.findOne({
         where: {
-            batch_id : batch_id
+            user_id: user_id
         }
     })
-    return plan
+    if (enrollment == null) {
+        return await models.SubscriptionPlan.findAll({
+            where: {
+                batch_id : batch_id
+            }
+        })
+    }
+    return  await models.SubscriptionPlan.findAll({
+        where: {
+            batch_id: batch_id,
+            type: {
+                [Op.notIn]: ["Demo", "demo", "DEMO"]
+            }
+        }
+    })
 }
 
 exports.post_process_get_plan_by_batch_id = async (plan,resp) => {
