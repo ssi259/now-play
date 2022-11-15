@@ -78,21 +78,41 @@ exports.post_process_search_batch = async (req, resp, input_response) => {
 }
 
 
-exports.pre_process_create_batch = async (req, resp) => {
-    const result = await models.Batch.create({ arena_id: req.body.arena_id, coach_id: req.body.coach_id, academy_id: req.body.academy_id, sports_id: req.body.sports_id, days: req.body.days, price: req.body.price, thumbnail_img: req.body.thumbnail_img, banner_img: req.body.banner_img, start_time: req.body.start_time, end_time: req.body.end_time, start_date: req.body.start_date, end_date: req.body.end_date }).then(function (batch) {
-        if (batch) {
-            resp.send(batch);
-        } else {
-            resp.status(400).send('Error in insert new record');
-        }
-    });
+exports.pre_process_create_batch = async (req) => {
+    if (req.files==null || req.files.thumbnail_img==null){
+        throw new Api400Error(`Thumbnail Image not found`)
+    }
+
+    if (req.files==null || req.files.banner_img==null){
+        throw new Api400Error(`Banner Image not found`)
+    }
+    const thumbnail_img_url = await lib.uploadFile(req.files.thumbnail_img)
+    const banner_img_url = await lib.uploadFile(req.files.banner_img)
+    return { thumbnail_img_url, banner_img_url, data: JSON.parse(req.body.data) }
 }
 exports.process_batch_create_input_req = async (input_response) => {
-    return input_response
+    const {thumbnail_img_url , banner_img_url , data} = input_response
+    const result = await models.Batch.create({
+        arena_id: data.arena_id,
+        coach_id: data.coach_id,
+        academy_id: data.academy_id,
+        sports_id: data.sports_id,
+        days: data.days,
+        price: data.price,
+        thumbnail_img: thumbnail_img_url,
+        banner_img: banner_img_url,
+        start_time: data.start_time,
+        end_time: data.end_time,
+        start_date: data.start_date,
+        end_date: data.end_date
+    })
+    return result
 }
-exports.post_process_create_batch = async (req, resp, input_response) => {
-    resp.send(input_response)
+
+exports.post_process_create_batch = async ( resp, new_batch) => {
+    resp.status(201).send({ status: "success", message: "batch created successfully", data: new_batch })
 }
+
 exports.pre_process_image_upload_request = async(req,resp)=>{
     if (req.files==null || req.files.files_name==null){
         throw new Api400Error(`image not found`)
