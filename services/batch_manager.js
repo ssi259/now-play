@@ -170,18 +170,38 @@ exports.process_batch_details_input_req = async(input_response)=>{
         rating_json = { "rating_count": ratings.length, "average_rating": overall_ratings / ratings.length };
 
     });
-    Object.assign(input_response.dataValues,rating_json);
-    Object.assign(input_response.dataValues,arena_data);
-    Object.assign(input_response.dataValues, { "address": { "city": arena_details["city"], "locality":arena_details["locality"], "state": arena_details["state"] } })
 
+   function range(lat1,lat2,lng1,lng2)
+  {  lng1 = lng1 * Math.PI / 180;
+  lng2 = lng2 * Math.PI / 180;
+  lat1 = lat1 * Math.PI / 180;
+  lat2 = lat2 * Math.PI / 180;
+  let dlng = lng2 - lng1;
+  let dlat = lat2 - lat1;
+  let a = Math.pow(Math.sin(dlat / 2), 2)
+   + Math.cos(lat1) * Math.cos(lat2)
+   * Math.pow(Math.sin(dlng / 2),2);
+ let c = 2 * Math.asin(Math.sqrt(a));
+ let r = 3956;
+ return(c * r);
+  }  
+ let lng1 = req.query.params.lng
+ let lat1 = req.query.params.lat
+ let lng2 = arena_details["lng"]
+ let lat2 = arena_details["lat"]
+ const distance =  (range(lat1, lat2, lng1, lng2) + " K.M")
+
+    Object.assign(input_response.dataValues,rating_json);
+  Object.assign(input_response.dataValues,arena_data);
+    Object.assign(input_response.dataValues, { "address": { "city": arena_details["city"], "locality":arena_details["locality"], "state": arena_details["state"] } })
     Object.assign(input_response.dataValues,coach_data);
     Object.assign(input_response.dataValues,academy_data);
     Object.assign(input_response.dataValues,sports_data);
     Object.assign(input_response.dataValues,image_list);
     Object.assign(input_response.dataValues,coach_reviews);
-
+    Object.assign(input_response.dataValues,distance);
     return input_response
-}  
+    }  
 exports.post_process = async(req,resp,input_response)=>{
     resp.send(input_response)
 }
