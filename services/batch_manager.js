@@ -80,11 +80,11 @@ exports.post_process_search_batch = async (req, resp, input_response) => {
 
 exports.pre_process_create_batch = async (req) => {
     if (req.files==null || req.files.thumbnail_img==null){
-        throw new Api400Error(`Thumbnail Img not found`)
+        throw new Api400Error(`Thumbnail Image not found`)
     }
 
     if (req.files==null || req.files.banner_img==null){
-        throw new Api400Error(`Banner Img not found`)
+        throw new Api400Error(`Banner Image not found`)
     }
     const thumbnail_img_url = await lib.uploadFile(req.files.thumbnail_img)
     const banner_img_url = await lib.uploadFile(req.files.banner_img)
