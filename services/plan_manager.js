@@ -26,7 +26,6 @@ exports.post_process_create = async (subscription_plan,resp) => {
 
 
 exports.pre_process_get_plan_by_batch_id = async (req) => {
-    console.log("called")
     if (req.query == null ||  req.query.batch_id == null) {
         throw new Api400Error("Batch ID Not Provided")
     }
@@ -50,8 +49,8 @@ exports.process_get_plan_by_batch_id = async (input_data) => {
     return  await models.SubscriptionPlan.findAll({
         where: {
             batch_id: batch_id,
-            type: {
-                [Op.notIn]: ["Demo", "demo", "DEMO"]
+            price: {
+                [Op.gt]: 0
             }
         }
     })
