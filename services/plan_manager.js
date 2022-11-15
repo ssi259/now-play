@@ -36,7 +36,8 @@ exports.process_get_plan_by_batch_id = async (input_data) => {
     const { user_id, batch_id } = input_data
     const enrollment = await models.Enrollment.findOne({
         where: {
-            user_id: user_id
+            user_id: user_id,
+            batch_id:batch_id
         }
     })
     if (enrollment == null) {
