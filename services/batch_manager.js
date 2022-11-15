@@ -258,8 +258,8 @@ exports.process_upcoming_classes = async (user_id) => {
     }
     let j = 0;
     const response_data = [];
-    const curr_day_index = (new Date()).getDay();
-
+    const date = new Date()
+    const curr_day_index = (new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(),  date.getHours(), date.getMinutes(), date.getSeconds()))).getDay()
     for (let i = curr_day_index; i < (days_arr_length + curr_day_index); i++){
         response_data.push({
             day:week_days[(i % days_arr_length)],
@@ -268,17 +268,15 @@ exports.process_upcoming_classes = async (user_id) => {
         })
         j++;
     }
-
     return response_data
 }
 
 function ist_formate_date (days_gap) {
     const date = new Date()
-    date.setDate(date.getDate() + days_gap)
-    return date.toLocaleDateString()
+    const local_date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()+ days_gap,  date.getHours(), date.getMinutes(), date.getSeconds()))
+    return local_date.toLocaleDateString()
 }
 
 exports.post_process_upcoming_classes = async (data, resp) => {
     resp.status(200).send({ status: "success", message: "retrieved upcoming classes successfully", data: data })
 }
-
