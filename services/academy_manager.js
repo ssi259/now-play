@@ -86,10 +86,12 @@ exports.pre_process_academy_list = async(req,resp)=>{
 
 exports.process_academy_list_input_req = async(input_response)=>{
   for (each_input_response of input_response){
-  var sports_details = await models.Sports.findOne({where:{id:each_input_response["sports_id"]}})
-  var sports_data = {"sports_name":sports_details["name"]}
-  Object.assign(each_input_response.dataValues,sports_data)
-  Object.assign(input_response,each_input_response.dataValues)
+    var sports_details = await models.Sports.findOne({where:{id:each_input_response["sports_id"]}})
+    var sports_data = {"sports_name":sports_details["name"]}
+    if(sports_data!=null && each_input_response.dataValues!=null ){
+      Object.assign(each_input_response.dataValues,sports_data)
+      Object.assign(input_response,each_input_response.dataValues)
+    }
   }
   return input_response
 }
