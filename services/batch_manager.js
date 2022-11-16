@@ -151,7 +151,7 @@ exports.pre_process_batch_details = async(req,resp)=>{
         }
 
 }
-exports.process_batch_details_input_req = async(input_response)=>{
+exports.process_batch_details_input_req = async(req,input_response)=>{
     const arena_details = await models.Arena.findOne({where:{id:input_response["arena_id"]}})
     const coach_details = await models.Coach.findOne({where:{id:input_response["coach_id"]}})
     const academy_details = await models.Academy.findOne({where:{id:input_response["academy_id"]}})
@@ -190,19 +190,47 @@ exports.process_batch_details_input_req = async(input_response)=>{
         rating_json = { "rating_count": ratings.length, "average_rating": overall_ratings / ratings.length };
 
     });
+
+   let lng1 = req.query.lng;
+    let lat1 = req.query.lat;
+    let lng2 = arena_details["lng"]
+    let lat2 = arena_details["lat"]
+    let unit = "k.M."
+
+    function range(lat1, lng1, lat2, lng2, unit) {
+        if ((lat1 == lat2) && (lng1 == lng2)) {
+            return 0;
+        }
+        else {
+            var radlat1 = Math.PI * lat1/180;
+            var radlat2 = Math.PI * lat2/180;
+            var theta = lng1-lng2;
+            var radtheta = Math.PI * theta/180;
+            var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+            if (dist > 1) {
+                dist = 1;
+            }
+            dist = Math.acos(dist);
+            dist = dist * 180/Math.PI;
+            dist = dist * 60 * 1.1515;
+            if (unit=="K.M.") { dist = dist * 1.609344 }
+            return dist;    
+        }
+    }
+
     Object.assign(input_response.dataValues,rating_json);
     Object.assign(input_response.dataValues,arena_data);
     Object.assign(input_response.dataValues, { "address": { "city": arena_details["city"], "locality":arena_details["locality"], "state": arena_details["state"] } })
-
     Object.assign(input_response.dataValues,coach_data);
     Object.assign(input_response.dataValues,academy_data);
     Object.assign(input_response.dataValues,sports_data);
     Object.assign(input_response.dataValues,image_list);
     Object.assign(input_response.dataValues,coach_reviews);
+    Object.assign(input_response.dataValues, { "distance": range( lat1,lng1,lat2,lng2 , unit)});
 
     return input_response
 }  
-exports.post_process = async(req,resp,input_response)=>{
+    exports.post_process = async(req,resp,input_response)=>{
     resp.send(input_response)
 }
 
