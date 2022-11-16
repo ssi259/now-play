@@ -7,7 +7,7 @@ const Api500Error = require('../error/api500Error');
 exports.pre_process_create_sport = async(req,resp)=>{
   const result = await  models.Sports.create({name: req.body.name,type: req.body.type,thumbnail: req.body.thumbnail,about: req.body.about}).then(function (sport) {
       if (sport) {
-          resp.send(sport);
+          return sport;
       } else {
         throw new Api500Error(`Error In Creating Sports`)
       }
