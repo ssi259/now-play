@@ -151,7 +151,7 @@ exports.pre_process_batch_details = async(req,resp)=>{
         }
 
 }
-exports.process_batch_details_input_req = async(input_response)=>{
+exports.process_batch_details_input_req = async(req,input_response)=>{
     const arena_details = await models.Arena.findOne({where:{id:input_response["arena_id"]}})
     const coach_details = await models.Coach.findOne({where:{id:input_response["coach_id"]}})
     const academy_details = await models.Academy.findOne({where:{id:input_response["academy_id"]}})
@@ -191,37 +191,42 @@ exports.process_batch_details_input_req = async(input_response)=>{
 
     });
 
-    function range(lat1,lat2,lng1,lng2)
-    {  lng1 = lng1 * Math.PI / 180;
-    lng2 = lng2 * Math.PI / 180;
-    lat1 = lat1 * Math.PI / 180;
-    lat2 = lat2 * Math.PI / 180;
-    let dlng = lng2 - lng1;
-    let dlat = lat2 - lat1;
-    let a = Math.pow(Math.sin(dlat / 2), 2)
-     + Math.cos(lat1) * Math.cos(lat2)
-     * Math.pow(Math.sin(dlng / 2),2);
-   let c = 2 * Math.asin(Math.sqrt(a));
-   let r = 3956;
-   return(c * r);
-    }  
-   let lng1 = req.query.params.lng
-   let lat1 = req.query.params.lat
-   let lng2 = arena_details["lng"]
-   let lat2 = arena_details["lat"]
-   const distance =  (range(lat1, lat2, lng1, lng2) + " K.M")
+   let lng1 = req.query.lng;
+    let lat1 = req.query.lat;
+    let lng2 = arena_details["lng"]
+    let lat2 = arena_details["lat"]
+    let unit = "k.M."
 
+    function range(lat1, lng1, lat2, lng2, unit) {
+        if ((lat1 == lat2) && (lng1 == lng2)) {
+            return 0;
+        }
+        else {
+            var radlat1 = Math.PI * lat1/180;
+            var radlat2 = Math.PI * lat2/180;
+            var theta = lng1-lng2;
+            var radtheta = Math.PI * theta/180;
+            var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+            if (dist > 1) {
+                dist = 1;
+            }
+            dist = Math.acos(dist);
+            dist = dist * 180/Math.PI;
+            dist = dist * 60 * 1.1515;
+            if (unit=="K.M.") { dist = dist * 1.609344 }
+            return dist;    
+        }
+    }
 
     Object.assign(input_response.dataValues,rating_json);
     Object.assign(input_response.dataValues,arena_data);
     Object.assign(input_response.dataValues, { "address": { "city": arena_details["city"], "locality":arena_details["locality"], "state": arena_details["state"] } })
-
     Object.assign(input_response.dataValues,coach_data);
     Object.assign(input_response.dataValues,academy_data);
     Object.assign(input_response.dataValues,sports_data);
     Object.assign(input_response.dataValues,image_list);
     Object.assign(input_response.dataValues,coach_reviews);
-    Object.assign(input_response.dataValues,distance);
+    Object.assign(input_response.dataValues, { "distance": range( lat1,lng1,lat2,lng2 , unit)});
 
     return input_response
 }  
