@@ -54,9 +54,9 @@ exports.academy_details = async(req,resp) =>{
 exports.update_academy = async(req,resp)=>{
         
     try{
-        var input_response =  await AcademyManager.pre_process_update_academy(req,resp)
-        var processed_reponse =  await AcademyManager.process_update_academy_input_req(input_response)
-        var post_process_response = await AcademyManager.post_update_academy_process(req,resp,processed_reponse)
+        var input_response =  await AcademyManager.pre_process_update_academy(req)
+        await AcademyManager.process_update_academy_input_req(input_response)
+        await AcademyManager.post_update_academy_process(resp)
     }catch(e){
         const status_code = e.statusCode ? e.statusCode : 500
         return resp.status(status_code).send({ status: "Failure", message: e.name })
