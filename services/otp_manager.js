@@ -1,5 +1,6 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken')
+const sdk = require('api')('@gupshup/v1.0#3wb1b43l4wp80pp');
 const { User, Notification } = require('../models'); 
 const AWS = require('aws-sdk');
 const { Op } = require("sequelize");
@@ -13,6 +14,10 @@ exports.pre_process_generate = async (req) => {
     const { phone_number } = req.body;
     if (!phone_number) {
         throw new Api400Error("phone number not provided")
+    }
+
+    if (phone_number.length > 10) {
+        throw new Api400Error("Invalide Phone Number Format")
     }
     return req.body
 }
@@ -42,18 +47,20 @@ exports.process_generate = async (input) => {
 }
 
 exports.post_process_generate = async (input, resp) => {
-    const {phone_number , otp} = input
-    const phone_message =
-        `Dear User,\n`
-        + `${otp} is your OTP for Phone Number Verfication. Please enter the OTP to verify your phone number`
-    const params = {
-        Message: phone_message,
-        PhoneNumber:`+91${phone_number}`
-    }
-    const publishTextPromise = new AWS.SNS({ apiVersion: '2010-03-31' }).publish(params).promise();
-    publishTextPromise.then((data) => {
-        resp.status(200).send({status:"success",message:"otp sent successfully",data:{otp:otp}})
-    }).catch((err) => {
+    const { phone_number ,otp} = input
+    sdk.sendMessagePOST({
+        userid: process.env.GUPSHUP_USER_ID,
+        password: process.env.GUPSHUP_PASSWORD,
+        send_to: `91${phone_number}`,
+        msg: `Please use the otp:${otp}  to verify your account in RUSH SPORTS (NOW DELIVERY).`,
+        method: 'sendMessage',
+        msg_type: 'text',
+        format: 'json',
+        auth_scheme: 'plain',
+        v: 1.1
+    }).then(() => {
+        resp.status(200).send({status:"success",message:"otp sent successfully"})
+    }).catch(() => {
         throw new Api500Error('error while sending otp')
     })
 }
@@ -62,6 +69,9 @@ exports.pre_process_verify = async (req) => {
     const { phone_number, otp } = req.body;
     if (!phone_number) {
         throw new Api400Error("phone number not provided")
+    }
+    if (phone_number.length > 10) {
+        throw new Api400Error("Invalide Phone Number Format")
     }
     if (!otp) {
         throw new Api400Error("otp not provided")
@@ -78,7 +88,8 @@ exports.process_verify = async (input) => {
             otp: otp,
             phoneNumber: phone_number,
             notificationType: "otp",
-        }
+        },
+        order: [ [ 'createdAt', 'DESC' ]],
     });
     if (!otp_instance) {
         throw new Api400Error("otp not matched")
