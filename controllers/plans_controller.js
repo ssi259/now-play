@@ -34,6 +34,18 @@ exports.getPlanByBatchId = async (req, resp) => {
         return resp.status(status_code).send({ status: "Failure", message: e.name })
     }
 }
+exports.plans_details = async(req,resp) =>{
+    try{
+        var input_response = await plan_manager.pre_process_plan_details(req,resp)
+        var processed_reponse =  await plan_manager.process_plan_details_input_req(input_response)
+        var post_process_response = await plan_manager.post_plan_process(req,resp,processed_reponse)
+
+    }catch(e){
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "Failure", message: e.name })
+    }finally{
+    }
+}
 
 
 
