@@ -25,9 +25,16 @@ exports.post_process_create = async (subscription_plan,resp) => {
 }
 
 
-exports.pre_process_get_plan_by_batch_id = async (req) => {
+exports.pre_process_get_plan_by_batch_id = async (req,resp) => {
+    var result;
     if (req.query == null ||  req.query.batch_id == null) {
-        throw new Api400Error("Batch ID Not Provided")
+        
+            result = await models.SubscriptionPlan.findAll({
+            })
+        
+    }
+    if (result){
+        resp.send(result)
     }
     return {user_id : req.user.user_id , batch_id :req.query.batch_id}
 }
@@ -58,7 +65,7 @@ exports.process_get_plan_by_batch_id = async (input_data) => {
 }
 
 exports.post_process_get_plan_by_batch_id = async (plan,resp) => {
-    resp.status(200).send({status:"Success",data:plan})
+    //resp.status(200).send({status:"Success",data:plan})
 }
 
 exports.pre_process_update_plan = async (req) => {
