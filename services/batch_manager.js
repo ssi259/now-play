@@ -286,8 +286,7 @@ exports.process_upcoming_classes = async (user_id) => {
     }
     let j = 0;
     const response_data = [];
-    const date = new Date()
-    const curr_day_index = (new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(),  date.getHours(), date.getMinutes(), date.getSeconds()))).getDay()
+    const curr_day_index = get_curr_day()
     for (let i = curr_day_index; i < (days_arr_length + curr_day_index); i++){
         response_data.push({
             day:week_days[(i % days_arr_length)],
@@ -301,8 +300,14 @@ exports.process_upcoming_classes = async (user_id) => {
 
 function ist_formate_date (days_gap) {
     const date = new Date()
-    const local_date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()+ days_gap,  date.getHours(), date.getMinutes(), date.getSeconds()))
-    return local_date.toLocaleDateString()
+    const local_date = new Date(date.getTime() + process.env.IN_UTC_TIMEZONE_OFFSET * 60 * 1000 + days_gap*24*60*60*1000)
+    return local_date.toLocaleDateString("en-IN")
+}
+
+function get_curr_day() {
+    const date = new Date()    
+    const local_date = new Date(date.getTime() + process.env.IN_UTC_TIMEZONE_OFFSET * 60 * 1000)
+    return local_date.getDay()
 }
 
 exports.post_process_upcoming_classes = async (data, resp) => {
