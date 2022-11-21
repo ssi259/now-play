@@ -17,7 +17,8 @@ module.exports = (sequelize, DataTypes) => {
     batch_id: DataTypes.INTEGER,
     user_id: DataTypes.INTEGER,
     subscription_id: DataTypes.INTEGER,
-    status: DataTypes.STRING
+    status: DataTypes.STRING,
+    end_date:DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Enrollment',

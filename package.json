@@ -21,7 +21,7 @@
     "morgan": "~1.9.1",
     "mysql2": "^2.3.3",
     "nodeman": "^1.1.2",
-    "sequelize": "^6.24.0"
+    "sequelize": "^6.25.7"
   },
   "devDependencies": {
     "nodemon": "^2.0.20",
