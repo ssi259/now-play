@@ -5,6 +5,7 @@ const models = require("../models");
 var lib = require('../lib/upload_files_s3');
 const Api400Error = require('./../error/api400Error')
 const Api500Error = require('./../error/api500Error')
+var haversine = require("haversine-distance")
 
 const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
     host: dbConfig.host,
@@ -195,28 +196,11 @@ exports.process_batch_details_input_req = async(req,input_response)=>{
     let lat1 = req.query.lat;
     let lng2 = arena_details["lng"]
     let lat2 = arena_details["lat"]
-    let unit = "k.M."
 
-    function range(lat1, lng1, lat2, lng2, unit) {
-        if ((lat1 == lat2) && (lng1 == lng2)) {
-            return 0;
-        }
-        else {
-            var radlat1 = Math.PI * lat1/180;
-            var radlat2 = Math.PI * lat2/180;
-            var theta = lng1-lng2;
-            var radtheta = Math.PI * theta/180;
-            var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-            if (dist > 1) {
-                dist = 1;
-            }
-            dist = Math.acos(dist);
-            dist = dist * 180/Math.PI;
-            dist = dist * 60 * 1.1515;
-            if (unit=="K.M.") { dist = dist * 1.609344 }
-            return dist;    
-        }
-    }
+    var point1 = {lat1 , lng1}
+    var point2 = {lat2 , lng2}
+    var haversine_m = haversine(point1,point2);
+    var haversine_km = haversine_m/1000;
 
     Object.assign(input_response.dataValues,rating_json);
     Object.assign(input_response.dataValues,arena_data);
@@ -226,8 +210,7 @@ exports.process_batch_details_input_req = async(req,input_response)=>{
     Object.assign(input_response.dataValues,sports_data);
     Object.assign(input_response.dataValues,image_list);
     Object.assign(input_response.dataValues,coach_reviews);
-    Object.assign(input_response.dataValues, { "distance": range( lat1,lng1,lat2,lng2 , unit)});
-
+    Object.assign(input_response.dataValues, { "distance": haversine_km });
     return input_response
 }  
     exports.post_process = async(req,resp,input_response)=>{
