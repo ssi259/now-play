@@ -247,6 +247,7 @@ exports.process_upcoming_classes = async (user_id) => {
     const batches = await models.Enrollment.findAll({
         where: {
             user_id: user_id,
+            type:"paid",
             status: {
                 [Op.or]: ["active", "pending"]
             }
