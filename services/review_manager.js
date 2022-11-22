@@ -1,5 +1,6 @@
 const dbConfig = require("../config/db_config.js");
 const models = require("../models");
+const API400Error = require("../errors/API400Error.js");
 
 exports.pre_process_create_review = async(req,resp)=>{
   const result = await  models.Review.create({rating: req.body.rating,coach_id: req.body.coach_id,user_id: req.body.user_id,review_text: req.body.review_text,type: req.body.type}).then(function (review) {
@@ -22,6 +23,9 @@ exports.pre_process_check_eligibility = async(req,resp)=>{
 }
 
 exports.process_check_eligibility_input_req = async(input_response)=>{
+  if(input_response.coach_id == null){
+    throw new API400Error("Coach ID Not Present")
+  }
   const eligible = await models.Enrollment.findOne({ where: { 
     coach_id: input_response.coach_id,
     user_id:input_response.user_id 

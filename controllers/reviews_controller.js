@@ -20,7 +20,7 @@ exports.check_eligibility = async(req,resp)=>{
     }catch(e){
         console.log(e)
         const status_code = e.statusCode ? e.statusCode : 500
-        return resp.status(status_code).send({ status: "Failure", message: 'Internal Server Error' })
+        return resp.status(status_code).send({ status: "Failure", message: e.name })
     }finally{
     }
 }
