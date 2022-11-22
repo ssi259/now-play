@@ -5,5 +5,6 @@ const {auth} = require('../middlewares/authentication')
 
 /* GET users listing. */
 router.post('/',auth, review_controller.create_review);
+router.get('/eligible',auth, review_controller.check_eligibility);
 module.exports = router;
 

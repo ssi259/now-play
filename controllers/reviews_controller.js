@@ -11,3 +11,16 @@ exports.create_review = async(req,resp)=>{
     }finally{
     }
 }
+
+exports.check_eligibility = async(req,resp)=>{
+    try{
+        var input_response =  await ReviewManager.pre_process_check_eligibility(req,resp)
+        var processed_reponse =  await ReviewManager.process_check_eligibility_input_req(input_response)
+        var post_process_response = await ReviewManager.post_process_check_eligibility(req,resp,processed_reponse)
+    }catch(e){
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "Failure", message: e.name })
+    }finally{
+    }
+}

@@ -1,6 +1,5 @@
 const models = require('../models')
 const Api400Error = require('../error/api400Error')
-const Api500Error = require('../error/api500Error')
 const {Op} = require('sequelize')
 
 exports.pre_process_create = async (req) => {
