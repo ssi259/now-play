@@ -19,6 +19,8 @@ exports.check_eligibility = async(req,resp)=>{
         var post_process_response = await ReviewManager.post_process_check_eligibility(req,resp,processed_reponse)
     }catch(e){
         console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "Failure", message: 'Internal Server Error' })
     }finally{
     }
 }

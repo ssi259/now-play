@@ -18,7 +18,14 @@ exports.post_review_process = async(req,resp,input_response)=>{
 }
 
 exports.pre_process_check_eligibility = async(req,resp)=>{
-  const eligible = await models.Enrollment.findOne({ where: { coach_id: req.query.coach_id,user_id:req.user.user_id } });
+  return {"coach_id":req.query.coach_id,"user_id":req.user.user_id}
+}
+
+exports.process_check_eligibility_input_req = async(input_response)=>{
+  const eligible = await models.Enrollment.findOne({ where: { 
+    coach_id: input_response.coach_id,
+    user_id:input_response.user_id 
+  }});
   if (eligible) {
       return ({"eligibility":true});
   }
@@ -27,12 +34,8 @@ exports.pre_process_check_eligibility = async(req,resp)=>{
   }
 }
 
-exports.process_check_eligibility_input_req = async(input_response)=>{
-  return input_response
-}
-
-exports.post_process_check_eligibility = async(req,resp,input_response)=>{
-  resp.send(input_response)
+exports.post_process_check_eligibility = async(req,resp,result)=>{
+  resp.status(200).send({ status: "success", data: result })
 }
 
 
