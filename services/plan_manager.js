@@ -84,11 +84,7 @@ exports.post_process_plan_batch = async (resp) => {
 
 exports.pre_process_get_all_plans = async (req) => {
     const allPlans = await models.SubscriptionPlan.findAll()
-    if (allPlans) {
-        return allPlans;
-    } else {
-        throw new Api500Error(`Bad Request`)
-    }
+    return allPlans;
 }
 
 exports.process_get_all_plans_input_req = async (input_response) => {
