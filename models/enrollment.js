@@ -16,8 +16,10 @@ module.exports = (sequelize, DataTypes) => {
   Enrollment.init({
     batch_id: DataTypes.INTEGER,
     user_id: DataTypes.INTEGER,
-    subscription_id: DataTypes.INTEGER,
-    status: DataTypes.STRING
+    subscription_id: DataTypes.INTEGER, //end_data, coach_id, type
+    end_data: DataTypes.DATE,
+    coach_id: DataTypes.INTEGER,
+    type: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Enrollment',
