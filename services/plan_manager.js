@@ -1,5 +1,6 @@
 const models = require('../models')
 const Api400Error = require('../error/api400Error')
+const Api500Error = require('../error/api500Error')
 const {Op} = require('sequelize')
 
 exports.pre_process_create = async (req) => {
@@ -80,3 +81,17 @@ exports.process_update_plan_input_req = async (input_data) => {
 exports.post_process_plan_batch = async (resp) => {
     resp.status(200).send({status:"success",message:"plan updated successfully"})
 }  
+
+exports.pre_process_get_all_plans = async (req) => {
+    const allPlans = await models.SubscriptionPlan.findAll()
+    return allPlans;
+}
+
+exports.process_get_all_plans_input_req = async (input_response) => {
+    return input_response
+}
+
+exports.post_process_get_all_plans = async (plans,resp) => {
+    resp.status(200).send({status:"success",data:plans})
+}
+
