@@ -13,17 +13,18 @@ exports.pre_process_create = async(req,resp)=>{
 exports.process_create_input_req = async(req,input_response)=>{
   const { user_id ,price,duration} = input_response
   const result = await  models.Payment.create({plan_id: req.body.plan_id,price: price,status: "pending",user_id: user_id,coach_id: req.body.coach_id})
-  if(results){
+  if(result){
     const enrollmentdetails = await models.Enrollment.findOne({
       where: {
         user_id: req.user.user_id ,status: "active"
       }
     }) 
-       var batchdetails = await models.Batch.findOne({where:{id:enrollmentdetails["batch_id"]}})
-       var enddate = batchdetails["end_date"]
+      const enddate = enrollmentdetails["end_date"]
       var duration1 = input_response.duration
-       var updated_end_date = new Date(enddate);
-       updated_end_date.setDate(updated_end_date.getDate() + duration1);
+      var updated_end_date = new Date(enddate);
+     updated_end_date.setDate(updated_end_date.getDate() + duration1);  
+     Object.assign(enrollmentdetails.dataValues,updated_end_date)
+    return enrollmentdetails
   } 
     else {
     await models.Enrollment.create({batch_id:req.body.batch_id,user_id: user_id, subscription_id: req.body.plan_id,status: "pending"})

@@ -8,7 +8,20 @@ module.exports = {
       {
         type:Sequelize.DATE
       }
+    ),queryInterface.addColumn(
+      'Enrollments',
+      'type',
+      {
+        type:Sequelize.STRING
+      }
+    ),queryInterface.addColumn(
+      'Enrollments' ,
+      'coach_id',
+      {
+        type:Sequelize.INTEGER
+      }
     )
+
     
   },
 

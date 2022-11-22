@@ -18,7 +18,9 @@ module.exports = (sequelize, DataTypes) => {
     user_id: DataTypes.INTEGER,
     subscription_id: DataTypes.INTEGER,
     status: DataTypes.STRING,
-    end_date:DataTypes.DATE
+    end_date:DataTypes.DATE,
+    type:DataTypes.STRING,
+    coach_id:DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Enrollment',
