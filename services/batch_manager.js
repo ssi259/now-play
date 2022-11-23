@@ -38,13 +38,8 @@ exports.process_batch_search_input_req = async (req,resp,input_response) => {
         return input_response
     }
     for (each_input_response of input_response) {
-       var lng1 = req.query.lng;
-       let lat1 = req.query.lat;
-        var lng2 = each_input_response["lng"];
-        var lat2 = each_input_response["lat"];
-        let unit = "k.M."     
-        Object.assign(each_input_response , { "distance": range( lat1,lng1,lat2,lng2 , unit)})
-        processed_response.push(each_input_response)
+     Object.assign(each_input_response , { "distance": range(req.query.lat, req.query.lng,each_input_response["lat"],each_input_response["lng"] ,"k.m.")})
+     processed_response.push(each_input_response)
     }
     for (each_input_response of input_response) {
         overall_ratings = 0;
@@ -197,12 +192,6 @@ exports.process_batch_details_input_req = async(req,input_response)=>{
         rating_json = { "rating_count": ratings.length, "average_rating": overall_ratings / ratings.length };
 
     });
-
-   let lng1 = req.query.lng;
-    let lat1 = req.query.lat;
-    let lng2 = arena_details["lng"]
-    let lat2 = arena_details["lat"]
-    let unit = "k.M."
     Object.assign(input_response.dataValues,rating_json);
     Object.assign(input_response.dataValues,arena_data);
     Object.assign(input_response.dataValues, { "address": { "city": arena_details["city"], "locality":arena_details["locality"], "state": arena_details["state"] } })
@@ -211,7 +200,7 @@ exports.process_batch_details_input_req = async(req,input_response)=>{
     Object.assign(input_response.dataValues,sports_data);
     Object.assign(input_response.dataValues,image_list);
     Object.assign(input_response.dataValues,coach_reviews);
-    Object.assign(input_response.dataValues, { "distance": range( lat1,lng1,lat2,lng2 , unit)});
+    Object.assign(input_response.dataValues, { "distance": range( req.query.lat,req.query.lng,arena_details["lat"],arena_details["lng"] , "k.M.")});
 
     return input_response
 }  
