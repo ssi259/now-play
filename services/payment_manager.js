@@ -83,3 +83,54 @@ exports.post_update_process = async(req,resp,input_response)=>{
   formatted_response["data"]=input_response
   resp.status(200).send(formatted_response)
 }
+
+exports.pre_process_update = async(req,resp)=>{
+  var enrollment = await models.Enrollment.findOne({
+    where: {
+      user_id: req.user.user_id,
+      subscription_id: req.body.plan_id,
+      batch_id:req.body.batch_id
+    }
+})
+var plan = await models.SubscriptionPlan.findOne({
+  where: {
+      id: req.body.plan_id
+  }
+})
+
+var coach_resp = req.body.coach_resp
+
+return {enrollment, plan, coach_resp}
+}
+
+exports.process_update_input_req = async(req,input_response)=>{
+
+  const {if_enrolled, plan, coach_resp} = input_response;
+  plan_duration = plan.duration
+
+  if(!if_enrolled.end_date){
+    if_enrolled.end_date = new Date(if_enrolled.updatedAt)
+  } 
+
+  var new_end_date = addDays(if_enrolled.end_date, plan_duration)
+
+  if(!coach_resp) {
+    await models.Enrollment.update({status: "inactive"}, {where: {user_id: req.user.user_id,batch_id:req.body.batch_id, subscription_id: req.body.plan_id}})
+    await models.Payment.update({status: "failed"}, {where: {user_id: req.user.user_id,plan_id: req.body.plan_id,batch_id:req.body.batch_id}})
+  } else {
+    await models.Enrollment.update({status: "active", end_date:new_end_date}, {where: {user_id: req.user.user_id, batch_id:req.body.batch_id, subscription_id: req.body.plan_id}})
+    await models.Payment.update({status: "success"}, {where: {user_id: req.user.user_id,plan_id: req.body.plan_id,batch_id:req.body.batch_id}})
+  }
+  
+return {user_id: req.user.user_id , dataValues:req.body, price: plan.price}
+}
+
+exports.post_update_process = async(req,resp,input_response)=>{
+  var formatted_response = {}
+  formatted_response["status"]="success"
+  formatted_response["message"]="payment success, enrollment created successfully"
+  delete input_response.dataValues.user_id
+  formatted_response["data"]=input_response
+
+  resp.status(200).send(formatted_response)
+}
