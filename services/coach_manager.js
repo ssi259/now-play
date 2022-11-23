@@ -1,6 +1,7 @@
-const { Coach, CoachImage, CoachDocument } = require('../models');
+const { Coach, CoachImage, CoachDocument, Payment } = require('../models');
 const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
+const {Op} = require('sequelize')
 
 exports.process_create_coach = async (req, resp) => {
     const {
@@ -149,4 +150,31 @@ exports.process_update_coach_by_id = async (input_data) => {
 
 exports.post_process_update_coach_by_id = async (resp) => {
   resp.status(200).send({status:"success",message:"coach updated successfully"})
+}
+
+
+exports.pre_process_get_monthly_payments = async (req) => {
+  return {coach_id:req.params.id,month:req.query.month}
+}
+
+exports.process_get_monthly_payments = async (input_data) => {
+  const { coach_id, month } = input_data
+  const utc_year = new Date().getUTCFullYear()
+  const month_first_day = new Date(Date.UTC(utc_year, month, 1))
+  const next_month_first_day = new Date(Date.UTC(utc_year, month + 1, 1)) 
+  const payment = await Payment.findAll(
+    {
+      where: {
+        status: "success",
+        createdAt: {
+            [Op.strictLeft]: [month_first_day,next_month_first_day],
+        }
+      },
+    },
+  )
+  return payment
+}
+
+exports.post_process_get_monthly_payments = async (data, resp) => {
+  resp.status(200).send({status:"success",message:"retreived data successfully", data})
 }
