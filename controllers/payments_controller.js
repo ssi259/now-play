@@ -6,7 +6,9 @@ exports.create_payment = async(req,resp)=>{
 
     try{
         var input_response =  await PaymentManager.pre_process_create(req,resp)
+        console.log("input_response",input_response)
         var processed_reponse =  await PaymentManager.process_create_input_req(req,input_response)
+        console.log("processed_reponse",processed_reponse)
         await PaymentManager.post_create_process(req,resp,processed_reponse)
     }catch(e){
         console.log(e)
