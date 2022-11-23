@@ -18,8 +18,17 @@ module.exports = {
       subscription_id: {
         type: Sequelize.INTEGER
       },
+      coach_id: {
+        type: Sequelize.INTEGER
+      },
+      type: {
+        type: Sequelize.STRING
+      },
       status: {
         type: Sequelize.STRING
+      },
+      end_date: {
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
