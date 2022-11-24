@@ -1,9 +1,6 @@
-
 const PaymentManager = require("../services/payment_manager")
 
-
 exports.create_payment = async(req,resp)=>{
-
     try{
         var input_response =  await PaymentManager.pre_process_create(req,resp)
         console.log("input_response",input_response)
@@ -19,7 +16,6 @@ exports.create_payment = async(req,resp)=>{
 }
 
 exports.update_payment = async(req,resp)=>{
-
     try{
         var input_response =  await PaymentManager.pre_process_update(req,resp)
         var processed_reponse =  await PaymentManager.process_update_input_req(req,input_response)
