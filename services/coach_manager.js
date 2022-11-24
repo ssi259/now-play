@@ -1,6 +1,7 @@
 const { Coach, CoachImage, CoachDocument } = require('../models');
 const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
+const models = require('../models');
 
 exports.process_create_coach = async (req, resp) => {
     const {
@@ -149,4 +150,30 @@ exports.process_update_coach_by_id = async (input_data) => {
 
 exports.post_process_update_coach_by_id = async (resp) => {
   resp.status(200).send({status:"success",message:"coach updated successfully"})
+}
+
+exports.pre_process_get_coach_batches = async (req) => {
+  return {"coach_id":3} //replace 3 with req.coach.coach_id
+}
+
+exports.process_get_coach_batches = async (input_data) => {
+  const {coach_id} = input_data
+  const batches = await models.Batch.findAll({
+    where: {
+      coach_id: coach_id
+    }
+  })
+  const coachBatches = await Promise.all(batches.map(async (batch) => {
+    batch = batch.toJSON()
+    batch.sports_name = await models.Sports.findByPk(batch.sports_id).then(sport => sport.name)
+    batch.academy_name = await models.Academy.findByPk(batch.academy_id).then(academy => academy.name)
+    batch.arena_name = await models.Arena.findByPk(batch.arena_id).then(arena => arena.name)
+    batch.total_players = await models.Enrollment.count({ where: { batch_id: batch.id } })
+    return batch
+  }))
+  return coachBatches
+}
+
+exports.post_process_get_coach_batches = async (resp,batches) => {
+  resp.status(200).send({status:"Success",data:batches})
 }
