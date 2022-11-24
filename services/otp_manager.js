@@ -1,7 +1,7 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken')
 const sdk = require('api')('@gupshup/v1.0#3wb1b43l4wp80pp');
-const { User, Notification } = require('../models'); 
+const models = require('../models'); 
 const { Op } = require("sequelize");
 const Api400Error = require('../error/api400Error')
 const Api500Error = require('../error/api500Error')
@@ -11,7 +11,6 @@ exports.pre_process_generate = async (req) => {
     if (!phone_number) {
         throw new Api400Error("phone number not provided")
     }
-
     if (phone_number.length > 10) {
         throw new Api400Error("Invalide Phone Number Format")
     }
@@ -23,7 +22,7 @@ exports.process_generate = async (input) => {
     const now = new Date();
     const expiration_date = new Date(now.getTime() + 10 * 60000);
     let otp;
-    const [otp_instance , created] = await Notification.findOrCreate({
+    const [otp_instance , created] = await models.Notification.findOrCreate({
         where: {
             phoneNumber: phone_number,
             notificationType: "otp",
@@ -62,7 +61,10 @@ exports.post_process_generate = async (input, resp) => {
 }
 
 exports.pre_process_verify = async (req) => {
-    const { phone_number, otp } = req.body;
+    const { phone_number, otp, type } = req.body;
+    if (type == null) {
+        throw new Api400Error("user type not provided")
+    }
     if (!phone_number) {
         throw new Api400Error("phone number not provided")
     }
@@ -76,9 +78,9 @@ exports.pre_process_verify = async (req) => {
 }
 
 exports.process_verify = async (input) => {
-    const { phone_number, otp } = input 
+    const { phone_number, otp, type } = input 
     const currentDate = new Date();
-    const otp_instance = await Notification.findOne({
+    const otp_instance = await models.Notification.findOne({
         where:
         {
             otp: otp,
@@ -99,21 +101,37 @@ exports.process_verify = async (input) => {
     otp_instance.isVerified = true
     await otp_instance.save();
 
-    const [user, created] = await User.findOrCreate({
-        where: {
-            phoneNumber: phone_number,
-        },
-        defaults: {
-            isPhoneVerified: true,
-        }
-    })
-    const token = jwt.sign(
-        {
-            user_id: user.id
-        },
-        process.env.JWT_SECRET_KEY,
-    );
-    return token
+    if (type == 'player') {
+        const [user, created] = await models.User.findOrCreate({
+            where: {
+                phoneNumber: phone_number,
+            },
+            defaults: {
+                isPhoneVerified: true,
+            }
+        }) 
+        return  jwt.sign(
+            {
+                user_id: user.id,
+                type:"player"
+            },
+            process.env.JWT_SECRET_KEY,
+        );
+    }
+    if (type == 'coach') {
+        const [coach, created] = await models.Coach.findOrCreate({
+            where: {
+                phone_number: phone_number,
+            }
+        })
+        return  jwt.sign(
+            {
+                coach_id: coach.id,
+                type:"coach"
+            },
+            process.env.JWT_SECRET_KEY,
+        );
+    }
 }
 
 exports.post_process_verify = async (token,resp) => {
