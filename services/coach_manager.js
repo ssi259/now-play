@@ -153,7 +153,7 @@ exports.post_process_update_coach_by_id = async (resp) => {
 }
 
 exports.pre_process_get_coach_batches = async (req) => {
-  return {"coach_id":3} //replace 3 with req.coach.coach_id
+  return {"coach_id":req.user.coach_id}
 }
 
 exports.process_get_coach_batches = async (input_data) => {
