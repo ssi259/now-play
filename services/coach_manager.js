@@ -166,6 +166,7 @@ exports.process_get_monthly_payments = async (input_data) => {
     {
       where: {
         status: "success",
+        coach_id:coach_id,
         createdAt: {
             [Op.strictLeft]: [month_first_day,next_month_first_day],
         }
