@@ -12,13 +12,13 @@ exports.pre_process_create = async(req,resp)=>{
       subscription_id: req.body.plan_id,
       batch_id:req.body.batch_id
     }
-})
-var plan = await models.SubscriptionPlan.findOne({
-  where: {
-      id: req.body.plan_id
-  }
-})
-return {enrollment, plan}
+  })
+  var plan = await models.SubscriptionPlan.findOne({
+    where: {
+        id: req.body.plan_id
+    }
+  })
+  return {enrollment, plan}
 }
 exports.process_create_input_req = async(req,input_response)=>{
   const {if_enrolled, plan} = input_response;
@@ -27,9 +27,9 @@ exports.process_create_input_req = async(req,input_response)=>{
     await models.Enrollment.update({status: "inactive"}, {where: {user_id: req.user.user_id,batch_id:req.body.batch_id, subscription_id: req.body.plan_id}})
     await models.Payment.update({status: "failed"}, {where: {user_id: req.user.user_id,plan_id: req.body.plan_id,batch_id:req.body.batch_id}})
   } 
-    await models.Payment.create({plan_id: req.body.plan_id,status: "pending",user_id: req.user.user_id,coach_id: req.body.coach_id, price: plan.price, payment_mode: "Cash"})
-    await models.Enrollment.create({batch_id:req.body.batch_id,user_id: req.user.user_id, subscription_id: req.body.plan_id, status: "pending"})
-return {user_id: req.user.user_id , dataValues:req.body, price: plan.price}
+  await models.Payment.create({plan_id: req.body.plan_id,status: "pending",user_id: req.user.user_id,coach_id: req.body.coach_id, price: plan.price, payment_mode: "Cash"})
+  await models.Enrollment.create({batch_id:req.body.batch_id,user_id: req.user.user_id, subscription_id: req.body.plan_id, status: "pending"})
+  return {user_id: req.user.user_id , dataValues:req.body, price: plan.price}
 }
 exports.post_create_process = async(req,resp,input_response)=>{
   var formatted_response = {}
@@ -45,20 +45,20 @@ exports.pre_process_update = async(req,resp)=>{
         id: req.body.payment_id
     }
   })
-var plan = await models.SubscriptionPlan.findOne({
-  where: {
-      id: payment_data.plan_id,
-  }
-})
-var coach_resp = req.body.coach_resp
-var enrollment_data = await models.Enrollment.findOne({
-  where: {
-    user_id: payment_data.user_id,
-    subscription_id: payment_data.plan_id,
-    batch_id: plan.batch_id
-  }
-})
-return {payment_data, enrollment_data, plan, coach_resp}
+  var plan = await models.SubscriptionPlan.findOne({
+    where: {
+        id: payment_data.plan_id,
+    }
+  })
+  var coach_resp = req.body.coach_resp
+  var enrollment_data = await models.Enrollment.findOne({
+    where: {
+      user_id: payment_data.user_id,
+      subscription_id: payment_data.plan_id,
+      batch_id: plan.batch_id
+    }
+  })
+  return {payment_data, enrollment_data, plan, coach_resp}
 }
 exports.process_update_input_req = async(req,input_response)=>{
   const {payment_data, enrollment_data, plan, coach_resp} = input_response;
@@ -72,7 +72,7 @@ exports.process_update_input_req = async(req,input_response)=>{
     await models.Enrollment.update({status: "active", end_date:new_end_date}, {where: {id: enrollment_data.id}})
     await models.Payment.update({status: "success"}, {where: {id: payment_data.id}})
   }
-return {payment_id: payment_data.id, enrollment_id: enrollment_data.id, dataValues:req.body}
+  return {payment_id: payment_data.id, enrollment_id: enrollment_data.id, dataValues:req.body}
 }
 
 exports.post_update_process = async(req,resp,input_response)=>{
