@@ -107,19 +107,14 @@ var enrollment_data = await models.Enrollment.findOne({
     batch_id: plan.batch_id
   }
 })
-
 return {payment_data, enrollment_data, plan, coach_resp}
 }
 
 exports.process_update_input_req = async(req,input_response)=>{
-
   const {payment_data, enrollment_data, plan, coach_resp} = input_response;
-  
   plan_duration = plan.duration
   enrollment_data.end_date = new Date().toJSON().slice(0,19).replace('T',' ');
-
   var new_end_date = addDays(enrollment_data.end_date, plan_duration)
-
   if(!coach_resp) {
     await models.Enrollment.update({status: "inactive"}, {where: {id: enrollment_data.id}})
     await models.Payment.update({status: "failed"}, {where: {id: payment_data.id}})
@@ -127,7 +122,6 @@ exports.process_update_input_req = async(req,input_response)=>{
     await models.Enrollment.update({status: "active", end_date:new_end_date}, {where: {id: enrollment_data.id}})
     await models.Payment.update({status: "success"}, {where: {id: payment_data.id}})
   }
-  
 return {payment_id: payment_data.id, enrollment_id: enrollment_data.id, dataValues:req.body}
 }
 
@@ -137,6 +131,5 @@ exports.post_update_process = async(req,resp,input_response)=>{
   formatted_response["message"]="payment success, enrollment created successfully"
   delete input_response.dataValues.user_id
   formatted_response["data"]=input_response
-
   resp.status(200).send(formatted_response)
 }
