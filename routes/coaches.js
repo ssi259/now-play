@@ -1,7 +1,6 @@
 const express = require('express');
 const coach_controller = require('../controllers/coaches_controller');
 const routes = express.Router();
-const auth = require('../middleware/auth');
 const { auth } = require('../middlewares/authentication')
 
 routes.post('/', coach_controller.createCoach);
