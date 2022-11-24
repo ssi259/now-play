@@ -168,7 +168,7 @@ exports.process_get_coach_batches = async (input_data) => {
     batch.sports_name = await models.Sports.findByPk(batch.sports_id).then(sport => sport.name)
     batch.academy_name = await models.Academy.findByPk(batch.academy_id).then(academy => academy.name)
     batch.arena_name = await models.Arena.findByPk(batch.arena_id).then(arena => arena.name)
-    batch.total_players = await models.Enrollment.count({ where: { batch_id: batch.id } })
+    batch.total_players = await models.Enrollment.count({ where: { batch_id: batch.id,status:'active' } })
     return batch
   }))
   return coachBatches
