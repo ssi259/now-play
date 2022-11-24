@@ -83,23 +83,18 @@ exports.post_update_process = async(req,resp,input_response)=>{
   formatted_response["data"]=input_response
   resp.status(200).send(formatted_response)
 }
-
 exports.pre_process_update = async(req,resp)=>{
-
   var payment_data = await models.Payment.findOne({
     where: {
         id: req.body.payment_id
     }
   })
-  
 var plan = await models.SubscriptionPlan.findOne({
   where: {
       id: payment_data.plan_id,
   }
 })
-
 var coach_resp = req.body.coach_resp
-
 var enrollment_data = await models.Enrollment.findOne({
   where: {
     user_id: payment_data.user_id,
@@ -109,7 +104,6 @@ var enrollment_data = await models.Enrollment.findOne({
 })
 return {payment_data, enrollment_data, plan, coach_resp}
 }
-
 exports.process_update_input_req = async(req,input_response)=>{
   const {payment_data, enrollment_data, plan, coach_resp} = input_response;
   plan_duration = plan.duration
