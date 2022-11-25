@@ -161,17 +161,14 @@ exports.pre_process_get_monthly_payments = async (req) => {
 exports.process_get_monthly_payments = async (input_data) => {
   const { coach_id, month } = input_data
   const data = []
-  const next_month = parseInt(month) + 1
   const utc_year = new Date().getUTCFullYear()
-  const month_first_day = new Date(Date.UTC(utc_year, month, 1))
-  const next_month_first_day = new Date(Date.UTC(utc_year, next_month, 1)) 
   const payments = await models.Payment.findAll(
     {
       where: {
         status: "success",
         coach_id:coach_id,
         updatedAt: {
-            [Op.strictLeft]: [month_first_day,next_month_first_day],
+            [Op.between]: [new Date(Date.UTC(utc_year, month, 1)),new Date(Date.UTC(utc_year, parseInt(month) + 1, 1))],
         }
       },
     },
@@ -180,15 +177,8 @@ exports.process_get_monthly_payments = async (input_data) => {
     const plan = await models.SubscriptionPlan.findByPk(payment.dataValues.plan_id)
     const user = await models.User.findByPk(payment.dataValues.user_id)
     data.push({
-      plan: plan!=null ? {
-        name: plan.plan_name,
-        price: plan.price,
-        duration:plan.duration
-      }: null,
-      user: user!=null ? {
-        name: user.name,
-        phone_number: user.phoneNumber
-      }:null,
+      plan: plan!=null ? { name: plan.plan_name, price: plan.price, duration:plan.duration }: null,
+      user: user!=null ? { name: user.name, phone_number: user.phoneNumber }: null,
       payment_mode: payment.dataValues.payment_mode,
       payment_date: payment.dataValues.updatedAt
     })
