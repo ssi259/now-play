@@ -2,9 +2,15 @@ const models = require("../models");
 const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
 const Api500Error = require('../error/api500Error');
+var DB = JSON.parse(fs.readFileSync('config/config.json', 'utf8')).production;
+
 
 
 exports.pre_process_create_sport = async(req,resp)=>{
+console.log("username"+DB.username)
+console.log("host"+DB.host)
+console.log("database"+DB.database)
+console.log("password"+DB.password)
   const result = await  models.Sports.create({name: req.body.name,type: req.body.type,thumbnail: req.body.thumbnail,about: req.body.about}).then(function (sport) {
       if (sport) {
           return sport;
