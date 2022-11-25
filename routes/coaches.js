@@ -3,7 +3,7 @@ const coach_controller = require('../controllers/coaches_controller');
 const routes = express.Router();
 const { auth } = require('../middlewares/authentication')
 
-routes.get('/payments', auth, coach_controller.get_payments_monthly)
+routes.get('/payments/monthly', auth, coach_controller.get_payments_monthly)
 routes.post('/', coach_controller.createCoach);
 routes.post('/upload_images',coach_controller.uploadCoachImages);
 routes.post('/upload_documents',coach_controller.uploadCoachDocuments);
