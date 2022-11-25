@@ -58,6 +58,7 @@ exports.update_arena_by_id = async (req, resp) => {
         await ArenaManager.process_update_arena_by_id(input_response)
         await ArenaManager.post_process_update_arena_by_id(resp)
     } catch (e) {
+        console.log(e)
         const status_code = e.statusCode ? e.statusCode : 500
         return resp.status(status_code).send({ status: "failure", message: e.name})
     }

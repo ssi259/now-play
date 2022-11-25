@@ -21,7 +21,11 @@ module.exports = (sequelize, DataTypes) => {
     lng: DataTypes.DECIMAL,
     city: DataTypes.STRING,
     locality: DataTypes.STRING,
-    state: DataTypes.STRING
+    state: DataTypes.STRING,
+    status:{
+      type: DataTypes.STRING,
+      defaultValue: 'Active'
+    }
 
   }, {
     sequelize,
