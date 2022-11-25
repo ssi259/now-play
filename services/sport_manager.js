@@ -2,6 +2,8 @@ const models = require("../models");
 const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
 const Api500Error = require('../error/api500Error');
+const fs = require('fs');
+
 var DB = JSON.parse(fs.readFileSync('config/config.json', 'utf8')).production;
 
 
