@@ -1,7 +1,8 @@
-const { Coach, CoachImage, CoachDocument, Payment, SubscriptionPlan, Batch, User} = require('../models');
+const { Coach, CoachImage, CoachDocument, Payment, SubscriptionPlan, User} = require('../models');
 const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
 const {Op} = require('sequelize')
+const models = require('../models');
 
 exports.process_create_coach = async (req, resp) => {
     const {
@@ -154,7 +155,7 @@ exports.post_process_update_coach_by_id = async (resp) => {
 
 
 exports.pre_process_get_monthly_payments = async (req) => {
-  return {coach_id:req.params.id,month:req.query.month}
+  return {coach_id:req.user.coach_id,month:req.query.month}
 }
 
 exports.process_get_monthly_payments = async (input_data) => {
@@ -164,7 +165,7 @@ exports.process_get_monthly_payments = async (input_data) => {
   const utc_year = new Date().getUTCFullYear()
   const month_first_day = new Date(Date.UTC(utc_year, month, 1))
   const next_month_first_day = new Date(Date.UTC(utc_year, next_month, 1)) 
-  const payments = await Payment.findAll(
+  const payments = await models.Payment.findAll(
     {
       where: {
         status: "success",
@@ -176,8 +177,8 @@ exports.process_get_monthly_payments = async (input_data) => {
     },
   )
   for (let payment of payments) {
-    const plan = await SubscriptionPlan.findByPk(payment.dataValues.plan_id)
-    const user = await User.findByPk(payment.dataValues.user_id)
+    const plan = await models.SubscriptionPlan.findByPk(payment.dataValues.plan_id)
+    const user = await models.User.findByPk(payment.dataValues.user_id)
     data.push({
       plan: plan!=null ? {
         name: plan.plan_name,
@@ -196,5 +197,31 @@ exports.process_get_monthly_payments = async (input_data) => {
 }
 
 exports.post_process_get_monthly_payments = async (data, resp) => {
-  resp.status(200).send({status:"success",message:"retreived data successfully", data})
+  resp.status(200).send({ status: "success", message: "retreived data successfully", data })
+}
+
+exports.pre_process_get_coach_batches = async (req) => {
+  return {"coach_id":req.user.coach_id}
+}
+
+exports.process_get_coach_batches = async (input_data) => {
+  const {coach_id} = input_data
+  const batches = await models.Batch.findAll({
+    where: {
+      coach_id: coach_id
+    }
+  })
+  const coachBatches = await Promise.all(batches.map(async (batch) => {
+    batch = batch.toJSON()
+    batch.sports_name = await models.Sports.findByPk(batch.sports_id).then(sport => sport.name)
+    batch.academy_name = await models.Academy.findByPk(batch.academy_id).then(academy => academy.name)
+    batch.arena_name = await models.Arena.findByPk(batch.arena_id).then(arena => arena.name)
+    batch.total_players = await models.Enrollment.count({ where: { batch_id: batch.id,status:'active' } })
+    return batch
+  }))
+  return coachBatches
+}
+
+exports.post_process_get_coach_batches = async (resp,batches) => {
+  resp.status(200).send({status:"Success",data:batches})
 }

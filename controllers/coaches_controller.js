@@ -69,7 +69,19 @@ exports.get_payments_monthly = async (req, resp) => {
         const process_response = await coachManager.process_get_monthly_payments(input_response)
         await coachManager.post_process_get_monthly_payments(process_response,resp)
     } catch (e) {
+        console.log(e)
         const status_code = e.statusCode ? e.statusCode : 500
-        resp.status(status_code).send({status:"failure",message:e.name})
+        resp.status(status_code).send({status:"failure",message:e.name, data:{}})
+    }
+}
+exports.getCoachBatches = async (req, resp) => {
+    try {
+        var input_response = await coachManager.pre_process_get_coach_batches(req)
+        var process_response = await coachManager.process_get_coach_batches(input_response)
+        var post_process_response = await coachManager.post_process_get_coach_batches(resp,process_response)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        resp.status(status_code).send({status:"Failure",message:e.name})
     }
 }

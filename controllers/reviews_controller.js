@@ -8,6 +8,8 @@ exports.create_review = async(req,resp)=>{
         var post_process_response = await ReviewManager.post_review_process(req,resp,processed_reponse)
     }catch(e){
         console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "Failure", message: e.name })
     }finally{
     }
 }
