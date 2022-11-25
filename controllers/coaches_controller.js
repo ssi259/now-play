@@ -73,11 +73,11 @@ exports.getCoachBatches = async (req, resp) => {
         resp.status(status_code).send({status:"Failure",message:e.name})
     }
 }
-exports.get_pending_payments = async (req, resp) => {
+exports.get_payments_by_status = async (req, resp) => {
     try {
-        const input_response = await coachManager.pre_process_get_pending_payments(req)
-        const process_response = await coachManager.process_get_pending_payments(input_response)
-        await coachManager.post_process_get_pending_payments(process_response, resp)
+        const input_response = await coachManager.pre_process_get_payments_by_status(req)
+        const process_response = await coachManager.process_get_payments_by_status(input_response)
+        await coachManager.post_process_get_payments_by_status(process_response, resp)
     }
     catch (e) {
         const status_code = e.statusCode ? e.statusCode : 500

@@ -178,35 +178,41 @@ exports.post_process_get_coach_batches = async (resp, batches) => {
   resp.status(200).send({ status: "Success", data: batches })
 }
 
-exports.pre_process_get_pending_payments = async (req) => {
-  return {coach_id:req.params.id, status:req.query.status}
+exports.pre_process_get_payments_by_status = async (req) => {
+  return { coach_id: req.user.coach_id, status: req.query.status }
 }
 
-exports.process_get_pending_payments = async (input_data) => {
+exports.process_get_payments_by_status = async (input_data) => {
   const { coach_id, status } = input_data
   const payment_data_list= []
-  const pending_payments = await Payment.findAll({
+  const pending_payments = await models.Payment.findAll({
     where: {
       coach_id: coach_id,
       status : status
     }
   })
   for (let pending_payment of pending_payments) {
-    const user = await User.findByPk(pending_payment.dataValues.user_id)
-    const plan = await SubscriptionPlan.findByPk(pending_payment.dataValues.plan_id)
-    const batch = await Batch.findByPk(plan.batch_id)
+    const user = await models.User.findByPk(pending_payment.dataValues.user_id)
+    const plan = await models.SubscriptionPlan.findByPk(pending_payment.dataValues.plan_id)
+    const batch = plan != null ? await models.Batch.findByPk(plan.batch_id) : null
+    const arena = batch != null ? await models.Arena.findByPk(batch.arena_id) : null
+    const sport = batch !=null ? await models.Sports.findByPk(batch.sports_id) : null
     payment_data_list.push({
-      user: {
-        name:user.name,
-        phone_number:user.phoneNumber
+      user: user!=null ? { name:user.name, phone_number:user.phoneNumber }:null,
+      plan: plan!=null ? { plan_name: plan.plan_name, price: plan.price, type: plan.type, duration:plan.duration }:null,
+      batch: {
+        arena: {
+          name: arena.name,
+          phone_number: arena.phone_number,
+          locality:arena.locality,
+          city:arena.city,
+          state:arena.state,
+          pincode:arena.pincode
+        },
+        sport: {
+          name: sport.name,
+        }
       },
-      plan: {
-        plan_name: plan.plan_name,
-        price: plan.price,
-        type: plan.type,
-        duration:plan.duration
-      },
-      batch:batch,
       price: pending_payment.dataValues.price,
       payment_mode: pending_payment.dataValues.payment_mode
     })
@@ -214,6 +220,6 @@ exports.process_get_pending_payments = async (input_data) => {
   return payment_data_list
 }
 
-exports.post_process_get_pending_payments = async (data, resp) => {
+exports.post_process_get_payments_by_status = async (data, resp) => {
   resp.status(200).send({status:"success",message:"pending payments retrieved successfully", data:data})
 }
