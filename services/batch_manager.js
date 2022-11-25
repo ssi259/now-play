@@ -18,15 +18,13 @@ const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.p
 
 exports.pre_process_params = async (req, resp) => {
     if (req.query.sports_id != null) {
-        const results = await sequelize.query(`SELECT batches.id , batches.price ,batches.start_time, batches.end_time,batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type, (6371 *acos(cos(radians("+ req.query.lat + ")) * cos(radians(lat)) * cos(radians(lng) - radians("+req.query.lng+")) + sin(radians("+req.query.lat+")) * sin(radians(lat)))) AS distance FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id) where sports.id = ${req.query.sports_id} HAVING distance < 100000   ORDER BY distance LIMIT 0, 20;`, { type: Sequelize.QueryTypes.SELECT }).then((result) => {
-            return result;
+        const results = await sequelize.query(`SELECT batches.id , batches.price ,batches.start_time, batches.end_time,batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,arena.lat,arena.lng,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id) where sports.id = ${req.query.sports_id};`, { type: Sequelize.QueryTypes.SELECT }).then((result) => {            return result;
         }).catch(() => {
             throw new Api500Error(`Error in batch search`)
         })
         return results;
 
-    } else {
-        const results = await sequelize.query("SELECT batches.id , batches.price ,batches.start_time, batches.end_time,batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type, (6371 *acos(cos(radians(" + req.query.lat + ")) * cos(radians(lat)) * cos(radians(lng) - radians(" + req.query.lng + ")) + sin(radians(" + req.query.lat + ")) * sin(radians(lat)))) AS distance FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id) HAVING distance < 100000   ORDER BY distance LIMIT 0, 20;", { type: Sequelize.QueryTypes.SELECT }).then((result) => {
+    } else {const results = await sequelize.query("SELECT batches.id , batches.price ,batches.start_time, batches.end_time,batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,arena.lat,arena.lng,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id);", { type: Sequelize.QueryTypes.SELECT }).then((result) => {
             return result;
         }).catch(() => {
             throw new Api500Error(`Error in batch search`)
@@ -34,10 +32,14 @@ exports.pre_process_params = async (req, resp) => {
         return results;
     }
 }
-exports.process_batch_search_input_req = async (input_response) => {
+exports.process_batch_search_input_req = async (req,resp,input_response) => {
     var processed_response = [], overall_ratings = 0, ratings;
     if (input_response == null) {
         return input_response
+    }
+    for (each_input_response of input_response) {
+     Object.assign(each_input_response , { "distance": range(req.query.lat, req.query.lng,each_input_response["lat"],each_input_response["lng"] ,"k.m.")})
+     processed_response.push(each_input_response)
     }
     for (each_input_response of input_response) {
         overall_ratings = 0;
@@ -190,34 +192,6 @@ exports.process_batch_details_input_req = async(req,input_response)=>{
         rating_json = { "rating_count": ratings.length, "average_rating": overall_ratings / ratings.length };
 
     });
-
-   let lng1 = req.query.lng;
-    let lat1 = req.query.lat;
-    let lng2 = arena_details["lng"]
-    let lat2 = arena_details["lat"]
-    let unit = "k.M."
-
-    function range(lat1, lng1, lat2, lng2, unit) {
-        if ((lat1 == lat2) && (lng1 == lng2)) {
-            return 0;
-        }
-        else {
-            var radlat1 = Math.PI * lat1/180;
-            var radlat2 = Math.PI * lat2/180;
-            var theta = lng1-lng2;
-            var radtheta = Math.PI * theta/180;
-            var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-            if (dist > 1) {
-                dist = 1;
-            }
-            dist = Math.acos(dist);
-            dist = dist * 180/Math.PI;
-            dist = dist * 60 * 1.1515;
-            if (unit=="K.M.") { dist = dist * 1.609344 }
-            return dist;    
-        }
-    }
-
     Object.assign(input_response.dataValues,rating_json);
     Object.assign(input_response.dataValues,arena_data);
     Object.assign(input_response.dataValues, { "address": { "city": arena_details["city"], "locality":arena_details["locality"], "state": arena_details["state"] } })
@@ -226,7 +200,7 @@ exports.process_batch_details_input_req = async(req,input_response)=>{
     Object.assign(input_response.dataValues,sports_data);
     Object.assign(input_response.dataValues,image_list);
     Object.assign(input_response.dataValues,coach_reviews);
-    Object.assign(input_response.dataValues, { "distance": range( lat1,lng1,lat2,lng2 , unit)});
+    Object.assign(input_response.dataValues, { "distance": range( req.query.lat,req.query.lng,arena_details["lat"],arena_details["lng"] , "k.M.")});
 
     return input_response
 }  
@@ -314,3 +288,24 @@ function get_curr_day() {
 exports.post_process_upcoming_classes = async (data, resp) => {
     resp.status(200).send({ status: "success", message: "retrieved upcoming classes successfully", data: data })
 }
+
+function range(lat1, lng1, lat2, lng2, unit) {
+    if ((lat1 == lat2) && (lng1 == lng2)) {
+        return 0;
+    }
+    else {
+        var radlat1 = Math.PI * lat1/180;
+        var radlat2 = Math.PI * lat2/180;
+        var theta = lng1-lng2;
+        var radtheta = Math.PI * theta/180;
+        var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+        if (dist > 1) {
+            dist = 1;
+        }
+        dist = Math.acos(dist);
+        dist = dist * 180/Math.PI;
+        dist = dist * 60 * 1.1515;
+        if (unit=="K.M.") { dist = dist * 1.609344 }
+        return dist;    
+    }
+} return range
