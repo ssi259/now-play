@@ -74,11 +74,11 @@ exports.getCoachBatches = async (req, resp) => {
     }
 }
 
-exports.getCoachActiveBatches = async (req, resp) => {
+exports.getCoachEnrolledStudents = async (req, resp) => {
     try {
-        var input_response = await coachManager.pre_process_get_coach_active_batches(req)
-        var process_response = await coachManager.process_get_coach_active_batches(input_response)
-        var post_process_response = await coachManager.post_process_get_coach_active_batches(resp,process_response)
+        var input_response = await coachManager.pre_process_get_coach_enrolled_students(req)
+        var process_response = await coachManager.process_get_coach_enrolled_students(input_response)
+        var post_process_response = await coachManager.post_process_get_coach_enrolled_students(resp,process_response)
     } catch (e) {
         console.log(e)
         const status_code = e.statusCode ? e.statusCode : 500
