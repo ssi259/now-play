@@ -178,21 +178,21 @@ exports.post_process_get_coach_batches = async (resp,batches) => {
   resp.status(200).send({status:"Success",data:batches})
 }
 
-exports.pre_process_get_coach_active_batches = async (req) => {
+exports.pre_process_get_coach_enrolled_students = async (req) => {
   return {"coach_id":req.user.coach_id}
 }
 
-exports.process_get_coach_active_batches = async (input_data) => {
+exports.process_get_coach_enrolled_students = async (input_data) => {
   const {coach_id} = input_data
-  const batches = await models.Batch.count({
+  const student_enrolled = await models.Enrollment.count({
     where: {
       coach_id: coach_id,
       status: 'active'
     }
   })
-  return {"active_batches":batches}
+  return {"student_enrolled":student_enrolled};
 }
 
-exports.post_process_get_coach_active_batches = async (resp,batches) => {
-  resp.status(200).send({status:"Success",data:batches})
+exports.post_process_get_coach_enrolled_students = async (resp,student_enrollled) => {
+  resp.status(200).send({status:"Success",data:student_enrollled})
 }
