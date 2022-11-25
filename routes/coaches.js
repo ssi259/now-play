@@ -10,4 +10,5 @@ routes.get('/', coach_controller.getCoaches)
 routes.get('/batches',auth,coach_controller.getCoachBatches)
 routes.get('/:id',coach_controller.getCoachById)
 routes.put('/:id', coach_controller.update_coach_by_id)
+routes.get('/payments/:id',coach_controller.get_pending_payments)
 module.exports = routes;

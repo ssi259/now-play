@@ -1,4 +1,4 @@
-const { Coach, CoachImage, CoachDocument } = require('../models');
+const { Coach, CoachImage, CoachDocument, Payment, User, SubscriptionPlan, Batch } = require('../models');
 const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
 const models = require('../models');
@@ -174,6 +174,46 @@ exports.process_get_coach_batches = async (input_data) => {
   return coachBatches
 }
 
-exports.post_process_get_coach_batches = async (resp,batches) => {
-  resp.status(200).send({status:"Success",data:batches})
+exports.post_process_get_coach_batches = async (resp, batches) => {
+  resp.status(200).send({ status: "Success", data: batches })
+}
+
+exports.pre_process_get_pending_payments = async (req) => {
+  return {coach_id:req.params.id, status:req.query.status}
+}
+
+exports.process_get_pending_payments = async (input_data) => {
+  const { coach_id, status } = input_data
+  const payment_data_list= []
+  const pending_payments = await Payment.findAll({
+    where: {
+      coach_id: coach_id,
+      status : status
+    }
+  })
+  for (let pending_payment of pending_payments) {
+    const user = await User.findByPk(pending_payment.dataValues.user_id)
+    const plan = await SubscriptionPlan.findByPk(pending_payment.dataValues.plan_id)
+    const batch = await Batch.findByPk(plan.batch_id)
+    payment_data_list.push({
+      user: {
+        name:user.name,
+        phone_number:user.phoneNumber
+      },
+      plan: {
+        plan_name: plan.plan_name,
+        price: plan.price,
+        type: plan.type,
+        duration:plan.duration
+      },
+      batch:batch,
+      price: pending_payment.dataValues.price,
+      payment_mode: pending_payment.dataValues.payment_mode
+    })
+  }
+  return payment_data_list
+}
+
+exports.post_process_get_pending_payments = async (data, resp) => {
+  resp.status(200).send({status:"success",message:"pending payments retrieved successfully", data:data})
 }
