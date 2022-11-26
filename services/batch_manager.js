@@ -26,7 +26,8 @@ exports.pre_process_params = async (req, resp) => {
 
     } else {const results = await sequelize.query("SELECT batches.id , batches.price ,batches.start_time, batches.end_time,batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,arena.lat,arena.lng,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id);", { type: Sequelize.QueryTypes.SELECT }).then((result) => {
             return result;
-        }).catch(() => {
+        }).catch((e) => {
+            console.log(e)
             throw new Api500Error(`Error in batch search`)
         })
         return results;
@@ -36,10 +37,6 @@ exports.process_batch_search_input_req = async (req,resp,input_response) => {
     var processed_response = [], overall_ratings = 0, ratings;
     if (input_response == null) {
         return input_response
-    }
-    for (each_input_response of input_response) {
-     Object.assign(each_input_response , { "distance": range(req.query.lat, req.query.lng,each_input_response["lat"],each_input_response["lng"] ,"k.m.")})
-     processed_response.push(each_input_response)
     }
     for (each_input_response of input_response) {
         overall_ratings = 0;
@@ -53,7 +50,7 @@ exports.process_batch_search_input_req = async (req,resp,input_response) => {
             })
 
             const data2 = { "rating_count": ratings.length, "average_rating": overall_ratings / ratings.length };
-
+            Object.assign(each_input_response , { "distance": range(req.query.lat, req.query.lng,each_input_response["lat"],each_input_response["lng"] ,"k.m.")})
             Object.assign(each_input_response, data2)
             Object.assign(each_input_response, { "address": { "city": each_input_response["city"], "locality": each_input_response["locality"], "state": each_input_response["state"] } })
             delete each_input_response["city"]

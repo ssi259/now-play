@@ -1,5 +1,5 @@
 const fs = require('fs');
-var DB = JSON.parse(fs.readFileSync('config/config.json', 'utf8')).production;
+var DB = JSON.parse(fs.readFileSync('config/config.json', 'utf8')).development;
 
 module.exports = {
   username: DB.username,
