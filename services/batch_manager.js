@@ -39,28 +39,31 @@ exports.process_batch_search_input_req = async (req,resp,input_response) => {
         return input_response
     }
     for (each_input_response of input_response) {
-        overall_ratings = 0;
-        ratings = await models.Review.findAll({
-            where: {
-                coach_id: each_input_response["coach_id"]
-            }
-        }).then((ratings) => {
-            ratings.forEach((rating) => {
-                overall_ratings = overall_ratings + rating["rating"]
+        const plan = await models.SubscriptionPlan.findOne({where:{batch_id:each_input_response["id"]}})
+        if(plan){
+            overall_ratings = 0;
+            ratings = await models.Review.findAll({
+                where: {
+                    coach_id: each_input_response["coach_id"]
+                }
+            }).then((ratings) => {
+                ratings.forEach((rating) => {
+                    overall_ratings = overall_ratings + rating["rating"]
+                })
+
+                const data2 = { "rating_count": ratings.length, "average_rating": overall_ratings / ratings.length };
+                Object.assign(each_input_response , { "distance": range(req.query.lat, req.query.lng,each_input_response["lat"],each_input_response["lng"] ,"k.m.")})
+                Object.assign(each_input_response, data2)
+                Object.assign(each_input_response, { "address": { "city": each_input_response["city"], "locality": each_input_response["locality"], "state": each_input_response["state"] } })
+                delete each_input_response["city"]
+                delete each_input_response["locality"]
+                delete each_input_response["state"]
+                processed_response.push(each_input_response)
+
+            }).catch((error) => {
+                console.log(error)
             })
-
-            const data2 = { "rating_count": ratings.length, "average_rating": overall_ratings / ratings.length };
-            Object.assign(each_input_response , { "distance": range(req.query.lat, req.query.lng,each_input_response["lat"],each_input_response["lng"] ,"k.m.")})
-            Object.assign(each_input_response, data2)
-            Object.assign(each_input_response, { "address": { "city": each_input_response["city"], "locality": each_input_response["locality"], "state": each_input_response["state"] } })
-            delete each_input_response["city"]
-            delete each_input_response["locality"]
-            delete each_input_response["state"]
-            processed_response.push(each_input_response)
-
-        }).catch((error) => {
-            console.log(error)
-        })
+        }
     }
     return processed_response;
 }
