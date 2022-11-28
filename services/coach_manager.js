@@ -196,3 +196,28 @@ exports.process_get_coach_enrolled_students = async (input_data) => {
 exports.post_process_get_coach_enrolled_students = async (resp,student_enrollled) => {
   resp.status(200).send({status:"Success",data:student_enrollled})
 }
+
+exports.pre_process_get_enrolled_users_list = async (req) => {
+  return {"coach_id":req.user.coach_id}
+}
+
+exports.process_get_enrolled_users_list = async (input_data) => {
+  const { coach_id } = input_data
+  const enrolled_users_data = []
+  const enrolled_users = await models.Enrollment.findAll({
+    where: {
+      coach_id: coach_id,
+      status: 'active'
+    },
+    attributes:['user_id'],
+    group: ['user_id']
+  })
+  for (let user of enrolled_users) {
+    enrolled_users_data.push(await models.User.findByPk(user.user_id))
+  }
+  return enrolled_users_data
+}
+
+exports.post_process_get_enrolled_users_list = async (resp,data) => {
+  resp.status(200).send({status:"Success",data:data})
+}

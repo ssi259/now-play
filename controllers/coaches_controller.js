@@ -85,3 +85,15 @@ exports.getCoachEnrolledStudents = async (req, resp) => {
         resp.status(status_code).send({status:"Failure",message:e.name})
     }
 }
+
+exports.get_enrolled_users_list = async (req, resp) => {
+    try {
+        const input_response = await coachManager.pre_process_get_enrolled_users_list(req)
+        const process_response = await coachManager.process_get_enrolled_users_list(input_response)
+        await coachManager.post_process_get_enrolled_users_list(resp,process_response)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        resp.status(status_code).send({status:"Failure",message:e.name})
+    }
+}
