@@ -35,7 +35,7 @@ exports.pre_process_check_eligibility = async(req,resp)=>{
   if(req.query.coach_id == undefined){
     throw new Api400Error("Coach ID Not Provided")
   }
-  return {"coach_id":req.query.coach_id,"user_id":req.user.user_id}
+  return {"coach_id":(+req.query.coach_id),"user_id":req.user.user_id}
 }
 
 exports.process_check_eligibility_input_req = async(input_response)=>{
@@ -52,7 +52,7 @@ exports.process_check_eligibility_input_req = async(input_response)=>{
 }
 
 exports.post_process_check_eligibility = async(req,resp,result)=>{
-  resp.status(200).send({ status: "success", data: result })
+  resp.status(200).send({ status: "success", data: result,message: "user is eligible to review coach" })
 }
 
 
