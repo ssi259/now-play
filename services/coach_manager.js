@@ -196,3 +196,26 @@ exports.process_get_coach_enrolled_students = async (input_data) => {
 exports.post_process_get_coach_enrolled_students = async (resp,student_enrollled) => {
   resp.status(200).send({status:"Success",data:student_enrollled})
 }
+
+
+exports.pre_process_update_profile_pic = async (req) => {
+  if (req.files == null || req.files.image == null) {
+      throw new Api400Error("Image Not Provided")
+  }
+  return {coach_id:req.user.coach_id,image:req.files.image }
+}
+
+exports.process_update_profile_pic = async (input_data) => {
+  const { coach_id, image } = input_data
+  const img_url = await uploadFile(image)
+  await models.Coach.update({ profile_pic: img_url }, {
+      where: {
+          id:coach_id
+      }
+  })
+  return {img_url}
+}
+
+exports.post_process_update_profile_pic = async (data,resp) => {
+  resp.status(200).send({status:"success",message:"profile pic updated successfully ", data:data})
+}
