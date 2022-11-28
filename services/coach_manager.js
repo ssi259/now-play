@@ -177,8 +177,8 @@ exports.process_get_monthly_payments = async (input_data) => {
     const plan = await models.SubscriptionPlan.findByPk(payment.dataValues.plan_id)
     const user = await models.User.findByPk(payment.dataValues.user_id)
     data.push({
-      plan: plan!=null ? { name: plan.plan_name, price: plan.price, duration:plan.duration }: null,
-      user: user!=null ? { name: user.name, phone_number: user.phoneNumber }: null,
+      plan: plan,
+      user: user,
       payment_mode: payment.dataValues.payment_mode,
       payment_date: payment.dataValues.updatedAt
     })
