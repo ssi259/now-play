@@ -219,5 +219,5 @@ exports.process_get_enrolled_users_list = async (input_data) => {
 }
 
 exports.post_process_get_enrolled_users_list = async (resp,data) => {
-  resp.status(200).send({status:"Success",data:data})
+  resp.status(200).send({status:"success",data:data})
 }

@@ -94,6 +94,6 @@ exports.get_enrolled_users_list = async (req, resp) => {
     } catch (e) {
         console.log(e)
         const status_code = e.statusCode ? e.statusCode : 500
-        resp.status(status_code).send({status:"Failure",message:e.name})
+        resp.status(status_code).send({status:"failure",message:e.name})
     }
 }
