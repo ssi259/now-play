@@ -195,26 +195,12 @@ exports.process_get_payments_by_status = async (input_data) => {
     const user = await models.User.findByPk(pending_payment.dataValues.user_id)
     const plan = await models.SubscriptionPlan.findByPk(pending_payment.dataValues.plan_id)
     const batch = plan != null ? await models.Batch.findByPk(plan.batch_id) : null
-    const arena = batch != null ? await models.Arena.findByPk(batch.arena_id) : null
-    const sport = batch !=null ? await models.Sports.findByPk(batch.sports_id) : null
     payment_data_list.push({
-      user: user!=null ? { name:user.name, phone_number:user.phoneNumber }:null,
-      plan: plan!=null ? { plan_name: plan.plan_name, price: plan.price, type: plan.type, duration:plan.duration }:null,
-      batch: {
-        arena: {
-          name: arena.name,
-          phone_number: arena.phone_number,
-          locality:arena.locality,
-          city:arena.city,
-          state:arena.state,
-          pincode:arena.pincode
-        },
-        sport: {
-          name: sport.name,
-        }
-      },
+      user: user,
+      plan: plan,
+      batch:batch,
       price: pending_payment.dataValues.price,
-      payment_mode: pending_payment.dataValues.payment_mode
+      payment_mode: pending_payment.dataValues.payment_mode,
     })
   }
   return payment_data_list
