@@ -17,10 +17,10 @@ exports.process_create_input_req = async(req,input_response)=>{
   const {plan} = input_response;
   console.log(input_response)
   var enrollent_type = plan.price==0?"free":"cash";
-  await models.Enrollment.update({status: "inactive"}, {where: {user_id: req.user.user_id,batch_id:req.body.batch_id, status: "pending"}})
+  await models.Enrollment.update({status: "inactive"}, {where: {user_id: req.user.user_id,batch_id:req.body.batch_id, status: "pending",coach_id:req.body.coach_id}})
   await models.Payment.update({status: "failed"}, {where: {user_id: req.user.user_id, coach_id: req.body.coach_id, batch_id:req.body.batch_id,status: "pending"}})
   await models.Payment.create({plan_id: req.body.plan_id,status: "pending",batch_id:req.body.batch_id, user_id: req.user.user_id,coach_id: req.body.coach_id, price: plan.price, payment_mode: "Cash"})
-  await models.Enrollment.create({batch_id:req.body.batch_id,user_id: req.user.user_id, subscription_id: req.body.plan_id, status: "pending", type:enrollent_type})
+  await models.Enrollment.create({batch_id:req.body.batch_id,user_id: req.user.user_id, subscription_id: req.body.plan_id, status: "pending", type:enrollent_type,coach_id: req.body.coach_id})
   return {user_id: req.user.user_id , dataValues:req.body, price: plan.price}
 }
 exports.post_create_process = async(req,resp,input_response)=>{
