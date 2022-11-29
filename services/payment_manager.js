@@ -36,10 +36,11 @@ exports.pre_process_transaction_details = async(req,resp)=>{
       } else {
         throw new Api500Error(`Bad Request`)
       }
+
 }
 exports.process_transaction_details_input_req = async(input_response)=>{
   return input_response
 }
 exports.post_transaction_details_process = async(req,resp,input_response)=>{
-  resp.send(input_response)
+  resp.status(200).send(input_response)
 }
