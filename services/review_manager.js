@@ -56,5 +56,23 @@ exports.post_process_check_eligibility = async(req,resp,result)=>{
 }
 
 
-  
+exports.pre_process_get_user_reviews = async(req,resp)=>{
+  if(req.query.coach_id == null){
+    throw new Api400Error("Coach ID Not Provided")
+  }
+  return {"coach_id":req.query.coach_id,"user_id":req.user.user_id}
+}
+
+exports.process_get_user_reviews = async (input_response) => {
+  const {coach_id, user_id} = input_response
+  const review = await models.Review.findAll({ where: { 
+    coach_id: coach_id,
+    user_id:user_id 
+  }});
+  return review
+}
+
+exports.post_process_get_user_reviews = async(data,resp)=>{
+  resp.status(200).send({ status: "success", data: data })
+}
 
