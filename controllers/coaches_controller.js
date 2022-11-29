@@ -96,3 +96,19 @@ exports.update_profile_pic = async (req, resp) => {
         return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
     }
 }
+
+exports.getCoachEarnings = async (req, resp) => {
+    console.log("getCoachEarnings is called");
+    try {
+        var input_response = await coachManager.pre_process_get_coach_earnings(req)
+        console.log(input_response)
+        var process_response = await coachManager.process_get_coach_earnings(input_response)
+        console.log(process_response)
+        var post_process_response = await coachManager.post_process_get_coach_earnings(resp,process_response)
+        console.log(post_process_response);
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        resp.status(status_code).send({status:"Failure",message:e.name})
+    }
+}

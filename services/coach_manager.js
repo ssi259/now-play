@@ -2,6 +2,7 @@ const { Coach, CoachImage, CoachDocument } = require('../models');
 const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
 const models = require('../models');
+const sequelize = require('sequelize')
 
 exports.process_create_coach = async (req, resp) => {
     const {
@@ -219,4 +220,40 @@ exports.process_update_profile_pic = async (input_data) => {
 
 exports.post_process_update_profile_pic = async (data,resp) => {
   resp.status(200).send({status:"success",message:"profile pic updated successfully ", data:data})
+// coach earnings
+exports.pre_process_get_coach_earnings = async (req) => {
+  return {"coach_id":req.body.coach_id, "month":req.params.month, "year":req.params.year}
+}
+
+exports.process_get_coach_earnings = async (input_data) => {
+  console.log("pre process get coach");
+  const {coach_id, month, year} = input_data
+  if(month == 0 && year == 0){
+    const total_earnings = await models.Payment.findAll({
+     attributes: { 
+         include: [[sequelize.fn("SUM", sequelize.col("price")), "total_earnings"]]
+     },
+     where: {coach_id: coach_id, status: "pending"}
+    })
+  return {"total_earnings":total_earnings.total_earnings};
+}
+  if(month !=0 && year !=0){
+    const monthly_earning = await models.Payment.findAll({
+     attributes: {
+       include: [
+         [sequelize.fn('SUM', sequelize.col('price')), 'earnings'],
+       ]
+     },
+     where: {
+        [sequelize.Op.and]: [
+        sequelize.where(sequelize.fn('MONTH', sequelize.col('createdAt')), month),
+        sequelize.where(sequelize.fn('YEAR', sequelize.col('createdAt')), year),
+        ],
+        coach_id: coach_id, status: "pending"}})
+  return {"monthly_earning" : monthly_earning}
+}  
+}
+
+exports.post_process_get_coach_earnings = async (resp,student_enrollled) => {
+  resp.status(200).send({status:"Success",data:student_enrollled})
 }
