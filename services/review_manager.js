@@ -73,6 +73,6 @@ exports.process_get_user_reviews = async (input_response) => {
 }
 
 exports.post_process_get_user_reviews = async(data,resp)=>{
-  resp.status(200).send({ status: "success", data: data[0].dataValues })
+  resp.status(200).send({ status: "success", data: data[0].dataValues,message: "review retrieved successfuly" })
 }
 
