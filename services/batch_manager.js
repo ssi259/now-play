@@ -226,7 +226,8 @@ exports.process_upcoming_classes = async (user_id) => {
                 [Op.or]: ["active", "pending"]
             }
         },
-        attributes: ['batch_id']
+        attributes: ['batch_id'],
+        group: ['batch_id'],
     })
     for (const batch of batches) {
         const batch_data = await models.Batch.findByPk(batch.dataValues.batch_id)
