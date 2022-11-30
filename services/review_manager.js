@@ -20,15 +20,16 @@ exports.process_review_input_req = async(input_response)=>{
     }
   )
   if (review_exists[0] == 0) {
-    return await models.Review.create(input_response);
+   const new_review = await models.Review.create(input_response);
+   return {"message":"Review Created","data": new_review }
   }
   else {
-    return {"message":"Review Updated"}
+    return {"message":"Review Updated","data": input_response}
   }
 }
 
 exports.post_review_process = async(req,resp,input_response)=>{
-  resp.status(200).send({ status: "success", data: input_response })
+  resp.status(200).send({ status: "success", data: input_response.data, message: input_response.message})
 }
 
 exports.pre_process_check_eligibility = async(req,resp)=>{
