@@ -32,3 +32,27 @@ exports.upload_profile_pic = async (req, resp) => {
         return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
     }
 }
+
+exports.get_all_users = async (req, resp) => {
+    try {
+        var input_response = await user_manager.pre_process_get_all_users(req)
+        var processed_response = await user_manager.process_get_all_users(input_response)
+        await user_manager.post_process_get_all_users(processed_response, resp)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
+    }
+}
+
+exports.update_user_on_adminPanel = async (req, resp) => {
+    try {
+        var input_response = await user_manager.pre_process_update_user_on_adminPanel(req)
+        var processed_response = await user_manager.process_update_user_on_adminPanel(input_response)
+        await user_manager.post_process_update_user_on_adminPanel(processed_response, resp)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
+    }
+}
