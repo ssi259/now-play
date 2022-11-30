@@ -29,7 +29,7 @@ exports.process_review_input_req = async(input_response)=>{
 }
 
 exports.post_review_process = async(req,resp,input_response)=>{
-  resp. status(200).send({ status: "success", data: input_response.data, message: input_response.message})
+  resp.status(200).send({ status: "success", data: input_response.data, message: input_response.message})
 }
 
 exports.pre_process_check_eligibility = async(req,resp)=>{
