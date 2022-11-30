@@ -16,7 +16,10 @@ module.exports = (sequelize, DataTypes) => {
     isEmailVerified: DataTypes.BOOLEAN,
     gender:DataTypes.STRING,
     type:DataTypes.STRING,
-    status: DataTypes.STRING,
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: 'active'
+    },
     dob:DataTypes.STRING
   }, {
     sequelize,
