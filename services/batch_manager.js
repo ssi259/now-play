@@ -308,4 +308,84 @@ function range(lat1, lng1, lat2, lng2, unit) {
         if (unit=="K.M.") { dist = dist * 1.609344 }
         return dist;    
     }
-} return range
+}
+
+exports.pre_process_next_class = async (req) => {
+    return req.user.user_id
+}
+
+exports.process_next_class = async (user_id) => {
+    const week_days = ['Sunday','Monday', 'Tuesday', 'Wednesday', 'Thursday','Friday','Saturday']
+    const weekly_classes = [[], [], [], [], [], [], []]
+    let days_arr_length = 7; 
+    const batches = await models.Enrollment.findAll({
+        where: {
+            user_id: user_id,
+            status: {
+                [Op.or]: ["active", "pending"]
+            }
+        },
+        attributes: ['batch_id'],
+        group:['batch_id']
+    })
+    for (const batch of batches) {
+        const batch_data = await models.Batch.findByPk(batch.dataValues.batch_id)    
+        const days_arr = JSON.parse(batch_data.days)
+        for (let i = 0; i < days_arr_length; i++){
+            if (days_arr[i] == 1) {
+                weekly_classes[(i+1)% days_arr_length].push(batch_data)
+            }
+        }
+    }
+    for (let i = 0; i < days_arr_length; i++) weekly_classes[i].sort((batch_1, batch_2) => batch_1.start_time > batch_2.start_time ? 1 : -1)   
+    let j = 0;
+    const response_data = [];
+    const curr_day_index = get_curr_day()
+    for (let i = curr_day_index; i < (days_arr_length + curr_day_index); i++){
+        for (let single_class of weekly_classes[(i % days_arr_length)]) {
+            if (i != curr_day_index || single_class.dataValues.start_date > get_curr_hour_minute_second()) {
+                response_data.push({
+                    day: week_days[(i % days_arr_length)],
+                    date: ist_formate_date(j),
+                    class: await get_class_details(single_class)
+                })
+                return response_data
+            }
+        }
+        j++;
+    }
+    return response_data
+}
+
+function get_curr_hour_minute_second() {
+    const date = new Date()
+    const a = new Date(date.getTime() + process.env.IN_UTC_TIMEZONE_OFFSET * 60 * 1000)
+    return (a.getHours() + ':' + a.getMinutes() + ':00')
+}
+
+async function get_class_details(single_class) {
+    const arena_details = await models.Arena.findByPk(single_class.dataValues.arena_id)
+    const academy_details = await models.Academy.findByPk(single_class.dataValues.academy_id)
+    const sports_details = await models.Sports.findByPk(single_class.dataValues.sports_id)
+    const arena_data = arena_details != null ? { "name": arena_details["name"], "lat": arena_details["lat"], "lng": arena_details["lng"], "city":arena_details["city"],"locality":arena_details["locality"],"state":arena_details["state"] } : null
+    const academy_data = academy_details != null ?  { "name": academy_details["name"]} : null
+    const sports_data = sports_details !=null ? {"id":sports_details["id"],"name":sports_details["name"],"type":sports_details["type"]} : null
+    const data = {
+        "id": single_class.dataValues["id"],
+        "arena_id": single_class.dataValues["arena_id"],
+        "coach_id": single_class.dataValues["coach_id"],
+        "academy_id": single_class.dataValues["academy_id"],
+        "sports_id": single_class.dataValues["sports_id"],
+        "days": single_class.dataValues["days"],
+        "start_time": single_class.dataValues["start_time"],
+        "end_time": single_class.dataValues["end_time"],
+        "arena_data":arena_data,
+        "academy_data":academy_data,
+        "sports_data": sports_data
+    }
+    return data
+}
+
+exports.post_process_next_class = async (data, resp) => {
+    resp.status(200).send({ status: "success", message: "retrieved data successfully", data: data })
+}
