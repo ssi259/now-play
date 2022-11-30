@@ -184,13 +184,14 @@ exports.pre_process_get_coach_enrolled_students = async (req) => {
 
 exports.process_get_coach_enrolled_students = async (input_data) => {
   const {coach_id} = input_data
-  const student_enrolled = await models.Enrollment.count({
+  const student_enrolled = await models.Enrollment.findAll({
     where: {
       coach_id: coach_id,
       status: 'active'
-    }
+    },
+    group: ['user_id'],
   })
-  return {"student_enrolled":student_enrolled};
+  return {"students_enrolled":student_enrolled.length};
 }
 
 exports.post_process_get_coach_enrolled_students = async (resp,student_enrollled) => {
