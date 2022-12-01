@@ -230,11 +230,11 @@ exports.process_get_coach_earnings = async (input_data) => {
   if(month == 0 && year == 0){
     const total_earnings = await models.Payment.findAll({
      attributes: { 
-         include: [[sequelize.fn("SUM", sequelize.col("price")), "total_earnings"]]
+         include: [[sequelize.fn("SUM", sequelize.col("price")), "lifetime"]]
      },
      where: {coach_id: coach_id, status: "success"}
     })
-  return {"total_earnings":total_earnings.total_earnings};
+  return {"total_earnings":total_earnings};
 }
   if(month !=0 && year !=0){
     const monthly_earning = await models.Payment.findAll({
@@ -245,8 +245,8 @@ exports.process_get_coach_earnings = async (input_data) => {
      },
      where: {
         [sequelize.Op.and]: [
-        sequelize.where(sequelize.fn('MONTH', sequelize.col('createdAt')), month),
-        sequelize.where(sequelize.fn('YEAR', sequelize.col('createdAt')), year),
+        sequelize.where(sequelize.fn('MONTH', sequelize.col('updatedAt')), month),
+        sequelize.where(sequelize.fn('YEAR', sequelize.col('updatedAt')), year),
         ],
         coach_id: coach_id, status: "success"}})
   return {"monthly_earning" : monthly_earning}
