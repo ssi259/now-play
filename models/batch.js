@@ -20,6 +20,10 @@ module.exports = (sequelize, DataTypes) => {
     sports_id: DataTypes.INTEGER,
     days: DataTypes.JSON,
     price: DataTypes.INTEGER,
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: 'active'
+    },
     thumbnail_img: DataTypes.STRING,
     banner_img: DataTypes.STRING,
     start_time: DataTypes.TIME,

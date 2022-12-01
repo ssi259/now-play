@@ -85,3 +85,26 @@ exports.getCoachBatches = async (req, resp) => {
         resp.status(status_code).send({status:"Failure",message:e.name})
     }
 }
+
+exports.getCoachEnrolledStudents = async (req, resp) => {
+    try {
+        var input_response = await coachManager.pre_process_get_coach_enrolled_students(req)
+        var process_response = await coachManager.process_get_coach_enrolled_students(input_response)
+        var post_process_response = await coachManager.post_process_get_coach_enrolled_students(resp,process_response)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        resp.status(status_code).send({status:"Failure",message:e.name})
+    }
+}
+
+exports.update_profile_pic = async (req, resp) => {
+    try {
+        var input_response = await coachManager.pre_process_update_profile_pic(req)
+        var processed_response = await coachManager.process_update_profile_pic(input_response)
+        await coachManager.post_process_update_profile_pic(processed_response,resp)
+    } catch (e) {
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
+    }
+}

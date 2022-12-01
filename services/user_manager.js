@@ -61,3 +61,37 @@ exports.process_upload_profile_pic = async (input_data) => {
 exports.post_process_upload_profile_pic = async (data,resp) => {
     resp.status(200).send({status:"success",message:"profile pic updated successfully ", data:data})
 }
+
+exports.pre_process_get_all_users = async (req) => {
+    return req.query
+}
+
+exports.process_get_all_users = async (query) => {
+    const users = await models.User.findAll()   
+    return users
+}
+
+exports.post_process_get_all_users = async (users, resp) => {
+    resp.status(200).send({status:"success",message:"users retrieved successfully",data:users})
+}
+
+exports.pre_process_update_user_on_adminPanel = async (req) => {
+    return {"user_id":req.params.id,"status":req.body.status}
+}
+
+exports.process_update_user_on_adminPanel = async (input_response) => {
+    const { user_id, status } = input_response
+    const [affected_rows] = await models.User.update({"status":status}, {
+        where: {
+          id:user_id
+        }
+    })
+    if (!affected_rows) {
+        throw new Api400Error("invalid request")
+    }
+    return affected_rows
+}
+
+exports.post_process_update_user_on_adminPanel = async (affected_rows, resp) => {
+    resp.status(200).send({status:"success",message:"user updated successfully"})
+}

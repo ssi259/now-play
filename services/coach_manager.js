@@ -215,3 +215,46 @@ exports.process_get_coach_batches = async (input_data) => {
 exports.post_process_get_coach_batches = async (resp,batches) => {
   resp.status(200).send({status:"Success",data:batches})
 }
+
+exports.pre_process_get_coach_enrolled_students = async (req) => {
+  return {"coach_id":req.user.coach_id}
+}
+
+exports.process_get_coach_enrolled_students = async (input_data) => {
+  const {coach_id} = input_data
+  const student_enrolled = await models.Enrollment.findAll({
+    where: {
+      coach_id: coach_id,
+      status: 'active'
+    },
+    group: ['user_id'],
+  })
+  return {"students_enrolled":student_enrolled.length};
+}
+
+exports.post_process_get_coach_enrolled_students = async (resp,student_enrollled) => {
+  resp.status(200).send({status:"Success",data:student_enrollled})
+}
+
+
+exports.pre_process_update_profile_pic = async (req) => {
+  if (req.files == null || req.files.image == null) {
+      throw new Api400Error("Image Not Provided")
+  }
+  return {coach_id:req.user.coach_id,image:req.files.image }
+}
+
+exports.process_update_profile_pic = async (input_data) => {
+  const { coach_id, image } = input_data
+  const img_url = await uploadFile(image)
+  await models.Coach.update({ profile_pic: img_url }, {
+      where: {
+          id:coach_id
+      }
+  })
+  return {img_url}
+}
+
+exports.post_process_update_profile_pic = async (data,resp) => {
+  resp.status(200).send({status:"success",message:"profile pic updated successfully ", data:data})
+}

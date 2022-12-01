@@ -20,22 +20,23 @@ exports.process_review_input_req = async(input_response)=>{
     }
   )
   if (review_exists[0] == 0) {
-    return await models.Review.create(input_response);
+   const new_review = await models.Review.create(input_response);
+   return {"message":"Review Created","data": new_review }
   }
   else {
-    return {"message":"Review Updated"}
+    return {"message":"Review Updated","data": input_response}
   }
 }
 
 exports.post_review_process = async(req,resp,input_response)=>{
-  resp.status(200).send({ status: "success", data: input_response })
+  resp.status(200).send({ status: "success", data: input_response.data, message: input_response.message})
 }
 
 exports.pre_process_check_eligibility = async(req,resp)=>{
   if(req.query.coach_id == undefined){
     throw new Api400Error("Coach ID Not Provided")
   }
-  return {"coach_id":req.query.coach_id,"user_id":req.user.user_id}
+  return {"coach_id":(+req.query.coach_id),"user_id":req.user.user_id}
 }
 
 exports.process_check_eligibility_input_req = async(input_response)=>{
@@ -52,9 +53,27 @@ exports.process_check_eligibility_input_req = async(input_response)=>{
 }
 
 exports.post_process_check_eligibility = async(req,resp,result)=>{
-  resp.status(200).send({ status: "success", data: result })
+  resp.status(200).send({ status: "success", data: result,message: "user is eligible to review coach" })
 }
 
 
-  
+exports.pre_process_get_user_reviews = async(req,resp)=>{
+  if(req.query.coach_id == null){
+    throw new Api400Error("Coach ID Not Provided")
+  }
+  return {"coach_id":req.query.coach_id,"user_id":req.user.user_id}
+}
+
+exports.process_get_user_reviews = async (input_response) => {
+  const {coach_id, user_id} = input_response
+  const review = await models.Review.findAll({ where: { 
+    coach_id: coach_id,
+    user_id:user_id 
+  }});
+  return review
+}
+
+exports.post_process_get_user_reviews = async(data,resp)=>{
+  resp.status(200).send({ status: "success", data: data[0].dataValues,message: "review retrieved successfuly" })
+}
 
