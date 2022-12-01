@@ -220,6 +220,7 @@ exports.process_update_profile_pic = async (input_data) => {
 
 exports.post_process_update_profile_pic = async (data,resp) => {
   resp.status(200).send({status:"success",message:"profile pic updated successfully ", data:data})
+}
 // coach earnings
 exports.pre_process_get_coach_earnings = async (req) => {
   return {"coach_id":req.user.coach_id, "month":req.params.month, "year":req.params.year}
