@@ -344,7 +344,7 @@ exports.process_next_class = async (user_id) => {
     const curr_day_index = get_curr_day()
     for (let i = curr_day_index; i < (days_arr_length + curr_day_index); i++){
         for (let single_class of weekly_classes[(i % days_arr_length)]) {
-            if (i != curr_day_index || single_class.dataValues.start_date > get_curr_hour_minute_second()) {
+            if (i != curr_day_index || single_class.dataValues.start_time > get_curr_time_hhmmss()) {
                 response_data.push({
                     day: week_days[(i % days_arr_length)],
                     date: ist_formate_date(j),
@@ -358,10 +358,10 @@ exports.process_next_class = async (user_id) => {
     return response_data
 }
 
-function get_curr_hour_minute_second() {
+function get_curr_time_hhmmss() {
     const date = new Date()
     const a = new Date(date.getTime() + process.env.IN_UTC_TIMEZONE_OFFSET * 60 * 1000)
-    return (a.getHours() + ':' + a.getMinutes() + ':00')
+    return ((a.getHours() < 10 ? ('0'+a.getHours()): a.getHours()) + ':' + (a.getMinutes()<10 ? ('0'+a.getMinutes()): a.getMinutes()) + ':00')
 }
 
 async function get_class_details(single_class) {
