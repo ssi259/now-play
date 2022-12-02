@@ -148,7 +148,6 @@ function otp_generator() {
 }
 
 exports.pre_process_otp = async(req,resp)=>{
-    console.log(req.query.phone_number)
     return {"phone_number":req.query.phone_number}
 }
 exports.process_otp = async(input_response)=>{
