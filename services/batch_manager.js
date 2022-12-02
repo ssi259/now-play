@@ -18,13 +18,13 @@ const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.p
 
 exports.pre_process_params = async (req, resp) => {
     if (req.query.sports_id != null) {
-        const results = await sequelize.query(`SELECT batches.id , batches.price ,batches.start_time, batches.end_time,batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,arena.lat,arena.lng,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id) where sports.id = ${req.query.sports_id};`, { type: Sequelize.QueryTypes.SELECT }).then((result) => {            return result;
+        const results = await sequelize.query(`SELECT batches.id , batches.price ,batches.start_time, batches.end_time, batches.start_date, batches.end_date, batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,arena.lat,arena.lng,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id) where sports.id = ${req.query.sports_id};`, { type: Sequelize.QueryTypes.SELECT }).then((result) => {            return result;
         }).catch(() => {
             throw new Api500Error(`Error in batch search`)
         })
         return results;
 
-    } else {const results = await sequelize.query("SELECT batches.id , batches.price ,batches.start_time, batches.end_time,batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,arena.lat,arena.lng,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id);", { type: Sequelize.QueryTypes.SELECT }).then((result) => {
+    } else {const results = await sequelize.query("SELECT batches.id , batches.price ,batches.start_time, batches.end_time, batches.start_date, batches.end_date, batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,arena.lat,arena.lng,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id);", { type: Sequelize.QueryTypes.SELECT }).then((result) => {
             return result;
         }).catch((e) => {
             console.log(e)
@@ -390,3 +390,22 @@ async function get_class_details(single_class) {
 exports.post_process_next_class = async (data, resp) => {
     resp.status(200).send({ status: "success", message: "retrieved data successfully", data: data })
 }
+
+
+exports.pre_process_update_batch = async (req) => {
+    console.log("pre_process_update_batch", req.params.id, req.body)
+    return {batch_id:req.params.id, data: req.body}
+  }
+
+  exports.process_update_batch = async (input_data) => {
+    const { batch_id, data } = input_data
+    console.log(batch_id, data);
+    const [affected_rows] = await models.Batch.update(data, {where: {id:batch_id}})
+    if (!affected_rows) {
+      throw new Api400Error("invalid request")
+    }
+  }
+
+  exports.post_process_update_batch = async (processed_response, resp) => {
+    resp.status(200).send({status:"success",updated_data: processed_response, message:"batch updated successfully"})
+  }
