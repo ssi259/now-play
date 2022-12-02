@@ -40,7 +40,7 @@ exports.process_batch_search_input_req = async (req,resp,input_response) => {
     }
     for (each_input_response of input_response) {
         const plan = await models.SubscriptionPlan.findOne({where:{batch_id:each_input_response["id"]}})
-        if(plan){
+        if(plan || req.query.type === "admin"){
             overall_ratings = 0;
             ratings = await models.Review.findAll({
                 where: {
