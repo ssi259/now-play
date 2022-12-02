@@ -9,16 +9,17 @@ exports.pre_process_create_review = async(req,resp)=>{
   }
   return {"user_id":req.user.user_id,"coach_id":req.body.coach_id,"rating":req.body.rating,"review_text":req.body.review_text,"type":req.body.type}
 }
-exports.process_review_input_req = async(input_response)=>{
+exports.process_review_input_req = async(resp,input_response)=>{
   const enrolled = await models.Enrollment.findOne({
     where: {
-      user_id: req.user.user_id,
-      coach_id: req.body.coach_id
+      user_id:input_response.user_id,
+      coach_id: input_response.coach_id
     }
  })
  if (enrolled == null) {
   return resp.status(400).send({ status: "failure", details: "Not eligible for review" })
  }
+ else{
   const review_exists = await models.Review.update(
     { rating: input_response.rating, review_text: input_response.review_text },
     {
@@ -35,6 +36,7 @@ exports.process_review_input_req = async(input_response)=>{
   else {
     return {"message":"Review Updated","data": input_response}
   }
+ }
 }
 
 exports.post_review_process = async(req,resp,input_response)=>{
