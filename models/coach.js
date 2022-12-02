@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       defaultValue: "active"
     },
+
     sports_id: DataTypes.INTEGER,
     experience: DataTypes.INTEGER,
     verified: DataTypes.TINYINT,
@@ -28,7 +29,11 @@ module.exports = (sequelize, DataTypes) => {
     awards: DataTypes.STRING,
     team_affiliations: DataTypes.STRING,
     about: DataTypes.STRING,
-    profile_pic: DataTypes.STRING
+    profile_pic: DataTypes.STRING,
+    locality: DataTypes.STRING,
+    city: DataTypes.STRING,
+    pincode: DataTypes.INTEGER,
+    state: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Coach',
