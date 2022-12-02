@@ -5,5 +5,6 @@ const routes = express.Router();
 
 routes.post('/generate', otp_controller.generate);
 routes.post('/verify', otp_controller.verify);
+routes.get('/text', otp_controller.otp_text);
 
 module.exports = routes;

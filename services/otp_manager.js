@@ -146,3 +146,24 @@ function otp_generator() {
     }
     return otp;
 }
+
+exports.pre_process_otp = async(req,resp)=>{
+ console.log(req.body.phone_number)
+    return {"phone_number":req.body.phone_number}
+}
+exports.process_otp = async(input_response)=>{
+    const {phone_number} = input_response
+    const otp_msg = await  models.Notification.findAll({
+        where: { 
+        phoneNumber: phone_number}})
+        console.log (otp_msg)
+        if (otp_msg) {
+            otp = otp_msg[otp_msg.length-1].otp
+            return {"otp":otp}
+        } else {
+            throw new Api400Error('Error in finding otp');
+        }
+}
+  exports.post_process_otp = async(resp,input_response)=>{
+    resp.status(200).send({"data":input_response})
+  }
