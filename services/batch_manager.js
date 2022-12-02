@@ -390,3 +390,22 @@ async function get_class_details(single_class) {
 exports.post_process_next_class = async (data, resp) => {
     resp.status(200).send({ status: "success", message: "retrieved data successfully", data: data })
 }
+
+
+exports.pre_process_update_batch = async (req) => {
+    console.log("pre_process_update_batch", req.params.id, req.body)
+    return {batch_id:req.params.id, data: req.body.data}
+  }
+
+  exports.process_update_batch = async (input_data) => {
+    const { batch_id, data } = input_data
+    console.log(batch_id, data);
+    const [affected_rows] = await models.Batch.update(data, {where: {id:batch_id}})
+    if (!affected_rows) {
+      throw new Api400Error("invalid request")
+    }
+  }
+
+  exports.post_process_update_batch = async (processed_response, resp) => {
+    resp.status(200).send({status:"success",updated_data: processed_response, message:"batch updated successfully"})
+  }
