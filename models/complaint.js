@@ -11,7 +11,8 @@ module.exports = (sequelize, DataTypes) => {
     complainant_id: DataTypes.INTEGER,
     complainant_type: DataTypes.STRING,
     subject: DataTypes.TEXT,
-    text: DataTypes.TEXT
+    text: DataTypes.TEXT,
+    is_call_request: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'Complaint',

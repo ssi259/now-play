@@ -21,6 +21,9 @@ module.exports = {
       text: {
         type: Sequelize.TEXT
       },
+      is_call_request: {
+        type: Sequelize.BOOLEAN
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

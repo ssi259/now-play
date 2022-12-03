@@ -4,22 +4,23 @@ const Api500Error = require('./../error/api500Error')
 
 
 exports.pre_process_create = async (req) => {
-    const {subject, text} = req.body
+    const {subject, text,is_call_request} = req.body
     if (subject == null || text == null) {
         throw new Api400Error("empty field")
     }
     const complainant_type = req.user.type
     const complainant_id = req.user.type =="player" ? req.user.user_id : req.user.coach_id
-    return {complainant_id,complainant_type,subject,text }
+    return {complainant_id,complainant_type,subject,text,is_call_request }
 }
 
 exports.process_create = async(input_response) => {
-    const { complainant_id, complainant_type, subject,text } = input_response
+    const { complainant_id, complainant_type, subject,text,is_call_request } = input_response
     const complaint = await models.Complaint.create({
         complainant_id,
         complainant_type,
         subject,
-        text
+        text,
+        is_call_request
     })
     return complaint
 }
