@@ -1,6 +1,7 @@
-const { Coach, CoachImage, CoachDocument } = require('../models');
+const { Coach, CoachImage, CoachDocument} = require('../models');
 const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
+const {Op} = require('sequelize')
 const models = require('../models');
 
 exports.process_create_coach = async (req, resp) => {
@@ -150,6 +151,43 @@ exports.process_update_coach_by_id = async (input_data) => {
 
 exports.post_process_update_coach_by_id = async (resp) => {
   resp.status(200).send({status:"success",message:"coach updated successfully"})
+}
+
+
+exports.pre_process_get_monthly_payments = async (req) => {
+  return {coach_id:req.user.coach_id,month:req.query.month}
+}
+
+exports.process_get_monthly_payments = async (input_data) => {
+  const { coach_id, month } = input_data
+  const data = []
+  const utc_year = new Date().getUTCFullYear()
+  const payments = await models.Payment.findAll(
+    {
+      where: {
+        status: "success",
+        coach_id:coach_id,
+        updatedAt: {
+            [Op.between]: [new Date(Date.UTC(utc_year, month, 1)),new Date(Date.UTC(utc_year, parseInt(month) + 1, 1))],
+        }
+      },
+    },
+  )
+  for (let payment of payments) {
+    const plan = await models.SubscriptionPlan.findByPk(payment.dataValues.plan_id)
+    const user = await models.User.findByPk(payment.dataValues.user_id)
+    data.push({
+      plan: plan,
+      user: user,
+      payment_mode: payment.dataValues.payment_mode,
+      payment_date: payment.dataValues.updatedAt
+    })
+  }
+  return data
+}
+
+exports.post_process_get_monthly_payments = async (data, resp) => {
+  resp.status(200).send({ status: "success", message: "retreived data successfully", data })
 }
 
 exports.pre_process_get_coach_batches = async (req) => {
