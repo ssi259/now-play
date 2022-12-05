@@ -85,6 +85,6 @@ exports.pre_process_transaction_details = async(req,resp)=>{
 exports.process_transaction_details_input_req = async(input_response)=>{
   return input_response
 }
-exports.post_transaction_details_process = async(resp,input_response)=>{
-  resp.status(200).send(input_response)
+exports.post_transaction_details_process = async(resp)=>{
+  resp.status(200).send({status:"Success",data:transactions})
 }
