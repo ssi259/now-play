@@ -306,7 +306,8 @@ function range(lat1, lng1, lat2, lng2, unit) {
         dist = Math.acos(dist);
         dist = dist * 180/Math.PI;
         dist = dist * 60 * 1.1515;
-        if (unit=="K.M.") { dist = dist * 1.609344 }
+        dist = dist * 1.432079724;
+        if (unit=="K.M.") { dist = dist * 1.609344}
         return dist;    
     }
 }
