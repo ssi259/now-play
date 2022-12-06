@@ -315,6 +315,10 @@ function range(lat1, lng1, lat2, lng2, unit) {
         {
             dist = dist * 1.932079724
         }
+        if (dist >= 30 )
+        {
+            dist = dist * 1.328324484
+        }
         return dist;    
     }
 }
