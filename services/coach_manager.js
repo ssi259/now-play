@@ -223,7 +223,8 @@ exports.process_get_coach_batches = async (input_data) => {
   const {coach_id} = input_data
   const batches = await models.Batch.findAll({
     where: {
-      coach_id: coach_id
+      coach_id: coach_id,
+      status: 'active'
     }
   })
   
