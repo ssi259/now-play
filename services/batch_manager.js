@@ -39,7 +39,7 @@ exports.process_batch_search_input_req = async (req,resp,input_response) => {
         return input_response
     }
     for (each_input_response of input_response) {
-        const plan = await models.SubscriptionPlan.findOne({where:{batch_id:each_input_response["id"]}})
+        const plan = await models.SubscriptionPlan.findOne({where:{batch_id:each_input_response["id"],status: 'active'}})
         if(plan || req.query.type === "admin"){
             overall_ratings = 0;
             ratings = await models.Review.findAll({
@@ -145,7 +145,7 @@ async function upload_and_create_data(each_file,request_batch_id){
 }
 
 exports.pre_process_batch_details = async(req,resp)=>{
-    const batch_details = await models.Batch.findOne({where: {id:req.params.id}});
+    const batch_details = await models.Batch.findOne({where: {id:req.params.id,status: 'active'}});
         if (batch_details) {
             return batch_details
         } else {
@@ -154,10 +154,10 @@ exports.pre_process_batch_details = async(req,resp)=>{
 
 }
 exports.process_batch_details_input_req = async(req,input_response)=>{
-    const arena_details = await models.Arena.findOne({where:{id:input_response["arena_id"]}})
-    const coach_details = await models.Coach.findOne({where:{id:input_response["coach_id"]}})
-    const academy_details = await models.Academy.findOne({where:{id:input_response["academy_id"]}})
-    const sports_details = await models.Sports.findOne({where:{id:input_response["sports_id"]}})
+    const arena_details = await models.Arena.findOne({where:{id:input_response["arena_id"],status: 'Active'}})
+    const coach_details = await models.Coach.findOne({where:{id:input_response["coach_id"],status: 'active'}})
+    const academy_details = await models.Academy.findOne({where:{id:input_response["academy_id"],status: 'active'}})
+    const sports_details = await models.Sports.findOne({where:{id:input_response["sports_id"],status: 'active'}})
     const batch_pics = await models.BatchPhotos.findAll({where: {batchId: input_response["id"]}})
     const reviews_details = await models.Review.findAll({where: {coach_id: input_response["coach_id"]}}) 
     const arena_data = arena_details != null ? {"arena_name":arena_details["name"],"lat":arena_details["lat"],"lng":arena_details["lng"]} : null
