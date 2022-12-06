@@ -20,7 +20,7 @@ exports.post_sport_process = async(req,resp,input_response)=>{
   resp.send(input_response)
 }
 exports.pre_process_sports_list = async(req,resp)=>{
-  const sports_list = await models.Sports.findAll();
+  const sports_list = await models.Sports.findAll({where: {status: 'active'}});
       if (sports_list) {
           return sports_list
       } else {
@@ -70,7 +70,7 @@ async function upload_and_create_data(image, sport_id) {
   await models.SportImage.create({ sportId: sport_id, img_url: img_url})
 }
 exports.pre_process_sport_list = async(req,resp)=>{
-  const sport_list = await models.Sports.findOne({where: {id:req.params.id}})
+  const sport_list = await models.Sports.findOne({where: {id:req.params.id,status: 'active'}})
       if (sport_list) {
           return sport_list
       } else {

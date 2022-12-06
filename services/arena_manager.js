@@ -51,7 +51,7 @@ async function upload_and_create_data(image, arena_id) {
 }
 
 exports.pre_process_arena_details = async(req,resp)=>{
-  const arena_details = await  models.Arena.findAll()
+  const arena_details = await  models.Arena.findAll({where: {status: 'Active'}})
       if (arena_details) {
           return arena_details;
       } else {
@@ -67,7 +67,7 @@ exports.post_arena_details_process = async(req,resp,input_response)=>{
 
 
 exports.pre_process_arenas_detail = async(req,resp)=>{
-  const arenas_detail = await  models.Arena.findOne({where: {id:req.params.id}})
+  const arenas_detail = await  models.Arena.findOne({where: {id:req.params.id,status: 'Active'}})
       if (arenas_detail) {
           resp.send(arenas_detail);
       } else {
