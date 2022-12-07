@@ -12,7 +12,11 @@ module.exports = (sequelize, DataTypes) => {
     complainant_type: DataTypes.STRING,
     subject: DataTypes.TEXT,
     text: DataTypes.TEXT,
-    is_call_request: DataTypes.BOOLEAN
+    is_call_request: DataTypes.BOOLEAN,
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: 'open' // open, closed, in_progress
+    }
   }, {
     sequelize,
     modelName: 'Complaint',
