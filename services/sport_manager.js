@@ -20,7 +20,9 @@ exports.post_sport_process = async(req,resp,input_response)=>{
   resp.send(input_response)
 }
 exports.pre_process_sports_list = async(req,resp)=>{
-  const sports_list = await models.Sports.findAll({where: {status: 'active'}});
+  const host = req.get('host') 
+  const sports_list = await models.Sports.findAll(
+    (host === "http://65.0.72.215:3000") ? {where: {status: 'active'}} : {});
       if (sports_list) {
           return sports_list
       } else {
