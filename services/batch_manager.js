@@ -307,15 +307,15 @@ function range(lat1, lng1, lat2, lng2, unit) {
         dist = dist * 180/Math.PI;
         dist = dist * 60 * 1.1515;
         if (unit=="K.M.") { dist = dist * 1.609344}
-        if (dist >= 20 )
+        if (dist >= 10 && dist <= 20 )
         {
             dist = dist * 1.73653709
         }
-        if (dist <= 10 )
+        if (dist >= 0 && dist <= 10 )
         {
             dist = dist * 1.932079724
         }
-        if (dist >= 30 )
+        if (dist >= 20 && dist <= 30 )
         {
             dist = dist * 1.328324484
         }
