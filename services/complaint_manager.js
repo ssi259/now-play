@@ -50,3 +50,20 @@ exports.process_get = async() => {
 exports.post_process_get = async (data, resp) => {
     resp.status(200).send({status:"success",message:"data retrieved successfully", data:data})
 }
+
+exports.pre_process_update = async (req) => {
+    const id = req.params.id
+    const body = req.body
+    return {id,body}
+}
+
+exports.process_update = async({id,body}) => {
+    const complaint = await models.Complaint.update(body, {
+        where: {
+            id: id}
+    })
+}
+
+exports.post_process_update = async (data, resp) => {
+    resp.status(200).send({status:"success",message:"complaint updated", data:data})
+}
