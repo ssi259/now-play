@@ -33,10 +33,11 @@ exports.process_get_all_enrollments_details = async () => {
         const arena_id = (await models.Batch.findByPk(enrollment.batch_id)).arena_id;
         const academy_id = (await models.Batch.findByPk(enrollment.batch_id)).academy_id;
         const sports_id = (await models.Batch.findByPk(enrollment.batch_id)).sports_id;
+        enrollment.player_name = (await models.User.findByPk(enrollment.user_id)).name;
         enrollment.arena_name = (await models.Arena.findByPk(arena_id)).name;
         enrollment.academy_name = (await models.Academy.findByPk(academy_id)).name;
         enrollment.sports_name = (await models.Sports.findByPk(sports_id)).name;
-        enrollment.Plan_name = (await models.SubscriptionPlan.findByPk(enrollment.subscription_id)).plan_name;
+        enrollment.plan_name = (await models.SubscriptionPlan.findByPk(enrollment.subscription_id)).plan_name;
         enrollment.coach_name = (await models.User.findByPk(enrollment.coach_id)).name;
         return enrollment
     }))
