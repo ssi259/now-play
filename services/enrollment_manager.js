@@ -14,7 +14,7 @@ exports.process_get_user_enrollments = async (user_id) => {
     return enrollments;
 }
 
-exports.post_process_get_all_enrollments = async (data, resp) => {
+exports.post_process_get_user_enrollments = async (data, resp) => {
     resp.status(200).send({status:"success",message:"retrieved enrollments successfully", data : data})
 }
 
