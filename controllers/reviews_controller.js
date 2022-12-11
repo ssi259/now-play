@@ -4,7 +4,7 @@ exports.create_review = async(req,resp)=>{
         
     try{
         var input_response =  await ReviewManager.pre_process_create_review(req,resp)
-        var processed_reponse =  await ReviewManager.process_review_input_req(input_response)
+        var processed_reponse =  await ReviewManager.process_review_input_req(resp,input_response)
         var post_process_response = await ReviewManager.post_review_process(req,resp,processed_reponse)
     }catch(e){
         console.log(e)
@@ -23,6 +23,19 @@ exports.check_eligibility = async(req,resp)=>{
         console.log(e)
         const status_code = e.statusCode ? e.statusCode : 500
         return resp.status(status_code).send({ status: "Failure", message: e.name })
+    }finally{
+    }
+}
+
+exports.get_user_reviews = async(req,resp)=>{
+    try{
+        var input_response =  await ReviewManager.pre_process_get_user_reviews(req)
+        var processed_reponse =  await ReviewManager.process_get_user_reviews(input_response)
+        await ReviewManager.post_process_get_user_reviews(processed_reponse,resp)
+    }catch(e){
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name })
     }finally{
     }
 }

@@ -17,7 +17,11 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     type: DataTypes.STRING,
     thumbnail: DataTypes.STRING,
-    about: DataTypes.STRING
+    about: DataTypes.STRING,
+    status:{
+      type: DataTypes.STRING,
+      defaultValue: 'Active'
+    }
   }, {
     sequelize,
     modelName: 'Sports',
