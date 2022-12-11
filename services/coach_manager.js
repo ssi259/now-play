@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-const { Coach, CoachImage, CoachDocument, Payment, User, SubscriptionPlan, Batch } = require('../models');
-=======
 const { Coach, CoachImage, CoachDocument} = require('../models');
->>>>>>> main
 const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
 const {Op} = require('sequelize')
