@@ -185,27 +185,68 @@ exports.pre_process_get_payments_by_status = async (req) => {
 exports.process_get_payments_by_status = async (input_data) => {
   const { coach_id, status } = input_data
   const payment_data_list= []
-  const pending_payments = await models.Payment.findAll({
+  const payments = await models.Payment.findAll({
     where: {
       coach_id: coach_id,
       status : status
     }
   })
-  for (let pending_payment of pending_payments) {
-    const user = await models.User.findByPk(pending_payment.dataValues.user_id)
-    const plan = await models.SubscriptionPlan.findByPk(pending_payment.dataValues.plan_id)
+  for (let payment of payments) {
+    const user = await models.User.findByPk(payment.dataValues.user_id)
+    const plan = await models.SubscriptionPlan.findByPk(payment.dataValues.plan_id)
     const batch = plan != null ? await models.Batch.findByPk(plan.batch_id) : null
     payment_data_list.push({
       user: user,
       plan: plan,
-      batch:batch,
-      price: pending_payment.dataValues.price,
-      payment_mode: pending_payment.dataValues.payment_mode,
+      batch: batch.id,
+      price: payment.dataValues.price,
+      payment_mode: payment.dataValues.payment_mode,
     })
   }
-  return payment_data_list
+  const result = (groupBy(payment_data_list, 'batch'));
+  return result
+}
+
+const groupBy = async function (xs,key) {
+  return xs.reduce((rv, x)=> {
+    (rv[x[key]] = rv[x[key]] || []).push(x);
+    return rv;
+  }, {});
 }
 
 exports.post_process_get_payments_by_status = async (data, resp) => {
-  resp.status(200).send({status:"success",message:"pending payments retrieved successfully", data:data})
+  const data_resp = []
+  for (const batch_id in data) {
+    data_resp.push({
+      batch_details: await batch_detials_fun(batch_id),
+      payments:data[batch_id]
+    })
+  }
+  resp.status(200).send({status:"success",message:"data retrieved successfully", data:data_resp})
+}
+
+async function  batch_detials_fun(batch_id) {
+  const batch_data = await models.Batch.findByPk(batch_id)
+  const arena_details = await models.Arena.findByPk(batch_data.dataValues.arena_id)
+  const academy_details = await models.Academy.findByPk(batch_data.dataValues.academy_id)
+  const sports_details = await models.Sports.findByPk(batch_data.dataValues.sports_id)
+  
+  const arena_data = arena_details != null ? { "name": arena_details["name"], "lat": arena_details["lat"], "lng": arena_details["lng"], "city":arena_details["city"],"locality":arena_details["locality"],"state":arena_details["state"] } : null
+  const academy_data = academy_details != null ?  { "name": academy_details["name"]} : null
+  const sports_data = sports_details !=null ? {"id":sports_details["id"],"name":sports_details["name"],"type":sports_details["type"]} : null
+  
+  const obj = {
+              "id": batch_data.dataValues["id"],
+              "arena_id": batch_data.dataValues["arena_id"],
+              "coach_id": batch_data.dataValues["coach_id"],
+              "academy_id": batch_data.dataValues["academy_id"],
+              "sports_id": batch_data.dataValues["sports_id"],
+              "days": batch_data.dataValues["days"],
+              "start_time": batch_data.dataValues["start_time"],
+              "end_time": batch_data.dataValues["end_time"],
+              "arena_data":arena_data,
+              "academy_data":academy_data,
+              "sports_data": sports_data
+  }
+  return obj
 }
