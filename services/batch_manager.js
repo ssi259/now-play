@@ -171,8 +171,8 @@ exports.process_batch_details_input_req = async(req,input_response)=>{
     }
     var image_list = {"batch_img_list":batch_images}
     review_list = []
-    for(each_reviews_detail of reviews_details){
-        var review_data = {"review_text":each_reviews_detail.dataValues.review_text, "review_time":each_reviews_detail.dataValues.createdAt}
+    for(let each_reviews_detail of reviews_details){
+        var review_data = {"review_text":each_reviews_detail.dataValues.review_text, "review_time":each_reviews_detail.dataValues.createdAt,"review_rating":each_reviews_detail.dataValues.rating}
         var user_detail = await models.User.findOne({where:{id: each_reviews_detail["user_id"]}})
         var reviewer_user_detail = {"reviewer_name":user_detail["name"],"reviewer_profile_pic":user_detail["profilePic"]}
         await Object.assign(review_data,reviewer_user_detail)
