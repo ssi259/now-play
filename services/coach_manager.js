@@ -321,19 +321,18 @@ exports.process_get_enrolled_users_list = async (input_data) => {
       coach_id: coach_id,
       status: 'active'
     },
-    attributes:['user_id','subscription_id'],
+    attributes:['user_id','subscription_id','batch_id'],
   })  
   for (let enrollment of enrollments) {
     const user = await models.User.findByPk(enrollment.dataValues.user_id)
     const plan = await models.SubscriptionPlan.findByPk(enrollment.dataValues.subscription_id)
-    const batch = await models.Batch.findByPk(plan.batch_id)
     enrolled_users_data.push({
       user: user,
       plan:plan,
-      batch: batch.id,
+      batch_id: enrollment.dataValues.batch_id,
     })
   }
-  const result = (groupBy(enrolled_users_data, 'batch'));
+  const result = (groupBy(enrolled_users_data, 'batch_id'));
   return result
 }
 
