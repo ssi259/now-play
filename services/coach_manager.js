@@ -309,6 +309,44 @@ exports.post_process_get_coach_enrolled_students = async (resp,student_enrollled
   resp.status(200).send({status:"Success",data:student_enrollled})
 }
 
+exports.pre_process_get_enrolled_users_list = async (req) => {
+  return {"coach_id":req.user.coach_id}
+}
+
+exports.process_get_enrolled_users_list = async (input_data) => {
+  const { coach_id } = input_data
+  const enrolled_users_data = []
+  const enrollments = await models.Enrollment.findAll({
+    where: {
+      coach_id: coach_id,
+      status: 'active'
+    },
+    attributes:['user_id','subscription_id'],
+  })  
+  for (let enrollment of enrollments) {
+    const user = await models.User.findByPk(enrollment.dataValues.user_id)
+    const plan = await models.SubscriptionPlan.findByPk(enrollment.dataValues.subscription_id)
+    const batch = await models.Batch.findByPk(plan.batch_id)
+    enrolled_users_data.push({
+      user: user,
+      plan:plan,
+      batch: batch.id,
+    })
+  }
+  const result = (groupBy(enrolled_users_data, 'batch'));
+  return result
+}
+
+exports.post_process_get_enrolled_users_list = async (resp, data) => {
+  const data_resp = []
+  for (const batch_id in data) {
+    data_resp.push({
+      batch_details: await batch_detials_fun(batch_id),
+      enrolled_users:data[batch_id]
+    })
+  }
+  resp.status(200).send({status:"success",message:"data retrieved successfully", data:data_resp})
+}
 
 exports.pre_process_update_profile_pic = async (req) => {
   if (req.files == null || req.files.image == null) {

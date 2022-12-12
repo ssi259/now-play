@@ -109,6 +109,18 @@ exports.getCoachEnrolledStudents = async (req, resp) => {
     }
 }
 
+exports.get_enrolled_users_list = async (req, resp) => {
+    try {
+        const input_response = await coachManager.pre_process_get_enrolled_users_list(req)
+        const process_response = await coachManager.process_get_enrolled_users_list(input_response)
+        await coachManager.post_process_get_enrolled_users_list(resp,process_response)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        resp.status(status_code).send({status:"failure",message:e.name})
+    }
+}
+
 exports.update_profile_pic = async (req, resp) => {
     try {
         var input_response = await coachManager.pre_process_update_profile_pic(req)
