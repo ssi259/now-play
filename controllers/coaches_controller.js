@@ -85,6 +85,17 @@ exports.getCoachBatches = async (req, resp) => {
         resp.status(status_code).send({status:"Failure",message:e.name})
     }
 }
+exports.get_payments_by_status = async (req, resp) => {
+    try {
+        const input_response = await coachManager.pre_process_get_payments_by_status(req)
+        const process_response = await coachManager.process_get_payments_by_status(input_response)
+        await coachManager.post_process_get_payments_by_status(process_response, resp)
+    }
+    catch (e) {
+        const status_code = e.statusCode ? e.statusCode : 500
+        resp.status(status_code).send({status:"failure",message:e.name, data:{}})
+    }
+}
 
 exports.getCoachEnrolledStudents = async (req, resp) => {
     try {
