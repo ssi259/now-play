@@ -232,16 +232,15 @@ exports.process_get_payments_by_status = async (input_data) => {
   for (let payment of payments) {
     const user = await models.User.findByPk(payment.dataValues.user_id)
     const plan = await models.SubscriptionPlan.findByPk(payment.dataValues.plan_id)
-    const batch = plan != null ? await models.Batch.findByPk(plan.batch_id) : null
     payment_data_list.push({
       user: user,
       plan: plan,
-      batch: batch.id,
+      batch_id: payment.dataValues.batch_id,
       price: payment.dataValues.price,
       payment_mode: payment.dataValues.payment_mode,
     })
   }
-  const result = (groupBy(payment_data_list, 'batch'));
+  const result = (groupBy(payment_data_list, 'batch_id'));
   return result
 }
 
