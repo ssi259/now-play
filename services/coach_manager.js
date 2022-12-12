@@ -1,6 +1,7 @@
-const { Coach, CoachImage, CoachDocument } = require('../models');
+const { Coach, CoachImage, CoachDocument} = require('../models');
 const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
+const {Op} = require('sequelize')
 const models = require('../models');
 
 exports.process_create_coach = async (req, resp) => {
@@ -152,6 +153,43 @@ exports.post_process_update_coach_by_id = async (resp) => {
   resp.status(200).send({status:"success",message:"coach updated successfully"})
 }
 
+
+exports.pre_process_get_monthly_payments = async (req) => {
+  return {coach_id:req.user.coach_id,month:req.query.month}
+}
+
+exports.process_get_monthly_payments = async (input_data) => {
+  const { coach_id, month } = input_data
+  const data = []
+  const utc_year = new Date().getUTCFullYear()
+  const payments = await models.Payment.findAll(
+    {
+      where: {
+        status: "success",
+        coach_id:coach_id,
+        updatedAt: {
+            [Op.between]: [new Date(Date.UTC(utc_year, month, 1)),new Date(Date.UTC(utc_year, parseInt(month) + 1, 1))],
+        }
+      },
+    },
+  )
+  for (let payment of payments) {
+    const plan = await models.SubscriptionPlan.findByPk(payment.dataValues.plan_id)
+    const user = await models.User.findByPk(payment.dataValues.user_id)
+    data.push({
+      plan: plan,
+      user: user,
+      payment_mode: payment.dataValues.payment_mode,
+      payment_date: payment.dataValues.updatedAt
+    })
+  }
+  return data
+}
+
+exports.post_process_get_monthly_payments = async (data, resp) => {
+  resp.status(200).send({ status: "success", message: "retreived data successfully", data })
+}
+
 exports.pre_process_get_coach_batches = async (req) => {
   return {"coach_id":req.user.coach_id}
 }
@@ -174,8 +212,81 @@ exports.process_get_coach_batches = async (input_data) => {
   return coachBatches
 }
 
-exports.post_process_get_coach_batches = async (resp,batches) => {
-  resp.status(200).send({status:"Success",data:batches})
+exports.post_process_get_coach_batches = async (resp, batches) => {
+  resp.status(200).send({ status: "Success", data: batches })
+}
+
+exports.pre_process_get_payments_by_status = async (req) => {
+  return { coach_id: req.user.coach_id, status: req.query.status }
+}
+
+exports.process_get_payments_by_status = async (input_data) => {
+  const { coach_id, status } = input_data
+  const payment_data_list= []
+  const payments = await models.Payment.findAll({
+    where: {
+      coach_id: coach_id,
+      status : status
+    }
+  })
+  for (let payment of payments) {
+    const user = await models.User.findByPk(payment.dataValues.user_id)
+    const plan = await models.SubscriptionPlan.findByPk(payment.dataValues.plan_id)
+    const batch = plan != null ? await models.Batch.findByPk(plan.batch_id) : null
+    payment_data_list.push({
+      user: user,
+      plan: plan,
+      batch: batch.id,
+      price: payment.dataValues.price,
+      payment_mode: payment.dataValues.payment_mode,
+    })
+  }
+  const result = (groupBy(payment_data_list, 'batch'));
+  return result
+}
+
+const groupBy = async function (xs,key) {
+  return xs.reduce((rv, x)=> {
+    (rv[x[key]] = rv[x[key]] || []).push(x);
+    return rv;
+  }, {});
+}
+
+exports.post_process_get_payments_by_status = async (data, resp) => {
+  const data_resp = []
+  for (const batch_id in data) {
+    data_resp.push({
+      batch_details: await batch_detials_fun(batch_id),
+      payments:data[batch_id]
+    })
+  }
+  resp.status(200).send({status:"success",message:"data retrieved successfully", data:data_resp})
+}
+
+async function batch_detials_fun(batch_id) {
+  const batch_data = await models.Batch.findByPk(batch_id)
+  const arena_details = await models.Arena.findByPk(batch_data.dataValues.arena_id)
+  const academy_details = await models.Academy.findByPk(batch_data.dataValues.academy_id)
+  const sports_details = await models.Sports.findByPk(batch_data.dataValues.sports_id)
+  
+  const arena_data = arena_details != null ? { "name": arena_details["name"], "lat": arena_details["lat"], "lng": arena_details["lng"], "city": arena_details["city"], "locality": arena_details["locality"], "state": arena_details["state"] } : null
+  const academy_data = academy_details != null ? { "name": academy_details["name"] } : null
+  const sports_data = sports_details != null ? { "id": sports_details["id"], "name": sports_details["name"], "type": sports_details["type"] } : null
+  
+  const obj = {
+    "id": batch_data.dataValues["id"],
+    "arena_id": batch_data.dataValues["arena_id"],
+    "coach_id": batch_data.dataValues["coach_id"],
+    "academy_id": batch_data.dataValues["academy_id"],
+    "sports_id": batch_data.dataValues["sports_id"],
+    "days": batch_data.dataValues["days"],
+    "start_time": batch_data.dataValues["start_time"],
+    "end_time": batch_data.dataValues["end_time"],
+    "arena_data": arena_data,
+    "academy_data": academy_data,
+    "sports_data": sports_data
+  }
+  return obj
 }
 
 exports.pre_process_get_coach_enrolled_students = async (req) => {
@@ -184,13 +295,14 @@ exports.pre_process_get_coach_enrolled_students = async (req) => {
 
 exports.process_get_coach_enrolled_students = async (input_data) => {
   const {coach_id} = input_data
-  const student_enrolled = await models.Enrollment.count({
+  const student_enrolled = await models.Enrollment.findAll({
     where: {
       coach_id: coach_id,
       status: 'active'
-    }
+    },
+    group: ['user_id'],
   })
-  return {"student_enrolled":student_enrolled};
+  return {"students_enrolled":student_enrolled.length};
 }
 
 exports.post_process_get_coach_enrolled_students = async (resp,student_enrollled) => {
@@ -218,6 +330,28 @@ exports.process_get_enrolled_users_list = async (input_data) => {
   return enrolled_users_data
 }
 
-exports.post_process_get_enrolled_users_list = async (resp,data) => {
-  resp.status(200).send({status:"success",data:data})
+exports.post_process_get_enrolled_users_list = async (resp, data) => {
+  resp.status(200).send({ status: "success", data: data })
+}
+
+exports.pre_process_update_profile_pic = async (req) => {
+  if (req.files == null || req.files.image == null) {
+      throw new Api400Error("Image Not Provided")
+  }
+  return {coach_id:req.user.coach_id,image:req.files.image }
+}
+
+exports.process_update_profile_pic = async (input_data) => {
+  const { coach_id, image } = input_data
+  const img_url = await uploadFile(image)
+  await models.Coach.update({ profile_pic: img_url }, {
+      where: {
+          id:coach_id
+      }
+  })
+  return {img_url}
+}
+
+exports.post_process_update_profile_pic = async (data,resp) => {
+  resp.status(200).send({status:"success",message:"profile pic updated successfully ", data:data})
 }

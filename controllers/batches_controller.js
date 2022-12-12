@@ -56,3 +56,27 @@ exports.get_upcoming_classes = async (req, resp) => {
         return resp.status(status_code).send({ status: "failure", message: e.name })
     }
 }
+
+exports.get_next_class = async (req, resp) => {
+    try {
+        var input_response = await BatchManager.pre_process_next_class(req)
+        var processed_response = await BatchManager.process_next_class(input_response)
+        await BatchManager.post_process_next_class(processed_response, resp)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name, data:{} })
+    }
+}
+
+exports.update_batch_details = async (req, resp) => {
+    try {
+        var input_response = await BatchManager.pre_process_update_batch(req)
+        var processed_response = await BatchManager.process_update_batch(input_response)
+        await BatchManager.post_process_update_batch(processed_response, resp)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name, data:{} })
+    }
+}

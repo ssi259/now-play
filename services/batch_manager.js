@@ -18,13 +18,13 @@ const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.p
 
 exports.pre_process_params = async (req, resp) => {
     if (req.query.sports_id != null) {
-        const results = await sequelize.query(`SELECT batches.id , batches.price ,batches.start_time, batches.end_time,batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,arena.lat,arena.lng,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id) where sports.id = ${req.query.sports_id};`, { type: Sequelize.QueryTypes.SELECT }).then((result) => {            return result;
+        const results = await sequelize.query(`SELECT batches.id , batches.status ,batches.price ,batches.start_time, batches.end_time, batches.start_date, batches.end_date, batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,arena.lat,arena.lng,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id) where sports.id = ${req.query.sports_id};`, { type: Sequelize.QueryTypes.SELECT }).then((result) => {            return result;
         }).catch(() => {
             throw new Api500Error(`Error in batch search`)
         })
         return results;
 
-    } else {const results = await sequelize.query("SELECT batches.id , batches.price ,batches.start_time, batches.end_time,batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,arena.lat,arena.lng,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id);", { type: Sequelize.QueryTypes.SELECT }).then((result) => {
+    } else {const results = await sequelize.query("SELECT batches.id , batches.status ,batches.price ,batches.start_time, batches.end_time, batches.start_date, batches.end_date, batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,arena.lat,arena.lng,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id);", { type: Sequelize.QueryTypes.SELECT }).then((result) => {
             return result;
         }).catch((e) => {
             console.log(e)
@@ -40,7 +40,7 @@ exports.process_batch_search_input_req = async (req,resp,input_response) => {
     }
     for (each_input_response of input_response) {
         const plan = await models.SubscriptionPlan.findOne({where:{batch_id:each_input_response["id"]}})
-        if(plan){
+        if(plan || req.query.type === "admin"){
             overall_ratings = 0;
             ratings = await models.Review.findAll({
                 where: {
@@ -226,7 +226,8 @@ exports.process_upcoming_classes = async (user_id) => {
                 [Op.or]: ["active", "pending"]
             }
         },
-        attributes: ['batch_id']
+        attributes: ['batch_id'],
+        group: ['batch_id'],
     })
     for (const batch of batches) {
         const batch_data = await models.Batch.findByPk(batch.dataValues.batch_id)
@@ -305,7 +306,118 @@ function range(lat1, lng1, lat2, lng2, unit) {
         dist = Math.acos(dist);
         dist = dist * 180/Math.PI;
         dist = dist * 60 * 1.1515;
-        if (unit=="K.M.") { dist = dist * 1.609344 }
+        if (unit=="K.M.") { dist = dist * 1.609344}
+        if (dist >= 10 && dist <= 20 )
+        {
+            dist = dist * 1.73653709
+        }
+        if (dist >= 0 && dist <= 10 )
+        {
+            dist = dist * 1.932079724
+        }
+        if (dist >= 20 && dist <= 30 )
+        {
+            dist = dist * 1.328324484
+        }
         return dist;    
     }
-} return range
+}
+
+exports.pre_process_next_class = async (req) => {
+    return req.user.user_id
+}
+
+exports.process_next_class = async (user_id) => {
+    const week_days = ['Sunday','Monday', 'Tuesday', 'Wednesday', 'Thursday','Friday','Saturday']
+    const weekly_classes = [[], [], [], [], [], [], []]
+    let days_arr_length = 7; 
+    const batches = await models.Enrollment.findAll({
+        where: {
+            user_id: user_id,
+            status: {
+                [Op.or]: ["active", "pending"]
+            }
+        },
+        attributes: ['batch_id'],
+        group:['batch_id']
+    })
+    for (const batch of batches) {
+        const batch_data = await models.Batch.findByPk(batch.dataValues.batch_id)    
+        const days_arr = JSON.parse(batch_data.days)
+        for (let i = 0; i < days_arr_length; i++){
+            if (days_arr[i] == 1) {
+                weekly_classes[(i+1)% days_arr_length].push(batch_data)
+            }
+        }
+    }
+    for (let i = 0; i < days_arr_length; i++) weekly_classes[i].sort((batch_1, batch_2) => batch_1.start_time > batch_2.start_time ? 1 : -1)   
+    let j = 0;
+    const response_data = [];
+    const curr_day_index = get_curr_day()
+    for (let i = curr_day_index; i < (days_arr_length + curr_day_index); i++){
+        for (let single_class of weekly_classes[(i % days_arr_length)]) {
+            if (i != curr_day_index || single_class.dataValues.start_time > get_curr_time_hhmmss()) {
+                response_data.push({
+                    day: week_days[(i % days_arr_length)],
+                    date: ist_formate_date(j),
+                    class: await get_class_details(single_class)
+                })
+                return response_data
+            }
+        }
+        j++;
+    }
+    return response_data
+}
+
+function get_curr_time_hhmmss() {
+    const date = new Date()
+    const a = new Date(date.getTime() + process.env.IN_UTC_TIMEZONE_OFFSET * 60 * 1000)
+    return ((a.getHours() < 10 ? ('0'+a.getHours()): a.getHours()) + ':' + (a.getMinutes()<10 ? ('0'+a.getMinutes()): a.getMinutes()) + ':00')
+}
+
+async function get_class_details(single_class) {
+    const arena_details = await models.Arena.findByPk(single_class.dataValues.arena_id)
+    const academy_details = await models.Academy.findByPk(single_class.dataValues.academy_id)
+    const sports_details = await models.Sports.findByPk(single_class.dataValues.sports_id)
+    const arena_data = arena_details != null ? { "name": arena_details["name"], "lat": arena_details["lat"], "lng": arena_details["lng"], "city":arena_details["city"],"locality":arena_details["locality"],"state":arena_details["state"] } : null
+    const academy_data = academy_details != null ?  { "name": academy_details["name"]} : null
+    const sports_data = sports_details !=null ? {"id":sports_details["id"],"name":sports_details["name"],"type":sports_details["type"]} : null
+    const data = {
+        "id": single_class.dataValues["id"],
+        "arena_id": single_class.dataValues["arena_id"],
+        "coach_id": single_class.dataValues["coach_id"],
+        "academy_id": single_class.dataValues["academy_id"],
+        "sports_id": single_class.dataValues["sports_id"],
+        "days": single_class.dataValues["days"],
+        "start_time": single_class.dataValues["start_time"],
+        "end_time": single_class.dataValues["end_time"],
+        "arena_data":arena_data,
+        "academy_data":academy_data,
+        "sports_data": sports_data
+    }
+    return data
+}
+
+exports.post_process_next_class = async (data, resp) => {
+    resp.status(200).send({ status: "success", message: "retrieved data successfully", data: data })
+}
+
+
+exports.pre_process_update_batch = async (req) => {
+    console.log("pre_process_update_batch", req.params.id, req.body)
+    return {batch_id:req.params.id, data: req.body}
+  }
+
+  exports.process_update_batch = async (input_data) => {
+    const { batch_id, data } = input_data
+    console.log(batch_id, data);
+    const [affected_rows] = await models.Batch.update(data, {where: {id:batch_id}})
+    if (!affected_rows) {
+      throw new Api400Error("invalid request")
+    }
+  }
+
+  exports.post_process_update_batch = async (processed_response, resp) => {
+    resp.status(200).send({status:"success",updated_data: processed_response, message:"batch updated successfully"})
+  }
