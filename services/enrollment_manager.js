@@ -29,7 +29,7 @@ exports.process_get_all_enrollments_details = async () => {
         const arena_id = (await models.Batch.findByPk(enrollment.batch_id)).arena_id;
         const academy_id = (await models.Batch.findByPk(enrollment.batch_id)).academy_id;
         const sports_id = (await models.Batch.findByPk(enrollment.batch_id)).sports_id;
-        enrollment.price = (await models.Batch.findByPk(enrollment.batch_id)).price;
+        enrollment.price = (await models.SubscriptionPlan.findByPk(enrollment.subscription_id)).price;
         enrollment.player_name = (await models.User.findByPk(enrollment.user_id)).name;
         enrollment.arena_name = (await models.Arena.findByPk(arena_id)).name;
         enrollment.academy_name = (await models.Academy.findByPk(academy_id)).name;
