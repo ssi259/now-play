@@ -56,7 +56,7 @@ exports.post_process_image_upload = async (resp) => {
   }
 
 exports.pre_process_academy_details = async(req,resp)=>{
-  const academy_details = await models.Academy.findOne({where: {id:req.params.id,status: 'active'}});
+  const academy_details = await models.Academy.findOne({where: {id:req.params.id}});
   if (academy_details) {
       return academy_details
   } else {
@@ -76,7 +76,7 @@ exports.post_process_academy_details = async(req,resp,input_response)=>{
 }
 
 exports.pre_process_academy_list = async(req,resp)=>{
-  const academy_list = await models.Academy.findAll({where: {status: 'active'}});
+  const academy_list = await models.Academy.findAll((host === "http://65.0.72.215:3000") ? {} : {where: {status: 'active'}});
   if (academy_list) {
    return academy_list
   } else {
