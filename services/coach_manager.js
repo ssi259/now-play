@@ -107,7 +107,7 @@ async function upload_and_create_document_data(document, coach_id,document_type)
 
 
 exports.process_get_coaches= async () => {
-  const coaches = await Coach.findAll()
+  const coaches = await Coach.findAll((host === "http://65.0.72.215:3000") ? {} : {where: {status: 'active'}})
   return coaches;
 }
 
