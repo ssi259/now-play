@@ -279,6 +279,8 @@ async function batch_detials_fun(batch_id) {
     "academy_id": batch_data.dataValues["academy_id"],
     "sports_id": batch_data.dataValues["sports_id"],
     "days": batch_data.dataValues["days"],
+    "thumbnail_img":batch_data.dataValues.thumbnail_img,
+    "banner_img":batch_data.dataValues.banner_img,
     "start_time": batch_data.dataValues["start_time"],
     "end_time": batch_data.dataValues["end_time"],
     "arena_data": arena_data,
@@ -366,4 +368,32 @@ exports.process_update_profile_pic = async (input_data) => {
 
 exports.post_process_update_profile_pic = async (data,resp) => {
   resp.status(200).send({status:"success",message:"profile pic updated successfully ", data:data})
+}
+
+exports.pre_process_get_batch_details = async (req) => {
+  return {batch_id:req.params.id }
+}
+
+exports.process_get_batch_details = async (input_data) => {
+  const { batch_id } = input_data
+  const batch = await batch_detials_fun(batch_id)
+  const enrollments = await models.Enrollment.findAll({ where: { batch_id: batch_id, status: 'active' }, attributes: ['user_id', 'subscription_id'] })
+  const enrolled_players = await Promise.all(enrollments.map(async (enrollment) => {
+    return {
+      user: await models.User.findByPk(enrollment.dataValues.user_id),
+      plan: await models.SubscriptionPlan.findByPk(enrollment.dataValues.subscription_id),
+    }
+  }))
+  batch.enrolled_players = enrolled_players
+  const batch_pics = await models.BatchPhotos.findAll({where: {batchId:batch_id}})
+  const  batch_images = []
+  for (each_batch_pic of batch_pics){
+    batch_images.push(each_batch_pic.dataValues.img_url)
+  }
+  batch.batch_img_list = batch_images
+  return batch
+}
+
+exports.post_process_get_batch_details = async (data, resp) => {
+  resp.status(200).send({ status: "success", message: "batch data retrieved successfully ", data: data })
 }
