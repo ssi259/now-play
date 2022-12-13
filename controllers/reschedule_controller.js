@@ -1,4 +1,4 @@
-const RescheduleManager = require('../services/reschedule_manager')
+const RescheduleManager = require('../services/reschedule_manager.js')
 
 exports.rescheduling = async(req,resp)=>{      
     try{
