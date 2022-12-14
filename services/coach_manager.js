@@ -371,26 +371,44 @@ exports.post_process_update_profile_pic = async (data,resp) => {
 }
 
 exports.pre_process_get_batch_details = async (req) => {
-  return {batch_id:req.params.id }
+  return {batch_id:req.params.id, coach_id:req.user.coach_id }
 }
 
 exports.process_get_batch_details = async (input_data) => {
-  const { batch_id } = input_data
+  const { batch_id, coach_id } = input_data
   const batch = await batch_detials_fun(batch_id)
   const enrollments = await models.Enrollment.findAll({ where: { batch_id: batch_id, status: 'active' }, attributes: ['user_id', 'subscription_id'] })
   const enrolled_players = await Promise.all(enrollments.map(async (enrollment) => {
     return {
-      user: await models.User.findByPk(enrollment.dataValues.user_id),
-      plan: await models.SubscriptionPlan.findByPk(enrollment.dataValues.subscription_id),
+      user: await models.User.findByPk(enrollment['user_id']),
+      plan: await models.SubscriptionPlan.findByPk(enrollment['subscription_id']),
     }
   }))
   batch.enrolled_players = enrolled_players
-  const batch_pics = await models.BatchPhotos.findAll({where: {batchId:batch_id}})
-  const  batch_images = []
-  for (each_batch_pic of batch_pics){
-    batch_images.push(each_batch_pic.dataValues.img_url)
+
+  const reviews = await models.Review.findAll({ where:coach_id }) 
+  const reviews_list = []
+  for(let review of reviews){
+    const user = await models.User.findOne({where:{id: review['user_id']}})
+    const review_data = {
+      review_text: review['review_text'],
+      review_time: review['createdAt'],
+      review_rating: review['rating'],
+      reviewer_name: user['name'],
+      reviewer_profile_pic : user['profilePic']
+    }
+    reviews_list.push(review_data)
   }
-  batch.batch_img_list = batch_images
+  batch.reviews = reviews_list
+
+  const ratings_sum =  reviews.reduce((total , review) => {
+    return total + review['rating']
+  }, 0)
+  batch.rating = {
+    rating_count: reviews.length,
+    average_rating: ratings_sum / reviews.length
+  };
+
   return batch
 }
 
