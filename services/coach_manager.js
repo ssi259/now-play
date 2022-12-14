@@ -307,7 +307,7 @@ exports.process_get_coach_enrolled_students = async (input_data) => {
 }
 
 exports.post_process_get_coach_enrolled_students = async (resp,student_enrollled) => {
-  resp.status(200).send({status:"Success",data:student_enrollled})
+  resp.status(200).send({status:"success",message:"data retrieved successfully",data:student_enrollled})
 }
 
 exports.pre_process_get_enrolled_users_list = async (req) => {
