@@ -66,7 +66,7 @@ exports.pre_process_get_all_users = async (req) => {
     return req.query
 }
 
-exports.process_get_all_users = async (query) => {
+exports.process_get_all_users = async (req,query) => {
     const host = req.get('host')
     const users = await models.User.findAll((host === "http://65.0.72.215:3000") ? {} : {where: {status: 'active'}})   
     return users
