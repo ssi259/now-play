@@ -76,6 +76,7 @@ exports.post_process_academy_details = async(req,resp,input_response)=>{
 }
 
 exports.pre_process_academy_list = async(req,resp)=>{
+  const host = req.get('host') 
   const academy_list = await models.Academy.findAll((host === "http://65.0.72.215:3000") ? {} : {where: {status: 'active'}});
   if (academy_list) {
    return academy_list

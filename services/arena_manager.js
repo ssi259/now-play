@@ -51,7 +51,10 @@ async function upload_and_create_data(image, arena_id) {
 }
 
 exports.pre_process_arena_details = async(req,resp)=>{
-  const arena_details = await  models.Arena.findAll((host === "http://65.0.72.215:3000") ? {} : {where: {status: 'active'}})
+  const host = req.get('host') 
+  const arena_details = await  models.Arena.findAll(
+    (host === "http://65.0.72.215:3000") ? {} : {where: {status: 'Active'}}
+  )
       if (arena_details) {
           return arena_details;
       } else {

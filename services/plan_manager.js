@@ -83,7 +83,8 @@ exports.post_process_plan_batch = async (resp,updated_data) => {
 }  
 
 exports.pre_process_get_all_plans = async (req) => {
-    const allPlans = await models.SubscriptionPlan.findAll()
+    const host = req.get('host') 
+    const allPlans = await models.SubscriptionPlan.findAll((host === "http://65.0.72.215:3000") ? {} : {where: {status: 'active'}})
     return allPlans;
 }
 
