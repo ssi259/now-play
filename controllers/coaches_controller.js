@@ -142,3 +142,15 @@ exports.get_batch_details = async (req, resp) => {
         return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
     }
 }
+
+exports.get_coach_earnings = async (req, resp) => {
+    try {
+        var input_response = await coachManager.pre_process_get_coach_earnings(req)
+        var process_response = await coachManager.process_get_coach_earnings(input_response)
+        var post_process_response = await coachManager.post_process_get_coach_earnings(resp,process_response)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        resp.status(status_code).send({status:"failure",message:e.name, data:{}})
+    }
+}

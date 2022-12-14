@@ -421,3 +421,35 @@ exports.process_get_batch_details = async (input_data) => {
 exports.post_process_get_batch_details = async (data, resp) => {
   resp.status(200).send({ status: "success", message: "batch data retrieved successfully ", data: data })
 }
+
+
+exports.pre_process_get_coach_earnings = async (req) => {
+  return {coach_id:req.user.coach_id, month:req.query.month, year:req.query.year}
+}
+
+exports.process_get_coach_earnings = async (input_data) => {
+  const {coach_id, month, year} = input_data
+  const total_earnings = await models.Payment.findAll({
+    attributes:[[sequelize.fn("SUM", sequelize.col("price")), "lifetime"]],
+    where: {coach_id: coach_id, status: "success"}
+  })
+
+  const monthly_earnings = await models.Payment.findAll({
+    attributes: [[sequelize.fn('SUM', sequelize.col('price')), 'earnings']],
+    where: {
+      [sequelize.Op.and]: [
+      sequelize.where(sequelize.fn('MONTH', sequelize.col('updatedAt')), month),
+      sequelize.where(sequelize.fn('YEAR', sequelize.col('updatedAt')), year),
+      ],
+      coach_id: coach_id, status: "success"
+    }
+  })
+  return {
+    total_earnings: total_earnings[0].dataValues.lifetime != null ? total_earnings[0].dataValues.lifetime : 0 ,
+    monthly_earnings: monthly_earnings[0].dataValues.earnings != null? monthly_earnings[0].dataValues.earnings : 0
+  }
+}
+
+exports.post_process_get_coach_earnings = async (resp,data) => {
+  resp.status(200).send({status:"success",message:"retrieved data successfully", data})
+}
