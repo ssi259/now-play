@@ -19,15 +19,20 @@ exports.process_sport_input_req = async(input_response)=>{
 exports.post_sport_process = async(req,resp,input_response)=>{
   resp.send(input_response)
 }
-exports.pre_process_sports_list = async(req,resp)=>{
-  const host = req.get('host') 
-  const sports_list = await models.Sports.findAll(
-    (host === "http://65.0.72.215:3000") ? {} : {where: {status: 'active'}});
-      if (sports_list) {
-          return sports_list
-      } else {
-        throw new Api400Error(`Error In Showing Sports List`)
-      }
+exports.pre_process_sports_list = async(req,resp)=>{ 
+  let sports_list = []
+  if (req.query.type == "admin"){
+   sports_list = await models.Sports.findAll()
+    return sports_list
+  }
+  else {
+   sports_list = await models.Sports.findAll({where:{status: "Active"}})
+  }
+    if (sports_list) {
+        return sports_list
+    } else {
+      throw new Api400Error(`Error In Showing Sports List`)
+    }
 }   
 exports.process_sports_list_input_req = async(input_response)=>{
   return input_response
