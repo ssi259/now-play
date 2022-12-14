@@ -251,15 +251,14 @@ const groupBy = async function (xs,key) {
   }, {});
 }
 
-exports.post_process_get_payments_by_status = async (data, resp) => {
-  const data_resp = []
-  for (const batch_id in data) {
-    data_resp.push({
-      batch_details: await batch_detials_fun(batch_id),
-      payments:data[batch_id]
-    })
+exports.post_process_get_payments_by_status = async (batches, resp) => {
+  const data = []
+  for (const batch_id in batches) {
+    const batch_details = await batch_detials_fun(batch_id)
+    batch_details.payments = batches[batch_id]
+    data.push(batch_details)
   }
-  resp.status(200).send({status:"success",message:"data retrieved successfully", data:data_resp})
+  resp.status(200).send({status:"success",message:"data retrieved successfully", data})
 }
 
 async function batch_detials_fun(batch_id) {
@@ -272,7 +271,13 @@ async function batch_detials_fun(batch_id) {
   const academy_data = academy_details != null ? { "name": academy_details["name"] } : null
   const sports_data = sports_details != null ? { "id": sports_details["id"], "name": sports_details["name"], "type": sports_details["type"] } : null
   
-  const obj = {
+  const batch_pics = await models.BatchPhotos.findAll({where: {batchId:batch_id}})
+  const  batch_images = []
+  for (pic of batch_pics){
+    batch_images.push(pic.dataValues.img_url)
+  }
+
+  const data = {
     "id": batch_data.dataValues["id"],
     "arena_id": batch_data.dataValues["arena_id"],
     "coach_id": batch_data.dataValues["coach_id"],
@@ -285,9 +290,10 @@ async function batch_detials_fun(batch_id) {
     "end_time": batch_data.dataValues["end_time"],
     "arena_data": arena_data,
     "academy_data": academy_data,
-    "sports_data": sports_data
+    "sports_data": sports_data,
+    "img_list":batch_images
   }
-  return obj
+  return data
 }
 
 exports.pre_process_get_coach_enrolled_students = async (req) => {
