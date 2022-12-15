@@ -3,6 +3,7 @@ const {uploadFile} = require('../lib/upload_files_s3')
 const Api400Error = require('../error/api400Error')
 const {Op} = require('sequelize')
 const models = require('../models');
+const sequelize = require('sequelize')
 
 exports.process_create_coach = async (req, resp) => {
     const {
