@@ -222,26 +222,45 @@ exports.pre_process_get_payments_by_status = async (req) => {
 
 exports.process_get_payments_by_status = async (input_data) => {
   const { coach_id, status } = input_data
-  const payment_data_list= []
-  const payments = await models.Payment.findAll({
+  const coach_batches = await models.Batch.findAll({
     where: {
       coach_id: coach_id,
-      status : status
+      status : 'active'
     }
   })
-  for (let payment of payments) {
-    const user = await models.User.findByPk(payment.dataValues.user_id)
-    const plan = await models.SubscriptionPlan.findByPk(payment.dataValues.plan_id)
-    payment_data_list.push({
-      user: user,
-      plan: plan,
-      batch_id: payment.dataValues.batch_id,
-      price: payment.dataValues.price,
-      payment_mode: payment.dataValues.payment_mode,
+  return await Promise.all(coach_batches.map(async (batch) => {
+    const batch_data = await batch_detials_fun(batch.id)
+    const payments = await models.Payment.findAll({
+      where: {
+        batch_id: batch.id,
+        status: status
+      }
     })
+    batch_data.payments = await payments_detail_func(payments)
+    return batch_data
+  }))
+}
+
+async function payments_detail_func(payments) {
+  return await Promise.all(payments.map(async (payment) => { 
+    const user = await models.User.findByPk(payment.user_id)
+    const plan = await models.SubscriptionPlan.findByPk(payment.plan_id)
+    return {
+      user: {
+        name: user['name'],
+        profilePic:user["profilePic"],
+      },
+      plan: {
+        plan_name: plan['plan_name'],
+        description: plan['description'],
+        status: plan['status'],
+        price: plan['price'],
+        tag: plan['tag'],
+        type: plan['type'],
+        duration:plan['duration']
+      }
   }
-  const result = (groupBy(payment_data_list, 'batch_id'));
-  return result
+  }))
 }
 
 const groupBy = async function (xs,key) {
@@ -251,13 +270,7 @@ const groupBy = async function (xs,key) {
   }, {});
 }
 
-exports.post_process_get_payments_by_status = async (batches, resp) => {
-  const data = []
-  for (const batch_id in batches) {
-    const batch_details = await batch_detials_fun(batch_id)
-    batch_details.payments = batches[batch_id]
-    data.push(batch_details)
-  }
+exports.post_process_get_payments_by_status = async (data, resp) => {
   resp.status(200).send({status:"success",message:"data retrieved successfully", data})
 }
 
