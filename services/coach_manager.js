@@ -370,10 +370,9 @@ exports.process_get_enrolled_users_list = async (input_data) => {
 exports.post_process_get_enrolled_users_list = async (resp, data) => {
   const data_resp = []
   for (const batch_id in data) {
-    data_resp.push({
-      batch_details: await batch_detials_fun(batch_id),
-      enrolled_users:data[batch_id]
-    })
+    const batch_details = await batch_detials_fun(batch_id)
+    batch_details.enrolled_players = data[batch_id]
+    data_resp.push(batch_details)
   }
   resp.status(200).send({status:"success",message:"data retrieved successfully", data:data_resp})
 }
