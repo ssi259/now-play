@@ -209,8 +209,8 @@ exports.process_get_coach_batches = async (input_data) => {
 
   const coachBatches = await Promise.all(batches.map(async (batch) => {
     batch = batch.toJSON()
-    batch.sports_name = await models.Sports.findByPk(batch.sports_id).then(sport => sport.name)
-    batch.academy_name = await models.Academy.findByPk(batch.academy_id).then(academy => academy.name)
+    batch.sport_data = await models.Sports.findByPk(batch.sports_id).then(sport => sport.name)
+    batch.academy_data = await models.Academy.findByPk(batch.academy_id).then(academy => academy.name)
     const arena_details = await models.Arena.findByPk(batch.arena_id)
     batch.arena_data = { "name": arena_details["name"], "lat": arena_details["lat"], "lng": arena_details["lng"], "city": arena_details["city"], "locality": arena_details["locality"], "state": arena_details["state"] }
     batch.rating = {
