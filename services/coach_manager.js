@@ -201,11 +201,22 @@ exports.process_get_coach_batches = async (input_data) => {
       coach_id: coach_id
     }
   })
+  
+  const reviews = await models.Review.findAll({ where: coach_id })
+  const ratings_sum =  reviews.reduce((total , review) => {
+    return total + review['rating']
+  }, 0)
+
   const coachBatches = await Promise.all(batches.map(async (batch) => {
     batch = batch.toJSON()
     batch.sports_name = await models.Sports.findByPk(batch.sports_id).then(sport => sport.name)
     batch.academy_name = await models.Academy.findByPk(batch.academy_id).then(academy => academy.name)
-    batch.arena_name = await models.Arena.findByPk(batch.arena_id).then(arena => arena.name)
+    const arena_details = await models.Arena.findByPk(batch.arena_id)
+    batch.arena_data = { "name": arena_details["name"], "lat": arena_details["lat"], "lng": arena_details["lng"], "city": arena_details["city"], "locality": arena_details["locality"], "state": arena_details["state"] }
+    batch.rating = {
+      rating_count: reviews.length,
+      average_rating: ratings_sum / reviews.length
+    };
     batch.total_players = await models.Enrollment.count({ where: { batch_id: batch.id,status:'active' } })
     return batch
   }))
