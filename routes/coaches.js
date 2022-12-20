@@ -9,7 +9,7 @@ routes.get('/payments/monthly', auth, coach_controller.get_payments_monthly)
 routes.post('/', coach_controller.createCoach);
 routes.post('/upload_images',coach_controller.uploadCoachImages);
 routes.post('/upload_documents',coach_controller.uploadCoachDocuments);
-routes.get('/', coach_controller.getCoaches)
+routes.get('/', coach_controller.get_coaches)
 routes.get('/batches/:id',auth,coach_controller.get_batch_details)
 routes.get('/batches', auth, coach_controller.getCoachBatches)
 routes.get('/enrollment/count', auth, coach_controller.getCoachEnrolledStudents)

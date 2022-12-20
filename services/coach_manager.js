@@ -106,19 +106,27 @@ async function upload_and_create_document_data(document, coach_id,document_type)
 }
 
 
-exports.process_get_coaches= async (req) => {
+exports.pre_process_get_coaches = async(req,resp)=>{ 
   let coaches = []
-  if(req.query.type == "admin"){
-   coaches = await models.Coach.findAll()
-  return coaches}
-  else{
-    coaches = await models.Coach.findAll({where:{status:"active"}})
+  if (req.query.type == "admin"){
+   coaches = await Coach.findAll()
   }
+  else {
+   coaches = await Coach.findAll({where:{status: "active"}})
+  }
+    if (coaches) {
+        return coaches
+    } else {
+      throw new Api400Error(`Error In Showing coaches`)
+    }
+}   
+exports.process_get_coaches_input_req = async(input_response)=>{
+  return input_response
+}
+exports.post_get_coaches_process = async(resp,input_response)=>{
+  resp.send(input_response)
 }
 
-exports.post_process_get_coaches = async ( coaches, resp) => {
-  resp.status(200).send({status:"Success",data:coaches})
-}
 
 exports.pre_process_get_coach_by_id = (req) => {
   if (req.params == null || req.params.id == null) {
