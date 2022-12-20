@@ -485,3 +485,20 @@ exports.process_get_coach_earnings = async (input_data) => {
 exports.post_process_get_coach_earnings = async (resp,data) => {
   resp.status(200).send({status:"success",message:"retrieved data successfully", data})
 }
+
+exports.pre_process_get_coach_details = async (req) => {
+  return {coach_id:req.user.coach_id}
+}
+
+exports.process_get_coach_details = async (input_data) => {
+  const {coach_id} = input_data
+  const coach_details = await models.Coach.findOne({where:{id:coach_id}})
+  if(coach_details == null){
+    throw new Api404Error("coach not found")
+  }
+  return coach_details
+}
+
+exports.post_process_get_coach_details = async (resp,data) => {
+  resp.status(200).send({status:"success",message:"retrieved data successfully", data})
+}
