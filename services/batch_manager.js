@@ -421,3 +421,11 @@ exports.pre_process_update_batch = async (req) => {
   exports.post_process_update_batch = async (processed_response, resp) => {
     resp.status(200).send({status:"success",updated_data: processed_response, message:"batch updated successfully"})
   }
+
+  exports.img_to_s3 = async (req, resp) => {
+    if (req.files==null || req.files.name==null){
+        throw new Api400Error(`Image not found`)
+    }
+    const img_url = await lib.uploadFile(req.files.name)
+    return img_url
+  }

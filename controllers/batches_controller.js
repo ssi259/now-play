@@ -80,3 +80,11 @@ exports.update_batch_details = async (req, resp) => {
         return resp.status(status_code).send({ status: "failure", message: e.name, data:{} })
     }
 }
+exports.img_to_s3 = async(req,resp)=>{
+    try{
+        var image_url = await BatchManager.img_to_s3(req,resp)
+        return {"image_url" : image_url}
+    }catch(error){
+        resp.status(error.statusCode).send(error.name)
+    }
+}
