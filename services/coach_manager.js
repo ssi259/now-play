@@ -334,11 +334,19 @@ exports.process_get_coach_enrolled_students = async (input_data) => {
     },
     group: ['user_id'],
   })
-  return {"students_enrolled":student_enrolled.length};
+
+  const payments = await models.Payment.findAll({
+    attributes: [[sequelize.fn('SUM', sequelize.col('price')), 'pending_payments_total']],
+    where: {
+      coach_id,
+      status:"pending"
+    }
+  })
+  return {"students_enrolled":student_enrolled.length , "pending_payments_total":payments[0].dataValues.pending_payments_total};
 }
 
-exports.post_process_get_coach_enrolled_students = async (resp,student_enrollled) => {
-  resp.status(200).send({status:"success",message:"data retrieved successfully",data:student_enrollled})
+exports.post_process_get_coach_enrolled_students = async (resp,data) => {
+  resp.status(200).send({status:"success",message:"data retrieved successfully",data})
 }
 
 exports.pre_process_get_enrolled_users_list = async (req) => {
