@@ -80,3 +80,15 @@ exports.update_batch_details = async (req, resp) => {
         return resp.status(status_code).send({ status: "failure", message: e.name, data:{} })
     }
 }
+
+exports.get_batch_images = async (req, resp) => {
+    try {
+        var input_response = await BatchManager.pre_process_get_batch_images(req)
+        var processed_response = await BatchManager.process_get_batch_images(input_response)
+        await BatchManager.post_process_get_batch_images(processed_response, resp)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name, data:{} })
+    }
+}
