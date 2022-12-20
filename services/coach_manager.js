@@ -107,9 +107,13 @@ async function upload_and_create_document_data(document, coach_id,document_type)
 
 
 exports.process_get_coaches= async (req) => {
-  const host = req.get('host') 
-  const coaches = await Coach.findAll((host === "http://65.0.72.215:3000") ? {} : {where: {status: "active"}})
-  return coaches;
+  let coaches = []
+  if(req.query.type == "admin"){
+   coaches = await models.Coach.findAll()
+  return coaches}
+  else{
+    coaches = await models.Coach.findAll({where:{status:"active"}})
+  }
 }
 
 exports.post_process_get_coaches = async ( coaches, resp) => {
@@ -321,6 +325,9 @@ async function batch_detials_fun(batch_id) {
     "img_list":batch_images
   }
   return data
+}
+exports.post_process_get_coach_batches = async (resp,batches) => {
+  resp.status(200).send({status:"Success",data:batches})
 }
 
 exports.pre_process_get_coach_enrolled_students = async (req) => {
