@@ -242,13 +242,50 @@ exports.process_get_payments_by_status = async (input_data) => {
   })
   return await Promise.all(coach_batches.map(async (batch) => {
     const batch_data = await batch_detials_fun(batch.id)
-    const payments = await models.Payment.findAll({
-      where: {
-        batch_id: batch.id,
-        status: status
-      }
-    })
-    batch_data.payments = await payments_detail_func(payments)
+    if (status == 'upcoming') {
+      const enrollments = await models.Enrollment.findAll({
+        where: {
+          batch_id: batch.id,
+          status: 'active',
+        }
+      })
+      batch_data.payments = []
+      for(let enrollment of enrollments){
+        const sevenDaysAfter = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        const new_end_date = new Date(enrollment.end_date)
+        const diffTime = Math.abs(sevenDaysAfter-new_end_date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        console.log("1",sevenDaysAfter,new_end_date,diffTime,diffDays)
+        if (diffDays <= 7) {
+          const user = await models.User.findByPk(enrollment.user_id)
+          const plan = await models.SubscriptionPlan.findByPk(enrollment.subscription_id)
+          batch_data.payments.push({
+            user: {
+              name: user['name'],
+              profilePic: user["profilePic"],
+            },
+            plan: {
+              plan_name: plan['plan_name'],
+              description: plan['description'],
+              status: plan['status'],
+              price: plan['price'],
+              tag: plan['tag'],
+              type: plan['type'],
+              duration: plan['duration']
+            }
+          })
+        }
+        }
+    }
+    else {
+      const payments = await models.Payment.findAll({
+        where: {
+          batch_id: batch.id,
+          status: status
+        }
+      })
+      batch_data.payments = await payments_detail_func(payments)
+    }
     return batch_data
   }))
 }
