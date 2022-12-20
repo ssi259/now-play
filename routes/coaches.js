@@ -4,6 +4,7 @@ const routes = express.Router();
 const { auth } = require('../middlewares/authentication')
 
 routes.get('/earnings', auth , coach_controller.get_coach_earnings)
+routes.get('/details',auth, coach_controller.get_coach_details)
 routes.get('/payments', auth, coach_controller.get_payments_by_status)
 routes.get('/payments/monthly', auth, coach_controller.get_payments_monthly)
 routes.post('/', coach_controller.createCoach);
