@@ -421,3 +421,16 @@ exports.pre_process_update_batch = async (req) => {
   exports.post_process_update_batch = async (processed_response, resp) => {
     resp.status(200).send({status:"success",updated_data: processed_response, message:"batch updated successfully"})
   }
+
+exports.pre_process_get_batch_images = async (req) => {
+    return 
+}
+
+exports.process_get_batch_images = async (input_data) => {
+    const batch_data = await models.BatchPhotos.findAll()
+    return batch_data
+}
+
+exports.post_process_get_batch_images = async (processed_response, resp) => {
+    resp.status(200).send({status:"success",data: processed_response, message:"batch images retrieved successfully"})
+}
