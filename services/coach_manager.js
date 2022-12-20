@@ -437,11 +437,13 @@ exports.pre_process_get_batch_details = async (req) => {
 exports.process_get_batch_details = async (input_data) => {
   const { batch_id, coach_id } = input_data
   const batch = await batch_detials_fun(batch_id)
-  const enrollments = await models.Enrollment.findAll({ where: { batch_id: batch_id, status: 'active' }, attributes: ['user_id', 'subscription_id'] })
+  const enrollments = await models.Enrollment.findAll({ where: { batch_id: batch_id, status: 'active' }, attributes: ['user_id', 'subscription_id','updatedAt','end_date'] })
   const enrolled_players = await Promise.all(enrollments.map(async (enrollment) => {
     return {
       user: await models.User.findByPk(enrollment['user_id']),
       plan: await models.SubscriptionPlan.findByPk(enrollment['subscription_id']),
+      start_date: enrollment['updatedAt'],
+      end_date: enrollment['end_date']
     }
   }))
   batch.enrolled_players = enrolled_players
