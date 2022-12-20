@@ -234,6 +234,9 @@ exports.pre_process_get_payments_by_status = async (req) => {
 
 exports.process_get_payments_by_status = async (input_data) => {
   const { coach_id, status } = input_data
+  const seven_days_after = await date_with_days_gap(7)
+  const seven_days_ago = await date_with_days_gap(-7)
+
   const coach_batches = await models.Batch.findAll({
     where: {
       coach_id: coach_id,
@@ -247,35 +250,12 @@ exports.process_get_payments_by_status = async (input_data) => {
         where: {
           batch_id: batch.id,
           status: 'active',
+          end_date: {
+            [Op.between]:[seven_days_ago , seven_days_after]
+          }
         }
       })
-      batch_data.payments = []
-      for(let enrollment of enrollments){
-        const sevenDaysAfter = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-        const new_end_date = new Date(enrollment.end_date)
-        const diffTime = Math.abs(sevenDaysAfter-new_end_date);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        console.log("1",sevenDaysAfter,new_end_date,diffTime,diffDays)
-        if (diffDays <= 7) {
-          const user = await models.User.findByPk(enrollment.user_id)
-          const plan = await models.SubscriptionPlan.findByPk(enrollment.subscription_id)
-          batch_data.payments.push({
-            user: {
-              name: user['name'],
-              profilePic: user["profilePic"],
-            },
-            plan: {
-              plan_name: plan['plan_name'],
-              description: plan['description'],
-              status: plan['status'],
-              price: plan['price'],
-              tag: plan['tag'],
-              type: plan['type'],
-              duration: plan['duration']
-            }
-          })
-        }
-        }
+      batch_data.payments = await collection_detail(enrollments, true)
     }
     else {
       const payments = await models.Payment.findAll({
@@ -284,16 +264,22 @@ exports.process_get_payments_by_status = async (input_data) => {
           status: status
         }
       })
-      batch_data.payments = await payments_detail_func(payments)
+      batch_data.payments = await collection_detail(payments , false)
     }
     return batch_data
   }))
 }
 
-async function payments_detail_func(payments) {
-  return await Promise.all(payments.map(async (payment) => { 
-    const user = await models.User.findByPk(payment.user_id)
-    const plan = await models.SubscriptionPlan.findByPk(payment.plan_id)
+async function date_with_days_gap(days) {
+  const date = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
+  return date.toISOString().substring(0, 10) + " 00:00:00";
+}
+
+async function collection_detail(collection, is_enrollment) {
+  return await Promise.all(collection.map(async (element) => { 
+    const user = await models.User.findByPk(element.user_id)
+    const plan_id = is_enrollment ? element.subscription_id : element.plan_id 
+    const plan = await models.SubscriptionPlan.findByPk(plan_id)
     return {
       user: {
         name: user['name'],
