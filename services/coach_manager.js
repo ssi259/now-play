@@ -242,21 +242,43 @@ exports.process_get_payments_by_status = async (input_data) => {
   })
   return await Promise.all(coach_batches.map(async (batch) => {
     const batch_data = await batch_detials_fun(batch.id)
-    const payments = await models.Payment.findAll({
-      where: {
-        batch_id: batch.id,
-        status: status
-      }
-    })
-    batch_data.payments = await payments_detail_func(payments)
+    if (status == 'upcoming') {
+      const seven_days_after = await date_with_days_gap(7)
+      const seven_days_ago = await date_with_days_gap(-7)
+      const enrollments = await models.Enrollment.findAll({
+        where: {
+          batch_id: batch.id,
+          status: 'active',
+          end_date: {
+            [Op.between]:[seven_days_ago , seven_days_after]
+          }
+        }
+      })
+      batch_data.payments = await collection_detail(enrollments, true)
+    }
+    else {
+      const payments = await models.Payment.findAll({
+        where: {
+          batch_id: batch.id,
+          status: status
+        }
+      })
+      batch_data.payments = await collection_detail(payments , false)
+    }
     return batch_data
   }))
 }
 
-async function payments_detail_func(payments) {
-  return await Promise.all(payments.map(async (payment) => { 
-    const user = await models.User.findByPk(payment.user_id)
-    const plan = await models.SubscriptionPlan.findByPk(payment.plan_id)
+async function date_with_days_gap(days) {
+  const date = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
+  return date.toISOString().substring(0, 10) + " 00:00:00";
+}
+
+async function collection_detail(collection, is_enrollment) {
+  return await Promise.all(collection.map(async (element) => { 
+    const user = await models.User.findByPk(element.user_id)
+    const plan_id = is_enrollment ? element.subscription_id : element.plan_id 
+    const plan = await models.SubscriptionPlan.findByPk(plan_id)
     return {
       user: {
         name: user['name'],
