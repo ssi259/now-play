@@ -234,9 +234,6 @@ exports.pre_process_get_payments_by_status = async (req) => {
 
 exports.process_get_payments_by_status = async (input_data) => {
   const { coach_id, status } = input_data
-  const seven_days_after = await date_with_days_gap(7)
-  const seven_days_ago = await date_with_days_gap(-7)
-
   const coach_batches = await models.Batch.findAll({
     where: {
       coach_id: coach_id,
@@ -246,6 +243,8 @@ exports.process_get_payments_by_status = async (input_data) => {
   return await Promise.all(coach_batches.map(async (batch) => {
     const batch_data = await batch_detials_fun(batch.id)
     if (status == 'upcoming') {
+      const seven_days_after = await date_with_days_gap(7)
+      const seven_days_ago = await date_with_days_gap(-7)
       const enrollments = await models.Enrollment.findAll({
         where: {
           batch_id: batch.id,
