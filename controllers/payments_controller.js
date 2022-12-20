@@ -21,7 +21,7 @@ exports.update_payment = async(req,resp)=>{
     }catch(e){
         console.log(e)
         const status_code = e.statusCode ? e.statusCode : 500
-        return resp.status(status_code).send({ status: "Failure", message: "payment not created" })
+        return resp.status(status_code).send({ status: "failure", message: "payment not created",data:{} })
     }finally{
     }
 }
