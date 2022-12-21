@@ -14,7 +14,7 @@ exports.pre_process_reschedule = async(req,resp)=>{
         updated_start_time: req.body.updated_start_time,updated_end_time: req.body.updated_end_time,previous_start_date: req.body.previous_start_date,updated_start_date: req.body.updated_start_date,
         previous_end_date: req.body.previous_end_date,updated_end_date: req.body.updated_end_date
     })
-    if (updated_start_time == null, updated_end_time == null, updated_start_date == null, updated_end_date == null) {
+    if (rescheduled.updated_start_time == null, rescheduled.updated_end_time == null, rescheduled.updated_start_date == null, rescheduled.updated_end_date == null) {
         await models.Reschedule.update({ status: 'cancelled' }, { where: { id: rescheduled.id } })
         resp.status(201).send({ status: "Success", message: "Class Has Been Cancelled" })
     }
