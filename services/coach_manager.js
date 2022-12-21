@@ -542,3 +542,22 @@ exports.process_get_coach_details = async (input_data) => {
 exports.post_process_get_coach_details = async (resp,data) => {
   resp.status(200).send({status:"success",message:"retrieved data successfully", data})
 }
+exports.pre_process_get_player_details = async (req) => {
+  return {user_id:req.params.id, coach_id:req.user.coach_id }
+}
+exports.process_get_player_details = async (input_data) => {
+  var {user_id, coach_id} = input_data
+  var player_details = []
+  await models.User.findOne({
+    where: {id: user_id}
+  }).then((data) => {player_details = data})
+  if (player_details.dataValues.status === "inactive"){
+    throw new Api400Error("Player is inactive")
+  }
+  console.log(player_details)
+  return player_details;
+
+}
+exports.post_process_get_player_details = (resp, data) => {
+  resp.status(200).send({status:"success",message:"retrieved data successfully", data: data.dataValues})
+}
