@@ -166,3 +166,13 @@ exports.get_coach_details = async (req, resp) => {
         resp.status(status_code).send({status:"failure",message:e.name, data:{}       })
     }
 }
+exports.get_player_details = async (req, resp) => {
+    try {
+        var input_response = await coachManager.pre_process_get_player_details(req)
+        var processed_response = await coachManager.process_get_player_details(input_response)
+        await coachManager.post_process_get_player_details(resp, processed_response)
+    } catch (e) {
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
+    }
+}
