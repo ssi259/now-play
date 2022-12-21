@@ -1,7 +1,8 @@
-const express = require('express')
 const reschedule_controller = require('../controllers/reschedule_controller')
+const express = require('express')
+const router = express.Router(); 
 const {auth} = require('../middlewares/authentication')
 
-const router = express.Router();
 
-router.post('/' , auth , reschedule_controller.rescheduling)
+router.post('/' , auth , reschedule_controller.rescheduling);
+module.exports = router;

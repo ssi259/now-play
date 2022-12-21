@@ -41,6 +41,6 @@ exports.pre_process_reschedule = async(req,resp)=>{
     return rescheduled
   }
 
-  exports.post_reschedule_process = async(req,resp,input_response)=>{
+  exports.post_reschedule_process = async(resp,input_response)=>{
     resp.status(200).send({ status: "success", data: rescheduled, message: "class Rescheduled"})
   }
