@@ -254,7 +254,7 @@ exports.process_get_payments_by_status = async (input_data) => {
           }
         }
       })
-      batch_data.payments = await collection_detail(enrollments, true)
+      batch_data.payments = await collection_detail(enrollments , status)
     }
     else {
       const payments = await models.Payment.findAll({
@@ -263,7 +263,7 @@ exports.process_get_payments_by_status = async (input_data) => {
           status: status
         }
       })
-      batch_data.payments = await collection_detail(payments , false)
+      batch_data.payments = await collection_detail(payments , status)
     }
     return batch_data
   }))
@@ -274,11 +274,25 @@ async function date_with_days_gap(days) {
   return date.toISOString().substring(0, 10) + " 00:00:00";
 }
 
-async function collection_detail(collection, is_enrollment) {
+async function collection_detail(collection, status) {
   return await Promise.all(collection.map(async (element) => { 
     const user = await models.User.findByPk(element.user_id)
-    const plan_id = is_enrollment ? element.subscription_id : element.plan_id 
+    const plan_id = status == 'upcoming' ? element.subscription_id : element.plan_id 
     const plan = await models.SubscriptionPlan.findByPk(plan_id)
+    let start_date = null;
+    let end_date = null
+    if (status == 'pending') {
+      start_date = new Date(element['createdAt'])
+    } 
+    else if (status == 'success') {
+      start_date = new Date(element.updatedAt)
+      let date = new Date(element['updatedAt'])
+      end_date = new Date(date.setDate(date.getDate() + plan['duration']))
+    }
+    else {
+      start_date = new Date(element['updatedAt'])
+      end_date = new Date(element['end_date'])
+    }
     return {
       user: {
         name: user['name'],
@@ -292,7 +306,9 @@ async function collection_detail(collection, is_enrollment) {
         tag: plan['tag'],
         type: plan['type'],
         duration:plan['duration']
-      }
+      },
+      start_date,
+      end_date
   }
   }))
 }
