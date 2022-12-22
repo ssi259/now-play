@@ -56,7 +56,7 @@ exports.process_update_input_req = async(req,input_response)=>{
   plan_duration = plan.duration
   enrollment_data.end_date = new Date().toJSON().slice(0,19).replace('T',' ');
   var new_end_date = addDays(enrollment_data.end_date, plan_duration)
-  if(!coach_resp) {
+  if(coach_resp == false) {
     await models.Enrollment.update({status: "inactive"}, {where: {id: enrollment_data.id}})
     await models.Payment.update({status: "failed"}, {where: {id: payment_data.id}})
   } else {
