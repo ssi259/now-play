@@ -56,3 +56,15 @@ exports.update_user_on_adminPanel = async (req, resp) => {
         return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
     }
 }
+
+exports.add_fcm_token = async (req, resp) => {
+    try {
+        var input_response = await user_manager.pre_process_add_fcm_token(req)
+        var processed_response = await user_manager.process_add_fcm_token(input_response)
+        await user_manager.post_process_add_fcm_token(processed_response, resp)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
+    }
+}

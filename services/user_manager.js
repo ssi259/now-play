@@ -95,3 +95,17 @@ exports.process_update_user_on_adminPanel = async (input_response) => {
 exports.post_process_update_user_on_adminPanel = async (affected_rows, resp) => {
     resp.status(200).send({status:"success",message:"user updated successfully"})
 }
+
+exports.pre_process_add_fcm_token = async (req) => {
+    return {user_id:req.user.user_id, fcm_token:req.body.fcm_token}
+}
+
+exports.process_add_fcm_token = async (input_data) => {
+    const { user_id, fcm_token } = input_data
+    const user = await models.fcm_token.create({user_id, fcm_token})
+    return user
+}
+
+exports.post_process_add_fcm_token = async (user, resp) => {
+    resp.status(200).send({status:"success",message:"fcm token added successfully",data:user})
+}
