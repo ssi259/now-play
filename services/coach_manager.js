@@ -524,3 +524,78 @@ exports.process_get_coach_details = async (input_data) => {
 exports.post_process_get_coach_details = async (resp,data) => {
   resp.status(200).send({status:"success",message:"retrieved data successfully", data})
 }
+
+exports.pre_process_upcoming_classes = async (req) => {
+  return {coach_id:req.user.coach_id}
+}
+
+exports.process_upcoming_classes = async (input_data) => {
+  const { coach_id } = input_data
+  let upcoming_classes = {}
+  const batches = await models.Batch.findAll({
+    where: {
+      coach_id,
+      status:'active'
+    }
+  })
+  for (let batch of batches) {
+    const batch_data = batch.dataValues
+    const rescheduled_classes = await models.Reschedule.findAll({
+      where: {
+        batch_id: batch['id'],
+        updated_start_date: {
+          [Op.ne]:null
+        }
+      }
+    })
+    const cancelled_classes = await models.Reschedule.findAll({
+      where: {
+        batch_id: batch['id'],
+        updated_start_date: null
+      }
+    })
+    const today_index = (new Date()).getDay()
+    let days_after = 0;
+    const days_arr = JSON.parse(batch_data.days)
+    for (let i = today_index; i < today_index + 7; i++){
+      let j = ((i % 7) + 6) % 7
+      const date = await date_after_gap(days_after)      
+      if (upcoming_classes[date] == null) {
+        upcoming_classes[date] = []
+      }
+      if (days_arr[j] == 1) {
+        upcoming_classes[date].push(batch_data)
+      }
+      days_after++;
+    }
+    for (let rsdl_cls of rescheduled_classes) {
+      const previous_start_date = new Date(rsdl_cls['previous_start_date'])
+      const previous_start_date_str =   previous_start_date.toLocaleDateString().substring(0, 10)      
+      if (upcoming_classes[previous_start_date_str] != null) {
+        upcoming_classes[previous_start_date_str] = await  upcoming_classes[previous_start_date_str].filter((item) => item['id'] != rsdl_cls['batch_id'] || item['start_time'] != rsdl_cls['previous_start_time'])
+      }
+      const updated_start_date = new Date(rsdl_cls['updated_start_date'])
+      const updated_start_date_str =   updated_start_date.toLocaleDateString().substring(0, 10)
+      if (upcoming_classes[updated_start_date_str] != null) {
+        upcoming_classes[updated_start_date_str].push(rsdl_cls)
+      }
+    }
+    for (let cncl_class of cancelled_classes) {
+      const previous_start_date = new Date(cncl_class['previous_start_date'])
+      const previous_start_date_str =   previous_start_date.toLocaleDateString().substring(0, 10)      
+      if (upcoming_classes[previous_start_date_str] != null) {
+        upcoming_classes[previous_start_date_str] = await  upcoming_classes[previous_start_date_str].filter((item) => item['id'] != cncl_class['batch_id'] || item['start_time'] != cncl_class['previous_start_time'])
+      }
+    }
+  }
+  return upcoming_classes
+}
+
+exports.post_process_upcoming_classes = async (resp,data) => {
+  resp.status(200).send({status:"success",message:"retrieved data successfully", data})
+}
+
+async function date_after_gap(gap) {
+  const date = new Date(Date.now() + gap * 24 * 60 * 60 * 1000)
+  return  date.toLocaleDateString().substring(0, 10)
+}
