@@ -63,13 +63,18 @@ exports.process_update_input_req = async(req,input_response)=>{
     await models.Enrollment.update({status: "active", end_date:new_end_date}, {where: {id: enrollment_data.id}})
     await models.Payment.update({status: "success"}, {where: {id: payment_data.id}})
   }
-  return {payment_id: payment_data.id, enrollment_id: enrollment_data.id, dataValues:req.body}
+  return {payment_id: payment_data.id, enrollment_id: enrollment_data.id, dataValues:req.body, coach_resp: coach_resp}
 }
 
 exports.post_update_process = async(req,resp,input_response)=>{
   var formatted_response = {}
-  formatted_response["status"]="success"
-  formatted_response["message"]="payment success, enrollment created successfully"
+  if(input_response.coach_resp) {
+    formatted_response["status"]="success"
+    formatted_response["message"]="payment success, enrollment created successfully"
+  } else {
+    formatted_response["status"]="rejected"
+    formatted_response["message"]="payment rejected by coach, enrollment creation failed"
+  }
   delete input_response.dataValues.user_id
   formatted_response["data"]=input_response
   resp.status(200).send(formatted_response)
