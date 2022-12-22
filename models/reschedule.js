@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
     previous_start_date: DataTypes.DATE,
     updated_start_date: DataTypes.DATE,
     days: DataTypes.JSON,
+    previous_end_date: DataTypes.DATE,
+    updated_end_date: DataTypes.DATE,
+    previous_days: DataTypes.JSON,
+    updated_days: DataTypes.JSON,
     status: DataTypes.STRING
   }, {
     sequelize,
