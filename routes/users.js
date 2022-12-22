@@ -9,6 +9,6 @@ router.get('/all', user_controller.get_all_users)
 router.get('/', auth , user_controller.get_user)
 router.put('/',auth, user_controller.update_user) // update user on profile page of user
 router.put('/:id', user_controller.update_user_on_adminPanel) // update user from admin panel
-
+router.post('/fcm-token', auth, user_controller.add_fcm_token)
 
 module.exports = router;
