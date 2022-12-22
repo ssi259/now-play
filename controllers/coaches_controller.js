@@ -173,6 +173,19 @@ exports.get_player_details = async (req, resp) => {
         await coachManager.post_process_get_player_details(resp, processed_response)
     } catch (e) {
         const status_code = e.statusCode ? e.statusCode : 500
-        return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
+        return resp.status(status_code).send({ status: "failure", message: e.name, data: {} })
+
+    }
+}
+
+exports.get_upcoming_classes = async (req, resp) => {
+    try {
+        const input_response = await coachManager.pre_process_upcoming_classes(req)
+        const process_response = await coachManager.process_upcoming_classes(input_response)
+        await coachManager.post_process_upcoming_classes(resp,process_response)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        resp.status(status_code).send({status:"failure",message:e.name, data:{}})
     }
 }
