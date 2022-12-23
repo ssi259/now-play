@@ -18,7 +18,7 @@ exports.process_reschedule_input_req = async(req,resp,input_response)=>{
     })
   
     for ( var each_batch_detail of batch_detail){
-     // console.log(each_batch_detail)
+    
     // time of first timespan
     var p_start_time = new Date(`${each_batch_detail.start_date} ${each_batch_detail.start_time} `).getTime();
     var p_end_time = new Date(`${each_batch_detail.end_date} ${each_batch_detail.end_time} `).getTime();
