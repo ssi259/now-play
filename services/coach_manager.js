@@ -696,3 +696,7 @@ exports.process_add_attendance = async (input_data) => {
 exports.post_process_add_attendance = async (resp, data) => {
   resp.status(200).send({status:"success",message:"attendance marked successfully", data: data})
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 104e0c4 (post_attendance)
