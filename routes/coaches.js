@@ -10,6 +10,7 @@ routes.get('/earnings', auth , coach_controller.get_coach_earnings)
 routes.get('/details',auth, coach_controller.get_coach_details)
 routes.get('/payments', auth, coach_controller.get_payments_by_status)
 routes.get('/attendance', auth, coach_controller.get_attendance)
+routes.post('/attendance', auth, coach_controller.post_attendance)
 routes.get('/payments/monthly', auth, coach_controller.get_payments_monthly)
 routes.post('/', coach_controller.createCoach);
 routes.post('/reminders/payment', auth, coach_controller.send_payment_reminder);
