@@ -73,6 +73,3 @@ exports.process_reschedule = async (input_data) => {
 exports.post_process_reschedule = async (reschedule, resp) => {
     resp.status(200).send({ status: reschedule.status, message: reschedule.message,data:reschedule.data})
 }
-
-
-

@@ -49,7 +49,11 @@ app.use('/plans', planRouter)
 app.use('/enrollments',enrollmentRouter)
 app.use('/payments', paymentRouter);
 app.use('/complaints', ComplaintRouter);
+<<<<<<< HEAD
 app.use('/coach/reschedule', rescheduleRouter);
+=======
+app.use('/reschedule', rescheduleRouter);
+>>>>>>> 2ef35be (Implemeted reschedule class)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
