@@ -6,6 +6,7 @@ const { auth } = require('../middlewares/authentication')
 routes.get('/earnings', auth , coach_controller.get_coach_earnings)
 routes.get('/details',auth, coach_controller.get_coach_details)
 routes.get('/payments', auth, coach_controller.get_payments_by_status)
+routes.get('/attendance', auth, coach_controller.get_attendance)
 routes.get('/payments/monthly', auth, coach_controller.get_payments_monthly)
 routes.post('/', coach_controller.createCoach);
 routes.post('/upload_images',coach_controller.uploadCoachImages);
@@ -19,5 +20,4 @@ routes.get('/enrollment/users',auth, coach_controller.get_enrolled_users_list)
 routes.get('/:id', coach_controller.getCoachById)
 routes.put('/profile_pic', auth, coach_controller.update_profile_pic)
 routes.put('/:id', coach_controller.update_coach_by_id)
-
 module.exports = routes;

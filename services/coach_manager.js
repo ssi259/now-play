@@ -561,3 +561,22 @@ exports.process_get_player_details = async (input_data) => {
 exports.post_process_get_player_details = (resp, data) => {
   resp.status(200).send({status:"success",message:"retrieved data successfully", data: data.dataValues})
 }
+
+exports.pre_process_get_attendance = async (req) => {
+  return {coach_id:req.user.coach_id};
+}
+
+exports.process_get_attendance = async (input_data) => {
+  const attendance = await models.Attendance.findAll({
+    where: {coach_id: input_data.coach_id,
+            createdAt: {
+              [Op.between]: [new Date(new Date().setHours(0, 0, 0)), new Date(new Date().setHours(23, 59, 59))]
+           }
+          }
+  })
+  return attendance;
+}
+
+exports.post_process_get_attendance = async (resp, data) => {
+  resp.status(200).send({status:"success",message:"retrieved data successfully", data: data})
+}
