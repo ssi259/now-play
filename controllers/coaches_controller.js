@@ -176,3 +176,15 @@ exports.get_player_details = async (req, resp) => {
         return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
     }
 }
+
+exports.get_attendance = async (req, resp) => {
+    try {
+        var input_response = await coachManager.pre_process_get_attendance(req)
+        var processed_response = await coachManager.process_get_attendance(input_response)
+        await coachManager.post_process_get_attendance(resp, processed_response)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
+    }
+}
