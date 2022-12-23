@@ -539,7 +539,6 @@ exports.process_upcoming_classes = async (input_data) => {
     }
   })
   for (let batch of batches) {
-    const batch_data = batch.dataValues
     const rescheduled_classes = await models.Reschedule.findAll({
       where: {
         batch_id: batch['id'],
@@ -554,9 +553,10 @@ exports.process_upcoming_classes = async (input_data) => {
         updated_start_date: null
       }
     })
+    const batch_data = await batch_details_upcoming_classes(batch['id'])
     const today_index = (new Date()).getDay()
     let days_after = 0;
-    const days_arr = JSON.parse(batch_data.days)
+    const days_arr = JSON.parse(batch['days'])
     for (let i = today_index; i < today_index + 7; i++){
       let j = ((i % 7) + 6) % 7
       const date = await date_after_gap(days_after)      
@@ -568,34 +568,73 @@ exports.process_upcoming_classes = async (input_data) => {
       }
       days_after++;
     }
-    for (let rsdl_cls of rescheduled_classes) {
-      const previous_start_date = new Date(rsdl_cls['previous_start_date'])
+    for (let rsdld_cls of rescheduled_classes) {
+      const rsdld_cls_data = await rescheduled_class_data(batch_data , rsdld_cls.dataValues)
+      const previous_start_date = new Date(rsdld_cls['previous_start_date'])
       const previous_start_date_str =   previous_start_date.toLocaleDateString().substring(0, 10)      
       if (upcoming_classes[previous_start_date_str] != null) {
-        upcoming_classes[previous_start_date_str] = await  upcoming_classes[previous_start_date_str].filter((item) => item['id'] != rsdl_cls['batch_id'] || item['start_time'] != rsdl_cls['previous_start_time'])
+        upcoming_classes[previous_start_date_str] = await  upcoming_classes[previous_start_date_str].filter((item) => item['id'] != rsdld_cls['batch_id'] || item['start_time'] != rsdld_cls['previous_start_time'])
       }
-      const updated_start_date = new Date(rsdl_cls['updated_start_date'])
-      const updated_start_date_str =   updated_start_date.toLocaleDateString().substring(0, 10)
+      const updated_start_date = new Date(rsdld_cls['updated_start_date'])
+      const updated_start_date_str = updated_start_date.toLocaleDateString().substring(0, 10)
       if (upcoming_classes[updated_start_date_str] != null) {
-        upcoming_classes[updated_start_date_str].push(rsdl_cls)
+        upcoming_classes[updated_start_date_str].push(rsdld_cls_data)
       }
     }
-    for (let cncl_class of cancelled_classes) {
-      const previous_start_date = new Date(cncl_class['previous_start_date'])
+    for (let cncld_class of cancelled_classes) {
+      const previous_start_date = new Date(cncld_class['previous_start_date'])
       const previous_start_date_str =   previous_start_date.toLocaleDateString().substring(0, 10)      
       if (upcoming_classes[previous_start_date_str] != null) {
-        upcoming_classes[previous_start_date_str] = await  upcoming_classes[previous_start_date_str].filter((item) => item['id'] != cncl_class['batch_id'] || item['start_time'] != cncl_class['previous_start_time'])
+        upcoming_classes[previous_start_date_str] = await  upcoming_classes[previous_start_date_str].filter((item) => item['id'] != cncld_class['batch_id'] || item['start_time'] != cncld_class['previous_start_time'])
       }
     }
   }
+  for ( let date in upcoming_classes ) upcoming_classes[date].sort((class_1, class_2) => class_1.start_time > class_2.start_time ? 1 : -1)  
   return upcoming_classes
 }
 
-exports.post_process_upcoming_classes = async (resp,data) => {
+exports.post_process_upcoming_classes = async (resp, data) => {
   resp.status(200).send({status:"success",message:"retrieved data successfully", data})
 }
 
 async function date_after_gap(gap) {
   const date = new Date(Date.now() + gap * 24 * 60 * 60 * 1000)
   return  date.toLocaleDateString().substring(0, 10)
+}
+
+async function batch_details_upcoming_classes(batch_id){
+  const batch_data = await models.Batch.findByPk(batch_id)
+  const arena_details = await models.Arena.findByPk(batch_data.dataValues.arena_id)
+  const academy_details = await models.Academy.findByPk(batch_data.dataValues.academy_id)
+  const sports_details = await models.Sports.findByPk(batch_data.dataValues.sports_id)
+  
+  const arena_data = arena_details != null ? { "name": arena_details["name"], "lat": arena_details["lat"], "lng": arena_details["lng"], "city": arena_details["city"], "locality": arena_details["locality"], "state": arena_details["state"] } : null
+  const academy_data = academy_details != null ? { "name": academy_details["name"] } : null
+  const sports_data = sports_details != null ? { "id": sports_details["id"], "name": sports_details["name"], "type": sports_details["type"] } : null
+
+  const data = {
+    "id": batch_data.dataValues["id"],
+    "start_time": batch_data["start_time"],
+    "end_time": batch_data["end_time"],
+    "day":batch_data['days'],
+    "arena_data": arena_data,
+    "academy_data": academy_data,
+    "sports_data": sports_data,
+    "type":"regular"
+  }
+  return data
+}
+
+async function rescheduled_class_data(batch_data, rsdld_cls_data) {
+  return {
+    "id": batch_data["id"],
+    "start_time": rsdld_cls_data["updated_start_time"],
+    "end_time": rsdld_cls_data["updated_end_time"],
+    "previous_start_date":rsdld_cls_data['previous_start_date'],
+    "updated_start_date": rsdld_cls_data['updated_start_date'],
+    "arena_data": batch_data['arena_data'],
+    "academy_data": batch_data['academy_data'],
+    "sports_data": batch_data['sports_data'],
+    "type":"rescheduled"
+  }
 }
