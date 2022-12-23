@@ -7,24 +7,18 @@ exports.pre_process_reschedule = async(req,resp)=>{
   }
 exports.process_reschedule_input_req = async(req,resp,input_response)=>{
     const batch_id = req.body.batch_id;
-      if (batch_id == null) {
-          resp.status(400).send({ status: "Failure", details: "batch_id Not Provided" })
-      }
     const rescheduled = await models.Reschedule.create({batch_id: req.body.batch_id,previous_end_time: req.body.previous_end_time,previous_start_time: req.body.previous_start_time,
         updated_start_time: req.body.updated_start_time,updated_end_time: req.body.updated_end_time,previous_start_date: req.body.previous_start_date,updated_start_date: req.body.updated_start_date,
         previous_end_date: req.body.previous_end_date,updated_end_date: req.body.updated_end_date
     })
-    if (rescheduled.updated_start_time == null, rescheduled.updated_end_time == null, rescheduled.updated_start_date == null, rescheduled.updated_end_date == null) {
-      await models.Reschedule.update({ status: 'cancelled' }, { where: { id: rescheduled.id } })
-      resp.status(201).send({ status: "Success", message: "Class Has Been Cancelled" })
-    }
     var batch_detail = await models.Batch.findAll({
         where: {
             coach_id:input_response.coach_id
         }
     })
-    for (each_batch_detail of batch_detail){
-
+  
+    for ( var each_batch_detail of batch_detail){
+     // console.log(each_batch_detail)
     // time of first timespan
     var p_start_time = new Date(`${each_batch_detail.start_date} ${each_batch_detail.start_time} `).getTime();
     var p_end_time = new Date(`${each_batch_detail.end_date} ${each_batch_detail.end_time} `).getTime();
@@ -32,14 +26,24 @@ exports.process_reschedule_input_req = async(req,resp,input_response)=>{
     // time of second timespan
     var u_start_time = new Date(`${rescheduled.updated_start_date} ${rescheduled.updated_start_time} `).getTime();
     var u_end_time = new Date(`${rescheduled.updated_end_date} ${rescheduled.updated_end_time} `).getTime();
-
-    if (Math.min(p_start_time, p_end_time) <= Math.max(u_start_time, u_end_time) && Math.max(p_start_time, p_end_time) >= Math.min(u_start_time, u_end_time)) {
-        resp.status(400).send({ status: "Failure", details: `time conflict with batch_id: ${each_batch_detail.id},please change time` })
-    }
- }
-    return rescheduled
+   }
+  
+    return{ rescheduled,p_start_time,p_end_time,u_start_time,u_end_time,batch_id} 
   }
 
   exports.post_reschedule_process = async(resp,input_response)=>{
-    resp.status(200).send({ status: "success", data: input_response, message: "class Rescheduled"})
+    const {rescheduled,p_start_time,p_end_time,u_start_time,u_end_time,batch_id} = input_response
+    if (batch_id == null) {
+     return resp.status(400).send({ status: "Failure", details: "batch_id Not Provided" })
+  }
+  if (rescheduled.updated_start_time == null || rescheduled.updated_end_time == null || rescheduled.updated_start_date == null) {
+    await models.Reschedule.update({ status: 'cancelled' }, { where: { id: rescheduled.id } })
+   return resp.status(201).send({ status: "Success", message: "Class Has Been Cancelled" })
+  }
+    if (Math.min(p_start_time, p_end_time) <= Math.max(u_start_time, u_end_time) && Math.max(p_start_time, p_end_time) >= Math.min(u_start_time, u_end_time)) {
+     return resp.status(400).send({ status: "Failure", details: `time conflict with batch_id: ${each_batch_detail.id},please change time` })
+  }
+  else{
+   return resp.status(200).send({ status: "success", data: rescheduled, message: "class Rescheduled", })
+  }
   }
