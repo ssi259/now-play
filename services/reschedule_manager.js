@@ -1,12 +1,11 @@
 const models = require('../models')
 const Api400Error = require('../error/api400Error')
-const Api500Error = require('../error/api500Error');
 
 exports.pre_process_reschedule_class = async (req) => {
     const coach_id = req.user.coach_id;
     const batch_id = req.body.batch_id;
     const reschedule_date = req.body.reschedule_date;
-    const reschedule_start_time = req.body.reschedule_time;
+    const reschedule_start_time = req.body.reschedule_start_time;
     const reschedule_end_time = req.body.reschedule_end_time;
     return {coach_id, batch_id, reschedule_date, reschedule_start_time, reschedule_end_time};
 }
@@ -59,7 +58,7 @@ exports.process_reschedule_class = async (input_data) => {
                         id: rescheduled_class.id
                     }
                 })
-                throw new Api500Error("Time Slot Conflict")
+                throw new Api400Error("Time Slot Conflict")
             }
     }
 }   
