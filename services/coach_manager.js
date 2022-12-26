@@ -542,15 +542,13 @@ exports.process_upcoming_classes = async (input_data) => {
     const rescheduled_classes = await models.Reschedule.findAll({
       where: {
         batch_id: batch['id'],
-        updated_start_date: {
-          [Op.ne]:null
-        }
+        type:"rescheduled"
       }
     })
     const cancelled_classes = await models.Reschedule.findAll({
       where: {
         batch_id: batch['id'],
-        updated_start_date: null
+        type:"canceled"
       }
     })
     const batch_data = await batch_details_upcoming_classes(batch['id'])
@@ -575,10 +573,10 @@ exports.process_upcoming_classes = async (input_data) => {
       if (upcoming_classes[previous_start_date_str] != null) {
         upcoming_classes[previous_start_date_str] = await  upcoming_classes[previous_start_date_str].filter((item) => item['id'] != rsdld_cls['batch_id'] || item['start_time'] != rsdld_cls['previous_start_time'])
       }
-      const updated_start_date = new Date(rsdld_cls['updated_start_date'])
-      const updated_start_date_str = updated_start_date.toLocaleDateString().substring(0, 10)
-      if (upcoming_classes[updated_start_date_str] != null) {
-        upcoming_classes[updated_start_date_str].push(rsdld_cls_data)
+      const updated_date = new Date(rsdld_cls['updated_date'])
+      const updated_date_str = updated_date.toLocaleDateString().substring(0, 10)
+      if (upcoming_classes[updated_date_str] != null) {
+        upcoming_classes[updated_date_str].push(rsdld_cls_data)
       }
     }
     for (let cncld_class of cancelled_classes) {
@@ -630,8 +628,6 @@ async function rescheduled_class_data(batch_data, rsdld_cls_data) {
     "id": batch_data["id"],
     "start_time": rsdld_cls_data["updated_start_time"],
     "end_time": rsdld_cls_data["updated_end_time"],
-    "previous_start_date":rsdld_cls_data['previous_start_date'],
-    "updated_start_date": rsdld_cls_data['updated_start_date'],
     "arena_data": batch_data['arena_data'],
     "academy_data": batch_data['academy_data'],
     "sports_data": batch_data['sports_data'],
