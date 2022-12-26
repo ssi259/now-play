@@ -19,6 +19,7 @@ var planRouter = require('./routes/plans')
 const enrollmentRouter = require('./routes/enrollments')
 var paymentRouter = require('./routes/payment.js');
 const ComplaintRouter = require('./routes/complaints')
+const rescheduleRouter = require('./routes/reschedule')
 
 var app = express();
 app.use(fileUpload());
@@ -48,6 +49,7 @@ app.use('/plans', planRouter)
 app.use('/enrollments',enrollmentRouter)
 app.use('/payments', paymentRouter);
 app.use('/complaints', ComplaintRouter);
+app.use('/coach/reschedule', rescheduleRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
