@@ -49,7 +49,7 @@ app.use('/plans', planRouter)
 app.use('/enrollments',enrollmentRouter)
 app.use('/payments', paymentRouter);
 app.use('/complaints', ComplaintRouter);
-app.use('/reschedule', rescheduleRouter);
+app.use('/coach/reschedule', rescheduleRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
