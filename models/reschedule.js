@@ -15,14 +15,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   Reschedule.init({
     batch_id: DataTypes.INTEGER,
-    previous_end_time: DataTypes.TIME,
-    previous_start_time: DataTypes.TIME,
+    updated_date: DataTypes.DATE,
     updated_start_time: DataTypes.TIME,
     updated_end_time: DataTypes.TIME,
     previous_start_date: DataTypes.DATE,
-    updated_start_date: DataTypes.DATE,
-    days: DataTypes.JSON,
-    status: DataTypes.STRING
+    previous_start_time: DataTypes.TIME,
+    type: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Reschedule',

@@ -1,7 +1,8 @@
 'use strict';
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Reschedule_classes', {
+    await queryInterface.createTable('Reschedules', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,13 +12,19 @@ module.exports = {
       batch_id: {
         type: Sequelize.INTEGER
       },
-      reschedule_date: {
+      updated_date: {
         type: Sequelize.DATE
       },
-      reschedule_start_time: {
+      updated_start_time: {
         type: Sequelize.TIME
       },
-      reschedule_end_time: {
+      updated_end_time: {
+        type: Sequelize.TIME
+      },
+      previous_start_date: {
+        type: Sequelize.DATE
+      },
+      previous_start_time: {
         type: Sequelize.TIME
       },
       type: {
@@ -34,6 +41,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Reschedule_classes');
+    await queryInterface.dropTable('Reschedules');
   }
 };

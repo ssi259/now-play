@@ -1,29 +1,34 @@
 const models = require('../models')
-const Api400Error = require('../error/api400Error')
+const Api400Error = require('../error/api400Error');
+const { DatabaseError } = require('sequelize');
 
 exports.pre_process_reschedule_class = async (req) => {
     const coach_id = req.user.coach_id;
     const batch_id = req.body.batch_id;
-    const reschedule_date = req.body.reschedule_date;
-    const reschedule_start_time = req.body.reschedule_start_time;
-    const reschedule_end_time = req.body.reschedule_end_time;
-    return {coach_id, batch_id, reschedule_date, reschedule_start_time, reschedule_end_time};
+    const updated_date = req.body.updated_date;
+    const updated_start_time = req.body.updated_start_time;
+    const updated_end_time = req.body.updated_end_time;
+    const previous_start_time = req.body.previous_start_time;
+    const previous_start_date = req.body.previous_start_date;
+    return {coach_id, batch_id, updated_date, updated_start_time, updated_end_time, previous_start_time, previous_start_date};
 }
 
 exports.process_reschedule_class = async (input_data) => {
-    const {coach_id, batch_id, reschedule_date, reschedule_start_time, reschedule_end_time} = input_data;
+    const {coach_id, batch_id, updated_date, updated_start_time, updated_end_time,previous_start_date,previous_start_time} = input_data;
     if(!batch_id){
         throw new Api400Error("batch_id is required");
     }
-    rescheduled_class = await models.Reschedule_class.create({
+    rescheduled_class = await models.Reschedule.create({
         batch_id,
-        reschedule_date,
-        reschedule_start_time,
-        reschedule_end_time,
-        type: "reschedule"
+        updated_date,
+        updated_start_time,
+        updated_end_time,
+        previous_start_date,
+        previous_start_time,
+        type: "rescheduled"
     })
-    if(reschedule_date == null || reschedule_start_time==null || reschedule_end_time==null){
-        await models.Reschedule_class.update({
+    if(updated_date == null || updated_start_time==null || updated_end_time==null){
+        await models.Reschedule.update({
             type: "cancel"
         }, {
             where: {
@@ -51,8 +56,8 @@ exports.process_reschedule_class = async (input_data) => {
             }
         })
 
-        if ((each_batch.start_date <= new Date(reschedule_date) && new Date(reschedule_date) <=each_batch.end_date) && actual_class_days.includes(js_days[(new Date(reschedule_date)).getDay()])){
-           if((each_batch.start_time <= reschedule_start_time && reschedule_start_time <= each_batch.end_time) || (each_batch.start_time <= reschedule_end_time && reschedule_end_time <= each_batch.end_time)){
+        if ((each_batch.start_date <= new Date(updated_date) && new Date(updated_date) <=each_batch.end_date) && actual_class_days.includes(js_days[(new Date(updated_date)).getDay()])){
+           if((each_batch.start_time <= updated_start_time && updated_start_time <= each_batch.end_time) || (each_batch.start_time <= updated_end_time && updated_end_time <= each_batch.end_time)){
                 await models.Reschedule_class.destroy({
                     where: {
                         id: rescheduled_class.id
@@ -68,3 +73,6 @@ exports.process_reschedule_class = async (input_data) => {
 exports.post_process_reschedule_class = async (reschedule, resp) => {
     resp.status(200).send({ status: reschedule.status, message: reschedule.message,data:reschedule.data})
 }
+
+
+
