@@ -102,10 +102,13 @@ exports.pre_process_add_fcm_token = async (req) => {
 
 exports.process_add_fcm_token = async (input_data) => {
     const { user_id, fcm_token } = input_data
-    const user = await models.fcm_token.create({user_id, fcm_token})
-    return user
+    await models.User.update({ fcm_token: fcm_token }, {
+        where: {
+            id:user_id
+        }
+    })
 }
 
-exports.post_process_add_fcm_token = async (user, resp) => {
-    resp.status(200).send({status:"success",message:"fcm token added successfully",data:user})
+exports.post_process_add_fcm_token = async (resp) => {
+    resp.status(200).send({status:"success",message:"fcm token added successfully"})
 }
