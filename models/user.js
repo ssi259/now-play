@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     isEmailVerified: DataTypes.BOOLEAN,
     gender:DataTypes.STRING,
     type:DataTypes.STRING,
+    fcm_token:DataTypes.STRING,
     status: {
       type: DataTypes.STRING,
       defaultValue: 'active'
