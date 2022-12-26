@@ -2,7 +2,7 @@ const models = require('../models')
 const Api400Error = require('../error/api400Error');
 const { DatabaseError } = require('sequelize');
 
-exports.pre_process_reschedule_class = async (req) => {
+exports.pre_process_reschedule = async (req) => {
     const coach_id = req.user.coach_id;
     const batch_id = req.body.batch_id;
     const updated_date = req.body.updated_date;
@@ -13,7 +13,7 @@ exports.pre_process_reschedule_class = async (req) => {
     return {coach_id, batch_id, updated_date, updated_start_time, updated_end_time, previous_start_time, previous_start_date};
 }
 
-exports.process_reschedule_class = async (input_data) => {
+exports.process_reschedule = async (input_data) => {
     const {coach_id, batch_id, updated_date, updated_start_time, updated_end_time,previous_start_date,previous_start_time} = input_data;
     if(!batch_id){
         throw new Api400Error("batch_id is required");
@@ -58,7 +58,7 @@ exports.process_reschedule_class = async (input_data) => {
 
         if ((each_batch.start_date <= new Date(updated_date) && new Date(updated_date) <=each_batch.end_date) && actual_class_days.includes(js_days[(new Date(updated_date)).getDay()])){
            if((each_batch.start_time <= updated_start_time && updated_start_time <= each_batch.end_time) || (each_batch.start_time <= updated_end_time && updated_end_time <= each_batch.end_time)){
-                await models.Reschedule_class.destroy({
+                await models.Reschedule.destroy({
                     where: {
                         id: rescheduled_class.id
                     }
@@ -70,7 +70,7 @@ exports.process_reschedule_class = async (input_data) => {
     return { status: "Success", message: "Class Rescheduled", data: rescheduled_class}
 }
 
-exports.post_process_reschedule_class = async (reschedule, resp) => {
+exports.post_process_reschedule = async (reschedule, resp) => {
     resp.status(200).send({ status: reschedule.status, message: reschedule.message,data:reschedule.data})
 }
 
