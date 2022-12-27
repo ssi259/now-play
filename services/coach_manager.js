@@ -680,13 +680,12 @@ exports.post_process_pay_reminder = async (resp, payment_reminder) => {
   resp.status(200).send({ status: "success", message: payment_reminder, data: {} })
 }
 exports.pre_process_add_attendance = async (req) => {
-  return {coach_id:req.user.coach_id, user_id:req.body.user_id, batch_id:req.body.batch_id, status:req.body.status, date:req.body.date};
+  return {coach_id:req.user.coach_id, batch_id:req.body.batch_id, status:req.body.status, date:req.body.date};
 }
-
+ 
 exports.process_add_attendance = async (input_data) => {
   const attendance = await models.Attendance.create({
     coach_id: input_data.coach_id,
-    user_id: input_data.user_id,
     batch_id: input_data.batch_id,
     status: input_data.status,
     date: input_data.date
@@ -696,8 +695,12 @@ exports.process_add_attendance = async (input_data) => {
 
 exports.post_process_add_attendance = async (resp, data) => {
   resp.status(200).send({status:"success",message:"attendance marked successfully", data: data})
+<<<<<<< HEAD
 }
 <<<<<<< HEAD
 =======
+=======
+} 
+>>>>>>> cdf32ad (changes)
 
 >>>>>>> 104e0c4 (post_attendance)
