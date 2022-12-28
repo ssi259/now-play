@@ -49,15 +49,7 @@ app.use('/plans', planRouter)
 app.use('/enrollments',enrollmentRouter)
 app.use('/payments', paymentRouter);
 app.use('/complaints', ComplaintRouter);
-<<<<<<< HEAD
-<<<<<<< HEAD
 app.use('/coach/reschedule', rescheduleRouter);
-=======
-app.use('/reschedule', rescheduleRouter);
->>>>>>> 2ef35be (Implemeted reschedule class)
-=======
-app.use('/coach/reschedule', rescheduleRouter);
->>>>>>> d825569 (changed end point)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
