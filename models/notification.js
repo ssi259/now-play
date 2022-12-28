@@ -7,13 +7,14 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Notification.init({
-    otp: DataTypes.STRING,
-    expirationDate: DataTypes.DATE,
-    isVerified: DataTypes.BOOLEAN,
-    phoneNumber: DataTypes.STRING,
-    userId: DataTypes.INTEGER,
-    channelType: DataTypes.STRING,
-    notificationType: DataTypes.STRING
+    user_id:DataTypes.INTEGER,
+    user_type: DataTypes.STRING,
+    type: DataTypes.STRING,
+    title: DataTypes.TEXT,
+    body: DataTypes.TEXT,
+    data: DataTypes.JSON,
+    is_marketing: DataTypes.BOOLEAN,
+    is_read: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'Notification',
