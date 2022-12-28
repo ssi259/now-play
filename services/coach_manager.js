@@ -294,6 +294,7 @@ async function collection_detail(collection, status) {
       end_date = new Date(element['end_date'])
     }
     return {
+      id:element['id'],
       user: {
         name: user['name'],
         profilePic:user["profilePic"],
