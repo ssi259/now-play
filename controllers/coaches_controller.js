@@ -200,3 +200,15 @@ exports.get_upcoming_classes = async (req, resp) => {
         resp.status(status_code).send({status:"failure",message:e.name, data:{}})
     }
 }
+
+exports.add_fcm_token = async (req, resp) => {
+    try {
+        var input_response = await coachManager.pre_process_add_fcm_token(req)
+        await coachManager.process_add_fcm_token(input_response)
+        await coachManager.post_process_add_fcm_token(resp)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
+    }
+}
