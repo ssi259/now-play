@@ -645,6 +645,7 @@ exports.post_process_add_attendance = async (resp, data) => {
 =======
 =======
 } 
+<<<<<<< HEAD
 >>>>>>> cdf32ad (changes)
 
 <<<<<<< HEAD
@@ -653,3 +654,5 @@ exports.post_process_add_attendance = async (resp, data) => {
 
 
 >>>>>>> c4d6840 (changes)
+=======
+>>>>>>> 21caf03 (changes)
