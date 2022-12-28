@@ -18,6 +18,29 @@ exports.process_reschedule = async (input_data) => {
     if(!batch_id){
         throw new Api400Error("batch_id is required");
     }
+    const update_reschedule_class = await models.Reschedule.update({
+        updated_date,
+        updated_start_time,
+        updated_end_time,
+        type: "rescheduled"
+    }, {
+        where: {
+            batch_id,
+            previous_start_date,
+            previous_start_time,
+        }
+    })
+    let rescheduled_class;
+    if(update_reschedule_class[0]!=0){
+        rescheduled_class = await models.Reschedule.findOne({
+            where: {
+                batch_id,
+                previous_start_date,
+                previous_start_time,
+            }
+        })
+    }
+    else
     rescheduled_class = await models.Reschedule.create({
         batch_id,
         updated_date,
