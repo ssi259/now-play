@@ -1,6 +1,6 @@
 
 const admin = require("firebase-admin");
-const serviceAccount = require("../config/firebase_secret_key.json");
+const serviceAccount = require("../config/rushsports-d2e5a_firebase_adminsdk.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
