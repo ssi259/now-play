@@ -60,7 +60,7 @@ exports.update_user_on_adminPanel = async (req, resp) => {
 exports.add_fcm_token = async (req, resp) => {
     try {
         var input_response = await user_manager.pre_process_add_fcm_token(req)
-        var processed_response = await user_manager.process_add_fcm_token(input_response)
+        await user_manager.process_add_fcm_token(input_response)
         await user_manager.post_process_add_fcm_token(resp)
     } catch (e) {
         console.log(e)

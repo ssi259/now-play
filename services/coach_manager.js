@@ -691,3 +691,20 @@ async function rescheduled_class_data(batch_data, rsdld_cls_data) {
     "type":"rescheduled"
   }
 }
+
+exports.pre_process_add_fcm_token = async (req) => {
+  return {coach_id:req.user.coach_id, fcm_token:req.body.fcm_token}
+}
+
+exports.process_add_fcm_token = async (input_data) => {
+  const { coach_id, fcm_token } = input_data
+  await models.Coach.update({ fcm_token: fcm_token }, {
+      where: {
+          id:coach_id
+      }
+  })
+}
+
+exports.post_process_add_fcm_token = async (resp) => {
+  resp.status(200).send({ status: "success", message: "fcm token added successfully", data: {} })
+}
