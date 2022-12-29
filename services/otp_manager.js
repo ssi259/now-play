@@ -22,19 +22,17 @@ exports.process_generate = async (input) => {
     const now = new Date();
     const expiration_date = new Date(now.getTime() + 10 * 60000);
     let otp;
-    const [otp_instance , created] = await models.Notification.findOrCreate({
+    const [otp_instance , created] = await models.Otp.findOrCreate({
         where: {
-            phoneNumber: phone_number,
-            notificationType: "otp",
-            isVerified:false,
-            expirationDate: {
+            phone_number: phone_number,
+            is_verified:false,
+            expiration_date: {
                 [Op.gt]:now
             }
         },
         defaults: {
-            expirationDate: expiration_date,
+            expiration_date: expiration_date,
             otp: otp_generator(),
-            channelType: "sms",
         }
     });
     otp = otp_instance.otp
@@ -79,26 +77,25 @@ exports.pre_process_verify = async (req) => {
 
 exports.process_verify = async (input) => {
     const { phone_number, otp, type } = input 
-    const currentDate = new Date();
-    const otp_instance = await models.Notification.findOne({
+    const current_date = new Date();
+    const otp_instance = await models.Otp.findOne({
         where:
         {
             otp: otp,
-            phoneNumber: phone_number,
-            notificationType: "otp",
+            phone_number: phone_number,
         },
         order: [ [ 'createdAt', 'DESC' ]],
     });
     if (!otp_instance) {
         throw new Api400Error("otp not matched")
     }
-    if (otp_instance.expirationDate < currentDate) {
+    if (otp_instance.expiration_date < current_date) {
         throw new Api400Error("otp exprired")
     }
-    if (otp_instance.isVerified) {
+    if (otp_instance.is_verified) {
         throw new Api400Error("otp already used")
     }
-    otp_instance.isVerified = true
+    otp_instance.is_verified = true
     await otp_instance.save();
 
     if (type == 'player') {
@@ -148,13 +145,14 @@ function otp_generator() {
 }
 
 exports.pre_process_otp = async(req,resp)=>{
-    return {"phone_number":req.query.phone_number}
+    return { "phone_number": req.query.phone_number };
 }
+
 exports.process_otp = async(input_response)=>{
     const {phone_number} = input_response
-    const otp_msg = await  models.Notification.findAll({
+    const otp_msg = await  models.Otp.findAll({
         where: { 
-        phoneNumber: phone_number}})
+        phone_number: phone_number}})
         if (otp_msg) {
             const otp = otp_msg[otp_msg.length-1].otp
             return {"otp":otp}
@@ -162,6 +160,7 @@ exports.process_otp = async(input_response)=>{
             throw new Api400Error('Error in finding otp');
         }
 }
-  exports.post_process_otp = async(resp,input_response)=>{
-    resp.status(200).send({"data":input_response})
-  }
+
+exports.post_process_otp = async(resp,input_response)=>{
+    resp.status(200).send({ "data": input_response });
+}
