@@ -555,6 +555,7 @@ exports.process_get_player_details = async (input_data) => {
   if (player_details.dataValues.status === "inactive"){
     throw new Api400Error("Player is inactive")
   }
+  console.log(player_details)
   return player_details;
 
 }
