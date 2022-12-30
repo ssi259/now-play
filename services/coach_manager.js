@@ -296,10 +296,12 @@ async function collection_detail(collection, status) {
     return {
       id:element['id'],
       user: {
+        id:user['id'],
         name: user['name'],
         profilePic:user["profilePic"],
       },
       plan: {
+        id:plan['id'],
         plan_name: plan['plan_name'],
         description: plan['description'],
         status: plan['status'],
