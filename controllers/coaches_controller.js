@@ -216,8 +216,8 @@ exports.add_fcm_token = async (req, resp) => {
 exports.send_payment_remainder = async (req, resp) => {
     try {
         var input_response = await coachManager.pre_process_pay_remainder(req)
-        await coachManager.process_pay_remainder(input_response)
-        await coachManager.post_process_pay_remainder(resp)
+        var processed_resp = await coachManager.process_pay_remainder(input_response)
+        await coachManager.post_process_pay_remainder(resp, processed_resp)
     } catch (e) {
         console.log(e)
         const status_code = e.statusCode ? e.statusCode : 500

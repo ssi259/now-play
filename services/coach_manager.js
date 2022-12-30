@@ -603,7 +603,7 @@ exports.post_process_add_fcm_token = async (resp) => {
   resp.status(200).send({ status: "success", message: "fcm token added successfully", data: {} })
 }
 
-exports.pre_process_pay_remainder = async (resp) => {
+exports.pre_process_pay_remainder = async (req) => {
   return {coach_id:req.user.coach_id, player_id:req.params.player_id}
 }
 exports.process_pay_remainder = async (input_data) => {
@@ -616,6 +616,6 @@ exports.process_pay_remainder = async (input_data) => {
   //FCM fuction to be Added
  return payment_remainder
 }
-exports.post_process_pay_remainder = async (resp) => {
-  resp.status(200).send({ status: "success", message: "payment_remainder", data: {} })
+exports.post_process_pay_remainder = async (resp, payment_remainder) => {
+  resp.status(200).send({ status: "success", message: payment_remainder, data: {} })
 }
