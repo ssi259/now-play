@@ -5,6 +5,7 @@ var cors = require('cors');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var fileUpload = require("express-fileupload");
+const cron = require('node-cron');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var batchesRouter = require('./routes/batches.js');
@@ -20,6 +21,8 @@ const enrollmentRouter = require('./routes/enrollments')
 var paymentRouter = require('./routes/payment.js');
 const ComplaintRouter = require('./routes/complaints')
 const rescheduleRouter = require('./routes/reschedule')
+const {next_payment_reminder} = require('./schedulers/payment_scheduler')
+
 
 var app = express();
 app.use(fileUpload());
@@ -50,6 +53,9 @@ app.use('/enrollments',enrollmentRouter)
 app.use('/payments', paymentRouter);
 app.use('/complaints', ComplaintRouter);
 app.use('/coach/reschedule', rescheduleRouter);
+
+
+next_payment_reminder();
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
