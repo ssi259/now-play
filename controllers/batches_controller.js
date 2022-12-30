@@ -46,16 +46,6 @@ exports.batch_details = async(req,resp) =>{
     }
 }
 
-exports.get_upcoming_classes = async (req, resp) => {
-    try {
-        var input_response = await BatchManager.pre_process_upcoming_classes(req)
-        var processed_response = await BatchManager.process_upcoming_classes(input_response)
-        await BatchManager.post_process_upcoming_classes(processed_response, resp)
-    } catch (e) {
-        const status_code = e.statusCode ? e.statusCode : 500
-        return resp.status(status_code).send({ status: "failure", message: e.name })
-    }
-}
 
 exports.get_next_class = async (req, resp) => {
     try {
@@ -90,5 +80,17 @@ exports.get_batch_images = async (req, resp) => {
         console.log(e)
         const status_code = e.statusCode ? e.statusCode : 500
         return resp.status(status_code).send({ status: "failure", message: e.name, data:{} })
+    }
+}
+
+exports.get_upcoming_classes = async (req, resp) => {
+    try {
+        const input_response = await BatchManager.pre_process_upcoming_classes(req)
+        const process_response = await BatchManager.process_upcoming_classes(input_response)
+        await BatchManager.post_process_upcoming_classes(resp,process_response)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        resp.status(status_code).send({status:"failure",message:e.name, data:{}})
     }
 }
