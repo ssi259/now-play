@@ -212,3 +212,15 @@ exports.add_fcm_token = async (req, resp) => {
         return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
     }
 }
+
+exports.send_payment_reminder = async (req, resp) => {
+    try {
+        var input_response = await coachManager.pre_process_pay_reminder(req)
+        var processed_resp = await coachManager.process_pay_reminder(input_response)
+        await coachManager.post_process_pay_reminder(resp, processed_resp)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
+    }
+}
