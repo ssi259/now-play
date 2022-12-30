@@ -208,72 +208,6 @@ exports.process_batch_details_input_req = async(req,input_response)=>{
     resp.send(input_response)
 }
 
-
-exports.pre_process_upcoming_classes = async (req) => {
-    return req.user.user_id
-}
-
-exports.process_upcoming_classes = async (user_id) => {
-    const week_days = ['Sunday','Monday', 'Tuesday', 'Wednesday', 'Thursday','Friday','Saturday']
-    const weekly_classes = [[], [], [], [], [], [], []]
-    let days_arr_length = 7; 
-
-    const batches = await models.Enrollment.findAll({
-        where: {
-            user_id: user_id,
-            type:"paid",
-            status: {
-                [Op.or]: ["active", "pending"]
-            }
-        },
-        attributes: ['batch_id'],
-        group: ['batch_id'],
-    })
-    for (const batch of batches) {
-        const batch_data = await models.Batch.findByPk(batch.dataValues.batch_id)
-
-        const arena_details = await models.Arena.findByPk(batch_data.dataValues.arena_id)
-        const academy_details = await models.Academy.findByPk(batch_data.dataValues.academy_id)
-        const sports_details = await models.Sports.findByPk(batch_data.dataValues.sports_id)
-        
-        const arena_data = arena_details != null ? { "name": arena_details["name"], "lat": arena_details["lat"], "lng": arena_details["lng"], "city":arena_details["city"],"locality":arena_details["locality"],"state":arena_details["state"] } : null
-        const academy_data = academy_details != null ?  { "name": academy_details["name"]} : null
-        const sports_data = sports_details !=null ? {"id":sports_details["id"],"name":sports_details["name"],"type":sports_details["type"]} : null
-        
-        const obj = {
-                    "id": batch_data.dataValues["id"],
-                    "arena_id": batch_data.dataValues["arena_id"],
-                    "coach_id": batch_data.dataValues["coach_id"],
-                    "academy_id": batch_data.dataValues["academy_id"],
-                    "sports_id": batch_data.dataValues["sports_id"],
-                    "days": batch_data.dataValues["days"],
-                    "start_time": batch_data.dataValues["start_time"],
-                    "end_time": batch_data.dataValues["end_time"],
-                    "arena_data":arena_data,
-                    "academy_data":academy_data,
-                    "sports_data": sports_data
-        }
-        const days_arr = JSON.parse(batch_data.days)
-        for (let i = 0; i < days_arr_length; i++){
-            if (days_arr[i] == 1) {
-                weekly_classes[(i+1)% days_arr_length].push(obj)
-            }
-        }
-    }
-    let j = 0;
-    const response_data = [];
-    const curr_day_index = get_curr_day()
-    for (let i = curr_day_index; i < (days_arr_length + curr_day_index); i++){
-        response_data.push({
-            day:week_days[(i % days_arr_length)],
-            date: ist_formate_date(j) ,
-            classes :weekly_classes[(i % days_arr_length)]
-        })
-        j++;
-    }
-    return response_data
-}
-
 function ist_formate_date (days_gap) {
     const date = new Date()
     const local_date = new Date(date.getTime() + process.env.IN_UTC_TIMEZONE_OFFSET * 60 * 1000 + days_gap*24*60*60*1000)
@@ -284,10 +218,6 @@ function get_curr_day() {
     const date = new Date()    
     const local_date = new Date(date.getTime() + process.env.IN_UTC_TIMEZONE_OFFSET * 60 * 1000)
     return local_date.getDay()
-}
-
-exports.post_process_upcoming_classes = async (data, resp) => {
-    resp.status(200).send({ status: "success", message: "retrieved upcoming classes successfully", data: data })
 }
 
 function range(lat1, lng1, lat2, lng2, unit) {
@@ -433,4 +363,141 @@ exports.process_get_batch_images = async (input_data) => {
 
 exports.post_process_get_batch_images = async (processed_response, resp) => {
     resp.status(200).send({status:"success",data: processed_response, message:"batch images retrieved successfully"})
+}
+
+exports.pre_process_upcoming_classes = async (req) => {
+    return req.user
+}
+
+exports.process_upcoming_classes = async (user) => {
+    const week_days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    const date_weekday = {}
+    let upcoming_classes = {}
+    let batches;  
+    if (user.type == 'coach') {
+        batches = await models.Batch.findAll({
+            where: {
+                coach_id:user.coach_id,
+                status: 'active'
+            }
+        })
+    }
+    else if (user.type == 'player') {
+        batches = await models.Enrollment.findAll({
+            where: {
+                user_id: user.user_id,
+                type:"paid",
+                status: {
+                    [Op.or]: ["active", "pending"]
+                }
+            },
+            attributes: ['batch_id'],
+            group: ['batch_id'],
+        })
+    }
+    for (let batch of batches) {
+        const batch_id = user.type == 'player' ? batch['batch_id'] : batch['id']
+        const batch_data = await batch_details_upcoming_classes(batch_id)
+        const rescheduled_classes = await models.Reschedule.findAll({
+            where: {
+                batch_id: batch_id,
+                type:"rescheduled"
+            }
+        })
+        const cancelled_classes = await models.Reschedule.findAll({
+            where: {
+                batch_id: batch_id,
+                type:"canceled"
+            }
+        })
+        const today_index = (new Date()).getDay()
+        let days_after = 0;
+        const days_arr = JSON.parse(batch_data['days'])
+        for (let i = today_index; i < today_index + 7; i++){
+            let j = ((i % 7) + 6) % 7
+            const date = await date_after_gap(days_after)  
+            date_weekday[date] = week_days[i%7]
+            if (upcoming_classes[date] == null) {
+                upcoming_classes[date] = []
+            }
+            if (days_arr[j] == 1) {
+                upcoming_classes[date].push(batch_data)
+            }
+            days_after++;
+        }
+        for (let rsdld_cls of rescheduled_classes) {
+            const rsdld_cls_data = await rescheduled_class_data(batch_data , rsdld_cls.dataValues)
+            const previous_start_date = new Date(rsdld_cls['previous_start_date'])
+            const previous_start_date_str =   previous_start_date.toLocaleDateString("en-IN").substring(0, 10)      
+            if (upcoming_classes[previous_start_date_str] != null) {
+                upcoming_classes[previous_start_date_str] = await  upcoming_classes[previous_start_date_str].filter((item) => item['id'] != rsdld_cls['batch_id'] || item['start_time'] != rsdld_cls['previous_start_time'])
+            }
+            const updated_date = new Date(rsdld_cls['updated_date'])
+            const updated_date_str = updated_date.toLocaleDateString("en-IN").substring(0, 10)
+            if (upcoming_classes[updated_date_str] != null) {
+                upcoming_classes[updated_date_str].push(rsdld_cls_data)
+            }
+        }
+        for (let cncld_class of cancelled_classes) {
+            const previous_start_date = new Date(cncld_class['previous_start_date'])
+            const previous_start_date_str =   previous_start_date.toLocaleDateString("en-IN").substring(0, 10)      
+            if (upcoming_classes[previous_start_date_str] != null) {
+                upcoming_classes[previous_start_date_str] = await  upcoming_classes[previous_start_date_str].filter((item) => item['id'] != cncld_class['batch_id'] || item['start_time'] != cncld_class['previous_start_time'])
+            }
+        }
+    }
+    for (let date in upcoming_classes) upcoming_classes[date].sort((class_1, class_2) => class_1.start_time > class_2.start_time ? 1 : -1) 
+    const result = []
+    for (const date in upcoming_classes){
+        result.push({
+            day:date_weekday[date],
+            date: date,
+            classes:upcoming_classes[date]
+        })
+    }
+    return result
+}
+  
+exports.post_process_upcoming_classes = async (resp, data) => {
+    resp.status(200).send({status:"success",message:"retrieved data successfully", data})
+}
+  
+async function date_after_gap(gap) {
+    const date = new Date(Date.now() + gap * 24 * 60 * 60 * 1000)
+    return  date.toLocaleDateString("en-IN").substring(0, 10)
+}
+
+async function batch_details_upcoming_classes(batch_id){
+    const batch_data = await models.Batch.findByPk(batch_id)
+    const arena_details = await models.Arena.findByPk(batch_data.dataValues.arena_id)
+    const academy_details = await models.Academy.findByPk(batch_data.dataValues.academy_id)
+    const sports_details = await models.Sports.findByPk(batch_data.dataValues.sports_id)
+
+    const arena_data = arena_details != null ? { "name": arena_details["name"], "lat": arena_details["lat"], "lng": arena_details["lng"], "city": arena_details["city"], "locality": arena_details["locality"], "state": arena_details["state"] } : null
+    const academy_data = academy_details != null ? { "name": academy_details["name"] } : null
+    const sports_data = sports_details != null ? { "id": sports_details["id"], "name": sports_details["name"], "type": sports_details["type"] } : null
+
+    const data = {
+        "id": batch_data.dataValues["id"],
+        "start_time": batch_data["start_time"],
+        "end_time": batch_data["end_time"],
+        "days":batch_data['days'],
+        "arena_data": arena_data,
+        "academy_data": academy_data,
+        "sports_data": sports_data,
+        "type":"regular"
+    }
+    return data
+}
+  
+async function rescheduled_class_data(batch_data, rsdld_cls_data) {
+    return {
+        "id": batch_data["id"],
+        "start_time": rsdld_cls_data["updated_start_time"],
+        "end_time": rsdld_cls_data["updated_end_time"],
+        "arena_data": batch_data['arena_data'],
+        "academy_data": batch_data['academy_data'],
+        "sports_data": batch_data['sports_data'],
+        "type":"rescheduled"
+    }
 }
