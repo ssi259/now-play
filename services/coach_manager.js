@@ -602,3 +602,20 @@ exports.process_add_fcm_token = async (input_data) => {
 exports.post_process_add_fcm_token = async (resp) => {
   resp.status(200).send({ status: "success", message: "fcm token added successfully", data: {} })
 }
+
+exports.pre_process_pay_remainder = async (resp) => {
+  return {coach_id:req.user.coach_id, player_id:req.params.player_id}
+}
+exports.process_pay_remainder = async (input_data) => {
+  var {coach_id, player_id} = input_data
+  var payment_remainder = ""
+  await models.User.findOne({
+    where: {id: player_id}
+  }).then((data) => {payment_remainder = `${data.dataValues.name}, Your coah has requested for a payment. Please proceed according or expect a discontinuation of your sevices`})
+  .catch((err) => {throw new Api400Error("Invalid Player ID")})
+  //FCM fuction to be Added
+ return payment_remainder
+}
+exports.post_process_pay_remainder = async (resp) => {
+  resp.status(200).send({ status: "success", message: "payment_remainder", data: {} })
+}
