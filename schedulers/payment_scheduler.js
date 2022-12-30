@@ -11,7 +11,8 @@ const next_payment_reminder = async () => {
         const fcm_token = models.User.findOne({where: {id: enrollment.user_id}}).fcm_token;
         const date = new Date(end_date);
         date.setDate(date.getDate() - 2);
-        cron.schedule(date, async () => {
+        const cronPattern = `${date.getSeconds()} ${date.getMinutes()} ${date.getHours()} ${date.getDate()} ${date.getMonth() + 1} *`;
+        cron.schedule(cronPattern, async () => {
             console.log('Please pay your payment for next month to continue your enrollment');
             // firebase.messaging().sendToDevice(fcm_token, {
             //     notification: {

@@ -20,6 +20,7 @@ var planRouter = require('./routes/plans')
 const enrollmentRouter = require('./routes/enrollments')
 var paymentRouter = require('./routes/payment.js');
 const ComplaintRouter = require('./routes/complaints')
+const rescheduleRouter = require('./routes/reschedule')
 const {next_payment_reminder} = require('./schedulers/payment_scheduler')
 
 
