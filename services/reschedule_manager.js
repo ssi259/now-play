@@ -5,13 +5,23 @@ const { DatabaseError } = require('sequelize');
 exports.pre_process_reschedule = async (req) => {
     const coach_id = req.user.coach_id;
     const batch_id = req.body.batch_id;
+    const previous_end_time = new Date("1970-01-01T"+req.body.previous_end_time+"Z");
     const updated_date = req.body.updated_date;
     const updated_start_time = req.body.updated_start_time;
     const updated_end_time = req.body.updated_end_time;
-    const previous_start_time = req.body.previous_start_time;
+    const previous_start_time =  new Date("1970-01-01T"+req.body.previous_start_time+"Z");
     const previous_start_date = req.body.previous_start_date;
+    let difference = (previous_end_time.getTime()-previous_start_time.getTime())/1000;
+    console.log(difference);
+    difference = difference/60;
+    difference = difference/60;
+    difference = Math.abs(Math.round(difference));
+
+    console.log(difference);
+    console.log(previous_end_time);
+    console.log(previous_start_time);
     return {coach_id, batch_id, updated_date, updated_start_time, updated_end_time, previous_start_time, previous_start_date};
-}
+} 
 
 exports.process_reschedule = async (input_data) => {
     const {coach_id, batch_id, updated_date, updated_start_time, updated_end_time,previous_start_date,previous_start_time} = input_data;
