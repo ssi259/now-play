@@ -603,19 +603,19 @@ exports.post_process_add_fcm_token = async (resp) => {
   resp.status(200).send({ status: "success", message: "fcm token added successfully", data: {} })
 }
 
-exports.pre_process_pay_remainder = async (req) => {
+exports.pre_process_pay_reminder = async (req) => {
   return {coach_id:req.user.coach_id, player_id:req.params.player_id}
 }
-exports.process_pay_remainder = async (input_data) => {
+exports.process_pay_reminder = async (input_data) => {
   var {coach_id, player_id} = input_data
-  var payment_remainder = ""
+  var payment_reminder = ""
   await models.User.findOne({
     where: {id: player_id}
-  }).then((data) => {payment_remainder = `${data.dataValues.name}, Your coah has requested for a payment. Please proceed according or expect a discontinuation of your sevices`})
+  }).then((data) => {payment_reminder = `${data.dataValues.name}, Your coah has requested for a payment. Please proceed according or expect a discontinuation of your sevices`})
   .catch((err) => {throw new Api400Error("Invalid Player ID")})
   //FCM fuction to be Added
- return payment_remainder
+ return payment_reminder
 }
-exports.post_process_pay_remainder = async (resp, payment_remainder) => {
-  resp.status(200).send({ status: "success", message: payment_remainder, data: {} })
+exports.post_process_pay_reminder = async (resp, payment_reminder) => {
+  resp.status(200).send({ status: "success", message: payment_reminder, data: {} })
 }
