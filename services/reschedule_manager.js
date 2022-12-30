@@ -5,18 +5,17 @@ const { DatabaseError } = require('sequelize');
 exports.pre_process_reschedule = async (req) => {
     const coach_id = req.user.coach_id;
     const batch_id = req.body.batch_id;
-    const previous_end_time = new Date("1970-01-01T"+req.body.previous_end_time+"Z");
+    const previous_end_time = new Date("1970-01-01T"+req.body.previous_end_time +"Z");
     const updated_date = req.body.updated_date;
-    const updated_start_time = req.body.updated_start_time;
-    const updated_end_time = req.body.updated_end_time;
-    const previous_start_time =  new Date("1970-01-01T"+req.body.previous_start_time+"Z");
+    const updated_start_time = new Date(`1970-02-01T${req.body.updated_start_time}Z`);
+    console.log(req.body.updated_start_time, updated_start_time)
+    const previous_start_time = new Date("1970-01-01T"+req.body.previous_start_time +"Z");
     const previous_start_date = req.body.previous_start_date;
+    const updated_end_time = req.body.updated_end_time;
     let difference = (previous_end_time.getTime()-previous_start_time.getTime())/1000;
     console.log(difference);
     difference = difference/60;
-    difference = difference/60;
     difference = Math.abs(Math.round(difference));
-
     console.log(difference);
     console.log(previous_end_time);
     console.log(previous_start_time);
@@ -60,7 +59,7 @@ exports.process_reschedule = async (input_data) => {
         previous_start_time,
         type: "rescheduled"
     })
-    if(updated_date == null || updated_start_time==null || updated_end_time==null){
+    if(updated_date == null || updated_start_time==null){
         await models.Reschedule.update({
             type: "cancel"
         }, {
