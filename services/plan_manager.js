@@ -83,8 +83,14 @@ exports.post_process_plan_batch = async (resp,updated_data) => {
 }  
 
 exports.pre_process_get_all_plans = async (req) => {
-    const allPlans = await models.SubscriptionPlan.findAll()
-    return allPlans;
+    let allPlans = []
+    if(req.query.type == "admin"){
+        allPlans = await models.SubscriptionPlan.findAll()
+    return allPlans}
+ else{
+    allPlans = await models.Sequelize.findAll({where: {status: 'active'}})
+ }
+
 }
 
 exports.process_get_all_plans_input_req = async (input_response) => {

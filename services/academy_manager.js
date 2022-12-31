@@ -76,7 +76,11 @@ exports.post_process_academy_details = async(req,resp,input_response)=>{
 }
 
 exports.pre_process_academy_list = async(req,resp)=>{
-  const academy_list = await models.Academy.findAll();
+  let academy_list = []
+  if(req.query.type == "admin"){
+  academy_list = await models.Academy.findAll()
+  }
+  else{academy_list = await models.Academy.findAll({where: {status: "active"}})}
   if (academy_list) {
    return academy_list
   } else {
@@ -86,7 +90,7 @@ exports.pre_process_academy_list = async(req,resp)=>{
 
 exports.process_academy_list_input_req = async(input_response)=>{
   for (each_input_response of input_response){
-    var sports_details = await models.Sports.findOne({where:{id:each_input_response["sports_id"]}})
+    var sports_details = await models.Sports.findOne({where:{id:each_input_response["sports_id"],status: 'active'}})
     var sports_data = {"sports_name":sports_details["name"]}
     if(sports_data!=null && each_input_response.dataValues!=null ){
       Object.assign(each_input_response.dataValues,sports_data)

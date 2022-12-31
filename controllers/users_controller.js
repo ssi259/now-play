@@ -36,7 +36,7 @@ exports.upload_profile_pic = async (req, resp) => {
 exports.get_all_users = async (req, resp) => {
     try {
         var input_response = await user_manager.pre_process_get_all_users(req)
-        var processed_response = await user_manager.process_get_all_users(input_response)
+        var processed_response = await user_manager.process_get_all_users(req,input_response)
         await user_manager.post_process_get_all_users(processed_response, resp)
     } catch (e) {
         console.log(e)
