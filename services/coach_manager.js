@@ -571,11 +571,7 @@ exports.pre_process_get_attendance = async (req) => {
 
 exports.process_get_attendance = async (input_data) => {
   const attendance = await models.Attendance.findAll({
-    where: {coach_id: input_data.coach_id,
-            createdAt: {
-              [Op.between]: [new Date(new Date().setHours(0, 0, 0)), new Date(new Date().setHours(23, 59, 59))]
-           }
-          }
+    where: {coach_id: input_data.coach_id}
   })
   return attendance;
 }
