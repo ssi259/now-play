@@ -22,7 +22,7 @@ var paymentRouter = require('./routes/payment.js');
 const ComplaintRouter = require('./routes/complaints')
 const rescheduleRouter = require('./routes/reschedule')
 const {next_payment_reminder} = require('./schedulers/payment_scheduler')
-
+const notificationRouter = require('./routes/notifications')
 
 var app = express();
 app.use(fileUpload());
@@ -53,6 +53,7 @@ app.use('/enrollments',enrollmentRouter)
 app.use('/payments', paymentRouter);
 app.use('/complaints', ComplaintRouter);
 app.use('/coach/reschedule', rescheduleRouter);
+app.use('/notifications', notificationRouter);
 
 
 next_payment_reminder();
