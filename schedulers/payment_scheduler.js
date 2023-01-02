@@ -1,9 +1,6 @@
 const cron = require('node-cron');
 const {process_get_all_enrollments_details } = require('../services/enrollment_manager');
 const models = require("../models");
-
-
-
 const next_payment_reminder = async () => {
     const enrollments = await process_get_all_enrollments_details()
     enrollments.forEach(enrollment => {
