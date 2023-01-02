@@ -566,15 +566,14 @@ exports.post_process_get_player_details = (resp, data) => {
 }
 
 exports.pre_process_get_attendance = async (req) => {
-  return {coach_id:req.user.coach_id};
+  return {coach_id:req.user.coach_id,date:req.body.date,batch_id:req.body.batch_id};
 }
 
 exports.process_get_attendance = async (input_data) => {
   const attendance = await models.Attendance.findAll({
     where: {coach_id: input_data.coach_id,
-            createdAt: {
-              [Op.between]: [new Date(new Date().setHours(0, 0, 0)), new Date(new Date().setHours(23, 59, 59))]
-           }
+            batch_id: input_data.batch_id,
+            date: input_data.date,
           }
   })
   return attendance;
