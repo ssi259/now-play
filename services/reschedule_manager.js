@@ -7,14 +7,20 @@ exports.pre_process_reschedule = async (req) => {
     const batch_id = req.body.batch_id;
     const updated_date = req.body.updated_date;
     const updated_start_time = req.body.updated_start_time;
-    const updated_end_time = req.body.updated_end_time;
     const previous_start_time = req.body.previous_start_time;
+    const previous_end_time = req.body.previous_end_time;
     const previous_start_date = req.body.previous_start_date;
-    return {coach_id, batch_id, updated_date, updated_start_time, updated_end_time, previous_start_time, previous_start_date};
+    return {coach_id, batch_id, updated_date, updated_start_time, previous_end_time, previous_start_time, previous_start_date};
 }
 
 exports.process_reschedule = async (input_data) => {
-    const {coach_id, batch_id, updated_date, updated_start_time, updated_end_time,previous_start_date,previous_start_time} = input_data;
+    const {coach_id, batch_id, updated_date, updated_start_time,previous_end_time,previous_start_date,previous_start_time} = input_data;
+    let end_time = new Date("2021-01-12 "+previous_end_time);
+    let start_time = new Date("2021-01-12 "+ previous_start_time);
+    const duration = (new Date(end_time) - new Date(start_time))/60000;
+    let updated_end_time = new Date(updated_date+" "+updated_start_time);
+    updated_end_time.setMinutes(updated_end_time.getMinutes() + duration);
+    updated_end_time = updated_end_time.toTimeString().split(" ")[0];
     if(!batch_id){
         throw new Api400Error("batch_id is required");
     }
