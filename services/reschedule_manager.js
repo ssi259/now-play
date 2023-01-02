@@ -21,6 +21,9 @@ exports.process_reschedule = async (input_data) => {
     let updated_end_time = new Date(updated_date+" "+updated_start_time);
     updated_end_time.setMinutes(updated_end_time.getMinutes() + duration);
     updated_end_time = updated_end_time.toTimeString().split(" ")[0];
+    if (updated_date == null || updated_start_time == null) {
+        updated_end_time = null;
+    }
     if(!batch_id){
         throw new Api400Error("batch_id is required");
     }
@@ -33,7 +36,7 @@ exports.process_reschedule = async (input_data) => {
         previous_start_time,
         type: "rescheduled"
     })
-    if(updated_date == null || updated_start_time==null || updated_end_time==null){
+    if(updated_date == null || updated_start_time==null){
         await models.Reschedule.update({
             type: "cancel"
         }, {
