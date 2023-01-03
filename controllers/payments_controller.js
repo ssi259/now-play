@@ -37,3 +37,15 @@ exports.transaction_details = async(req,resp)=>{
     }finally{
     }
 }
+exports.all_payments = async(req,resp)=>{
+    try{
+        var input_response =  await PaymentManager.pre_process_all_payments(req,resp)
+        var processed_reponse =  await PaymentManager.process_all_payments_input_req(input_response)
+        var post_process_response = await PaymentManager.post_all_payments_process(resp,processed_reponse)
+    }catch(e){
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "Failure", message: e.name })
+    }finally{
+    }
+}

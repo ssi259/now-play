@@ -93,3 +93,24 @@ exports.process_transaction_details_input_req = async(input_response)=>{
 exports.post_transaction_details_process = async(resp)=>{
   resp.status(200).send({status:"Success",data:transactions})
 }
+
+exports.pre_process_all_payments = async(req,resp)=>{
+  return {}
+}
+
+exports.process_all_payments_input_req = async(input_response)=>{
+  let all_payments = await models.Payment.findAll()
+  all_payments = Promise.all(all_payments.map(async (payment) => {
+    payment = payment.toJSON();
+    payment.user_name = await models.User.findOne({where: {id: payment.user_id}}).then((user)=>{return user.name})
+    payment.coach_name = await models.Coach.findOne({where: {id: payment.coach_id}}).then((coach)=>{return coach.name})
+    payment.plan_name = await models.SubscriptionPlan.findOne({where: {id: payment.plan_id}}).then((plan)=>{return plan.plan_name})
+    return payment
+  }))
+  if(!all_payments) throw new Error("No payments found").status(204)
+  return all_payments
+}
+
+exports.post_all_payments_process = async(resp,input_response)=>{
+  resp.status(200).send({status:"Success",data:input_response})
+}
