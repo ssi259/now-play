@@ -1,5 +1,6 @@
 const express = require('express');
 const coach_controller = require('../controllers/coaches_controller');
+const reschedule_controller = require('../controllers/reschedule_controller');
 const routes = express.Router();
 const { auth } = require('../middlewares/authentication')
 
@@ -23,4 +24,6 @@ routes.get('/enrollment/users',auth, coach_controller.get_enrolled_users_list)
 routes.get('/:id', coach_controller.getCoachById)
 routes.put('/profile_pic', auth, coach_controller.update_profile_pic)
 routes.put('/:id', coach_controller.update_coach_by_id)
+routes.post('/reschedule', auth, reschedule_controller.rescheduling)
+routes.get('/get/reschedule', reschedule_controller.getRescheduled)
 module.exports = routes;
