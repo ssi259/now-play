@@ -10,11 +10,11 @@ const upcoming_class_reminder = async () => {
         console.log(batch_id, user_id)
         const {days,start_time,start_date,end_date} = await models.Batch.findOne({where: {id: batch_id}});
         const {fcm_token} = await models.User.findOne({where: {id: user_id}});
-        const cron_pattern = `0 0 ${start_time.getHours() - 2} * * ${days.map(day => day + 1).join(',')}`;
+        // const cron_pattern = `0 0 ${start_time.getHours() - 2} * * ${days.map(day => day + 1).join(',')}`;
         
-        cron.schedule(cron_pattern, async () => {
-            // send a notification to the user with the fcm_token
-        })
+        // cron.schedule(cron_pattern, async () => {
+        //     // send a notification to the user with the fcm_token
+        // })
     })
 }
 

@@ -83,5 +83,17 @@ exports.post_process_reschedule = async (reschedule, resp) => {
     resp.status(200).send({ status: reschedule.status, message: reschedule.message,data:reschedule.data})
 }
 
+exports.pre_process_getReschedule = async (req) => {
+    return req.query
+}
+
+exports.process_getReschedule = async (query) => {
+    const reschedule = await models.Reschedule.findAll()   
+    return reschedule
+}
+
+exports.post_process_getReschedule = async (reschedule, resp) => {
+    resp.status(200).send({status:"success",message:"reschedule data retrieved successfully",data:reschedule})
+}
 
 
