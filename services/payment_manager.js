@@ -102,13 +102,12 @@ exports.process_all_payments_input_req = async(input_response)=>{
   let all_payments = await models.Payment.findAll()
   all_payments = Promise.all(all_payments.map(async (payment) => {
     payment = payment.toJSON();
-    console.log(payment)
     payment.user_name = await models.User.findOne({where: {id: payment.user_id}}).then((user)=>{return user.name})
     payment.coach_name = await models.Coach.findOne({where: {id: payment.coach_id}}).then((coach)=>{return coach.name})
     payment.plan_name = await models.SubscriptionPlan.findOne({where: {id: payment.plan_id}}).then((plan)=>{return plan.plan_name})
     return payment
   }))
-  if(!all_payments) throw new Api500Error(`Bad Request`)
+  if(!all_payments) throw new Error("No payments found").status(204)
   return all_payments
 }
 
