@@ -108,6 +108,18 @@ async function upload_and_create_document_data(document, coach_id,document_type)
 
 exports.process_get_coaches= async () => {
   const coaches = await Coach.findAll()
+  let awards = []
+  let team_affiliations = []
+  for (each_coach of coaches) {
+    if (each_coach.awards){
+      awards = each_coach.awards.replace(/[^a-zA-Z, ]/g, "").split(",");
+      team_affiliations = each_coach.awards.replace(/[^a-zA-Z, ]/g, "").split(",");
+    }
+    delete each_coach["awards"];
+    delete each_coach["team_affiliations"];
+    each_coach["awards"] = awards
+    each_coach["team_affiliations"] = team_affiliations
+  }
   return coaches;
 }
 
@@ -127,6 +139,17 @@ exports.process_get_coach_by_id = async (coach_id) => {
   if (!coach) {
     throw new Api400Error(`Bad Request`)
   }
+  let awards = []
+  let team_affiliations = []
+  if (coach.awards){
+    awards = coach.awards.replace(/[^a-zA-Z, ]/g, "").split(",");
+    team_affiliations = coach.awards.replace(/[^a-zA-Z, ]/g, "").split(",");
+  }
+  delete coach["awards"];
+  delete coach["team_affiliations"];
+  coach["awards"] = awards
+  coach["team_affiliations"] = team_affiliations
+  
   return coach;
 }
 
