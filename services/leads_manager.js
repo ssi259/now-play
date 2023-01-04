@@ -54,5 +54,3 @@ exports.process_get_leads = async (input_data) => {
 exports.post_process_get_leads = async (process_response, resp) => {
     return resp.status(200).send({ status: "Success", message: "Leads Fetched", data: process_response })
 }
-
-//postman data for create lead
