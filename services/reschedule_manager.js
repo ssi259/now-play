@@ -10,6 +10,9 @@ exports.pre_process_reschedule = async (req) => {
     const previous_start_time = req.body.previous_start_time;
     const previous_end_time = req.body.previous_end_time;
     const previous_start_date = req.body.previous_start_date;
+    if(previous_start_date == null || previous_start_time == null || previous_end_time == null){
+        throw new Api400Error("previous_start_date, previous_start_time and previous_end_time are required");
+    }
     return {coach_id, batch_id, updated_date, updated_start_time, previous_end_time, previous_start_time, previous_start_date};
 }
 
@@ -44,7 +47,12 @@ exports.process_reschedule = async (input_data) => {
                 id: rescheduled_class.id
             }
         })
-        return { status: "Success", message: "Class Cancelled"}
+        rescheduled_class = await models.Reschedule.findOne({
+            where: {
+                id: rescheduled_class.id
+            }
+        })
+        return { status: "Success", message: "Class Cancelled", data: rescheduled_class}
     }
     
     const batches = await models.Batch.findAll({
