@@ -1,6 +1,5 @@
 const models = require('../models')
 const Api400Error = require('../error/api400Error');
-const { DatabaseError } = require('sequelize');
 
 exports.pre_process_reschedule = async (req) => {
     const coach_id = req.user.coach_id;
@@ -41,7 +40,7 @@ exports.process_reschedule = async (input_data) => {
     })
     if(updated_date == null || updated_start_time==null){
         await models.Reschedule.update({
-            type: "cancel"
+            type: "canceled"
         }, {
             where: {
                 id: rescheduled_class.id
@@ -52,7 +51,7 @@ exports.process_reschedule = async (input_data) => {
                 id: rescheduled_class.id
             }
         })
-        return { status: "Success", message: "Class Cancelled", data: rescheduled_class}
+        return { status: "success", message: "Class Cancelled", data: rescheduled_class}
     }
     
     const batches = await models.Batch.findAll({
@@ -84,7 +83,7 @@ exports.process_reschedule = async (input_data) => {
             }
     }
 }   
-    return { status: "Success", message: "Class Rescheduled", data: rescheduled_class}
+    return { status: "success", message: "Class Rescheduled", data: rescheduled_class}
 }
 
 exports.post_process_reschedule = async (reschedule, resp) => {
