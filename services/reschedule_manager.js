@@ -5,11 +5,11 @@ const { DatabaseError } = require('sequelize');
 exports.pre_process_reschedule = async (req) => {
     const coach_id = req.user.coach_id;
     const batch_id = req.body.batch_id;
-    const updated_date = req.body.updated_date;
+    const updated_date = new Date(req.body.updated_date).toLocaleDateString("en-IN").substring(0, 10);
     const updated_start_time = req.body.updated_start_time;
     const previous_start_time = req.body.previous_start_time;
     const previous_end_time = req.body.previous_end_time;
-    const previous_start_date = req.body.previous_start_date;
+    const previous_start_date = new Date (req.body.previous_start_date).toLocaleDateString("en-IN").substring(0, 10);
     if(previous_start_date == null || previous_start_time == null || previous_end_time == null){
         throw new Api400Error("previous_start_date, previous_start_time and previous_end_time are required");
     }
