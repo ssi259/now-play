@@ -12,7 +12,7 @@ routes.get('/payments', auth, coach_controller.get_payments_by_status)
 routes.get('/attendance', auth, coach_controller.get_attendance)
 routes.get('/payments/monthly', auth, coach_controller.get_payments_monthly)
 routes.post('/', coach_controller.createCoach);
-routes.post('/reminder/:player_id', auth, coach_controller.send_payment_reminder);
+routes.post('/reminders/payment', auth, coach_controller.send_payment_reminder);
 routes.post('/upload_images',coach_controller.uploadCoachImages);
 routes.post('/upload_documents',coach_controller.uploadCoachDocuments);
 routes.get('/', coach_controller.getCoaches)
