@@ -618,3 +618,25 @@ exports.process_pay_reminder = async (input_data) => {
 exports.post_process_pay_reminder = async (resp, payment_reminder) => {
   resp.status(200).send({ status: "success", message: payment_reminder, data: {} })
 }
+exports.pre_process_add_attendance = async (req) => {
+  return {coach_id:req.user.coach_id, batch_id:req.body.batch_id, date:req.body.date, users:req.body.users};
+}
+ 
+exports.process_add_attendance = async (input_data) => {
+  const {coach_id, batch_id, date, users} = input_data
+  users_entries = users.map((user) => {
+    return {
+      coach_id: coach_id,
+      batch_id: batch_id,
+      date: date,
+      user_id: user.user_id,
+      status: user.status
+    }
+   })
+   const attendance = await models.Attendance.bulkCreate(users_entries)
+  return attendance;
+}
+
+exports.post_process_add_attendance = async (resp, data) => {
+  resp.status(200).send({status:"success",message:"attendance marked successfully", data: data})
+}
