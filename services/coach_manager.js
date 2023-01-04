@@ -700,20 +700,4 @@ exports.process_add_attendance = async (input_data) => {
 
 exports.post_process_add_attendance = async (resp, data) => {
   resp.status(200).send({status:"success",message:"attendance marked successfully", data: data})
-<<<<<<< HEAD
 }
-<<<<<<< HEAD
-=======
-=======
-} 
-<<<<<<< HEAD
->>>>>>> cdf32ad (changes)
-
-<<<<<<< HEAD
->>>>>>> 104e0c4 (post_attendance)
-=======
-
-
->>>>>>> c4d6840 (changes)
-=======
->>>>>>> 21caf03 (changes)
