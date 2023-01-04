@@ -4,6 +4,7 @@ const Api400Error = require('../error/api400Error')
 const {Op} = require('sequelize')
 const models = require('../models');
 const sequelize = require('sequelize')
+const {send_push_notifications} = require('../utilities/send_push_notifications')
 
 exports.process_create_coach = async (req, resp) => {
     const {
@@ -603,18 +604,22 @@ exports.post_process_add_fcm_token = async (resp) => {
 }
 
 exports.pre_process_pay_reminder = async (req) => {
-  return {coach_id:req.user.coach_id, player_id:req.params.player_id}
+  return {player_id:req.query.player_id}
 }
+
 exports.process_pay_reminder = async (input_data) => {
-  var {coach_id, player_id} = input_data
-  var payment_reminder = ""
-  await models.User.findOne({
+  var { player_id} = input_data
+  const user = await models.User.findOne({
     where: {id: player_id}
-  }).then((data) => {payment_reminder = `${data.dataValues.name}, Your coah has requested for a payment. Please proceed according or expect a discontinuation of your sevices`})
-  .catch((err) => {throw new Api400Error("Invalid Player ID")})
-  //FCM fuction to be Added
+  })
+  const payment_reminder = `${user['name']}, Your coach has requested for a payment. Please proceed according or expect a discontinuation of your sevices`
+  send_push_notifications("daOIwyOYR0uzPj88fzVf0Q:APA91bGwyLeHWfvt9E-XVfAd2jaeZz-loYTDdwlNF4gNak7QYWXSLUGaGtLEWMqVOTb5KNBwU7X7QtaTUPKxVg-VAaYBJwL7akqF5X8yUIBL9vj2lRJ-HSOUnQ_djAeGEkFYkNQOVXNA", {
+    title: "Payment Reminder",
+    body: payment_reminder,
+  })
  return payment_reminder
 }
-exports.post_process_pay_reminder = async (resp, payment_reminder) => {
-  resp.status(200).send({ status: "success", message: payment_reminder, data: {} })
+
+exports.post_process_pay_reminder = async (resp) => {
+  resp.status(200).send({ status: "success", message: "payment reminder sent successfully", data: {} })
 }
