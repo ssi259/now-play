@@ -41,3 +41,16 @@ exports.process_create_lead = async (input_data) => {
 exports.post_process_create_lead = async (process_response, resp) => {
     return resp.status(200).send({ status: "Success", message: "Lead Created", data: process_response })
 }
+
+exports.pre_process_get_leads = async (req) => {
+    return {};
+}
+
+exports.process_get_leads = async (input_data) => {
+    const leads = await models.Lead.findAll();
+    return leads;
+}   
+
+exports.post_process_get_leads = async (process_response, resp) => {
+    return resp.status(200).send({ status: "Success", message: "Leads Fetched", data: process_response })
+}

@@ -3,5 +3,6 @@ var express = require('express');
 var router = express.Router();
 
 router.post('/', lead_controller.create_lead);
+router.get('/', lead_controller.get_leads);
 
 module.exports = router;
