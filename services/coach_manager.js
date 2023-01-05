@@ -573,10 +573,24 @@ exports.process_get_coach_details = async (input_data) => {
   delete coach_details["team_affiliations"];
   coach_details["awards"] = awards
   coach_details["team_affiliations"] = team_affiliations
+  var sport = await models.Sports.findByPk(coach_details.sports_id)
+  coach_details["sport_name"] = sport.name
+  //find average rating for coach
+  const reviews = await models.Review.findAll({where:{coach_id:coach_id}})
+  let ratings_sum = 0
+  for(let review of reviews){
+    ratings_sum += review['rating']
+  }
+  coach_details["rating"] = {
+    rating_count: reviews.length,
+    average_rating: ratings_sum / reviews.length
+  }
   return coach_details
 }
 
 exports.post_process_get_coach_details = async (resp,data) => {
+  data.dataValues["rating"] = data["rating"]
+  data.dataValues["sport_name"] = data["sport_name"]
   resp.status(200).send({status:"success",message:"retrieved data successfully", data})
 }
 exports.pre_process_get_player_details = async (req) => {
