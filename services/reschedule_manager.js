@@ -95,7 +95,20 @@ exports.pre_process_getReschedule = async (req) => {
 }
 
 exports.process_getReschedule = async (query) => {
-    const reschedule = await models.Reschedule.findAll()   
+    const reschedule = await models.Reschedule.findAll()
+    for (const each_reschedule of reschedule) {
+        each_reschedule.dataValues.batch = await models.Batch.findOne({
+            where: {
+                id: each_reschedule.dataValues.batch_id
+            }
+        })
+        each_reschedule.dataValues.coach = await models.Coach.findOne({
+        where: {
+            id: each_reschedule.dataValues.batch.coach_id
+        }
+    })
+    }
+
     return reschedule
 }
 
