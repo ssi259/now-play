@@ -563,6 +563,16 @@ exports.process_get_coach_details = async (input_data) => {
   if(coach_details == null){
     throw new Api404Error("coach not found")
   }
+  let awards = []
+  let team_affiliations = []
+  if (coach_details.awards){
+    awards = coach_details.awards.replace(/[^a-zA-Z, ]/g, "").split(",");
+    team_affiliations = coach_details.awards.replace(/[^a-zA-Z, ]/g, "").split(",");
+  }
+  delete coach_details["awards"];
+  delete coach_details["team_affiliations"];
+  coach_details["awards"] = awards
+  coach_details["team_affiliations"] = team_affiliations
   return coach_details
 }
 
