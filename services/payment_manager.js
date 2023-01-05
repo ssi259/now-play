@@ -102,8 +102,8 @@ exports.process_all_payments_input_req = async(input_response)=>{
   let all_payments = await models.Payment.findAll()
   all_payments = Promise.all(all_payments.map(async (payment) => {
     payment = payment.toJSON();
-    payment.user_name = await models.User.findOne({where: {id: payment.user_id}}).then((user)=>{return user.name})
-    payment.coach_name = await models.Coach.findOne({where: {id: payment.coach_id}}).then((coach)=>{return coach.name})
+    [payment.user_name,payment.user_phone] = await models.User.findOne({where: {id: payment.user_id}}).then((user)=>{return [user.name,user.phoneNumber]});
+    [payment.coach_name,payment.coach_phone] = await models.Coach.findOne({where: {id: payment.coach_id}}).then((coach)=>{return [coach.name,coach.phone_number]});
     payment.plan_name = await models.SubscriptionPlan.findOne({where: {id: payment.plan_id}}).then((plan)=>{return plan.plan_name})
     return payment
   }))
