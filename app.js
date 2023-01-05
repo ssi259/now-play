@@ -21,6 +21,7 @@ const enrollmentRouter = require('./routes/enrollments')
 var paymentRouter = require('./routes/payment.js');
 const ComplaintRouter = require('./routes/complaints')
 const rescheduleRouter = require('./routes/reschedule')
+const leadRouter = require('./routes/leads')
 const {next_payment_reminder} = require('./schedulers/payment_scheduler')
 const notificationRouter = require('./routes/notifications')
 const {upcoming_class_reminder} = require('./schedulers/batch_scheduler')
@@ -55,6 +56,8 @@ app.use('/payments', paymentRouter);
 app.use('/complaints', ComplaintRouter);
 app.use('/notifications', notificationRouter);
 app.use('/reschedule', rescheduleRouter)
+app.use('/leads', leadRouter);
+
 
 next_payment_reminder();
 upcoming_class_reminder();
