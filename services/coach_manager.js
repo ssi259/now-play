@@ -114,7 +114,7 @@ exports.process_get_coaches= async () => {
   for (each_coach of coaches) {
     if (each_coach.awards){
       awards = each_coach.awards.replace(/[^a-zA-Z, ]/g, "").split(",");
-      team_affiliations = each_coach.awards.replace(/[^a-zA-Z, ]/g, "").split(",");
+      team_affiliations = each_coach.team_affiliations.replace(/[^a-zA-Z, ]/g, "").split(",");
     }
     delete each_coach["awards"];
     delete each_coach["team_affiliations"];
@@ -144,7 +144,7 @@ exports.process_get_coach_by_id = async (coach_id) => {
   let team_affiliations = []
   if (coach.awards){
     awards = coach.awards.replace(/[^a-zA-Z, ]/g, "").split(",");
-    team_affiliations = coach.awards.replace(/[^a-zA-Z, ]/g, "").split(",");
+    team_affiliations = coach.team_affiliations.replace(/[^a-zA-Z, ]/g, "").split(",");
   }
   delete coach["awards"];
   delete coach["team_affiliations"];
@@ -563,6 +563,16 @@ exports.process_get_coach_details = async (input_data) => {
   if(coach_details == null){
     throw new Api404Error("coach not found")
   }
+  let awards = []
+  let team_affiliations = []
+  if (coach_details.awards){
+    awards = coach_details.awards.replace(/[^a-zA-Z, ]/g, "").split(",");
+    team_affiliations = coach_details.team_affiliations.replace(/[^a-zA-Z, ]/g, "").split(",");
+  }
+  delete coach_details["awards"];
+  delete coach_details["team_affiliations"];
+  coach_details["awards"] = awards
+  coach_details["team_affiliations"] = team_affiliations
   return coach_details
 }
 
