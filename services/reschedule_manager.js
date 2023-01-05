@@ -4,19 +4,20 @@ const Api400Error = require('../error/api400Error');
 exports.pre_process_reschedule = async (req) => {
     const coach_id = req.user.coach_id;
     const batch_id = req.body.batch_id;
-    const updated_date = new Date(req.body.updated_date).toLocaleDateString("en-IN").substring(0, 10);
-    const updated_start_time = req.body.updated_start_time;
+    const updated_date = req.body.updated_date ? new Date(req.body.updated_date).toLocaleDateString("en-IN").substring(0, 10):null;
+    const updated_start_time = req.body.updated_start_time ? req.body.updated_start_time : null;
     const previous_start_time = req.body.previous_start_time;
     const previous_end_time = req.body.previous_end_time;
-    const previous_start_date = new Date (req.body.previous_start_date).toLocaleDateString("en-IN").substring(0, 10);
+    const previous_start_date = new Date(req.body.previous_start_date).toLocaleDateString("en-IN").substring(0, 10);
+    const type = req.body.type;
     if(previous_start_date == null || previous_start_time == null || previous_end_time == null){
         throw new Api400Error("previous_start_date, previous_start_time and previous_end_time are required");
     }
-    return {coach_id, batch_id, updated_date, updated_start_time, previous_end_time, previous_start_time, previous_start_date};
+    return {coach_id, batch_id, updated_date, updated_start_time, previous_end_time, previous_start_time, previous_start_date, type};
 }
 
 exports.process_reschedule = async (input_data) => {
-    const {coach_id, batch_id, updated_date, updated_start_time,previous_end_time,previous_start_date,previous_start_time} = input_data;
+    const {coach_id, batch_id, updated_date, updated_start_time,previous_end_time,previous_start_date,previous_start_time,type} = input_data;
     let end_time = new Date("2021-01-12 "+previous_end_time);
     let start_time = new Date("2021-01-12 "+ previous_start_time);
     const duration = (new Date(end_time) - new Date(start_time))/60000;
@@ -38,7 +39,7 @@ exports.process_reschedule = async (input_data) => {
         previous_start_time,
         type: "rescheduled"
     })
-    if(updated_date == null || updated_start_time==null){
+    if(type=='canceled'){
         await models.Reschedule.update({
             type: "canceled"
         }, {
