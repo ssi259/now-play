@@ -442,7 +442,7 @@ exports.process_upcoming_classes = async (user) => {
             const previous_start_date = new Date(cncld_class['previous_start_date'])
             const previous_start_date_str =   previous_start_date.toLocaleDateString("en-IN").substring(0, 10)      
             if (upcoming_classes[previous_start_date_str] != null) {
-                upcoming_classes[previous_start_date_str] = await  upcoming_classes[previous_start_date_str].filter((item) => item['id'] != cncld_class['batch_id'] || item['start_time'] != cncld_class['previous_start_time'])
+                upcoming_classes[previous_start_date_str] = await  upcoming_classes[previous_start_date_str].filter((item) => item['id'] != cncld_class['batch_id'] || item['start_time'] != cncld_class['previous_start_time'] || cncld_class['createdAt'] < item['createdAt'])
             }
         }
     }
@@ -485,6 +485,7 @@ async function batch_details_upcoming_classes(batch_id){
         "arena_data": arena_data,
         "academy_data": academy_data,
         "sports_data": sports_data,
+        "createdAt":batch_data['createdAt'],
         "type":"regular"
     }
     return data
@@ -498,6 +499,7 @@ async function rescheduled_class_data(batch_data, rsdld_cls_data) {
         "arena_data": batch_data['arena_data'],
         "academy_data": batch_data['academy_data'],
         "sports_data": batch_data['sports_data'],
+        "createdAt":rsdld_cls_data['createdAt'],
         "type":"rescheduled"
     }
 }
