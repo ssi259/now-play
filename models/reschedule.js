@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     updated_end_time: DataTypes.TIME,
     previous_start_date: DataTypes.DATE,
     previous_start_time: DataTypes.TIME,
+    previous_end_time: DataTypes.TIME,
     type: DataTypes.STRING
   }, {
     sequelize,

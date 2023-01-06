@@ -1,94 +1,52 @@
 const models = require('../models')
 const Api400Error = require('../error/api400Error');
+const { Op } = require('sequelize')
 
 exports.pre_process_reschedule = async (req) => {
-    const coach_id = req.user.coach_id;
-    const batch_id = req.body.batch_id;
-    const updated_date = req.body.updated_date ? new Date(req.body.updated_date).toLocaleDateString("en-IN").substring(0, 10):null;
-    const updated_start_time = req.body.updated_start_time ? req.body.updated_start_time : null;
-    const previous_start_time = req.body.previous_start_time;
-    const previous_end_time = req.body.previous_end_time;
-    const previous_start_date = new Date(req.body.previous_start_date).toLocaleDateString("en-IN").substring(0, 10);
-    const type = req.body.type;
-    if(previous_start_date == null || previous_start_time == null || previous_end_time == null){
+    let { batch_id, updated_date, updated_start_time, previous_start_time, previous_end_time, previous_start_date, type } = req.body
+    if (previous_start_date == null || previous_start_time == null || previous_end_time == null) {
         throw new Api400Error("previous_start_date, previous_start_time and previous_end_time are required");
     }
-    return {coach_id, batch_id, updated_date, updated_start_time, previous_end_time, previous_start_time, previous_start_date, type};
+    previous_start_date = await convert_to_ddmmyyyy(previous_start_date);
+    previous_start_date = await IN_to_UTC_date(previous_start_date);
+    if (updated_date != null) {
+        updated_date = await IN_to_UTC_date(updated_date);
+    }
+    return {batch_id, updated_date, updated_start_time,previous_start_date, previous_start_time,previous_end_time, type};
 }
 
 exports.process_reschedule = async (input_data) => {
-    const {coach_id, batch_id, updated_date, updated_start_time,previous_end_time,previous_start_date,previous_start_time,type} = input_data;
-    let end_time = new Date("2021-01-12 "+previous_end_time);
-    let start_time = new Date("2021-01-12 "+ previous_start_time);
-    const duration = (new Date(end_time) - new Date(start_time))/60000;
-    let updated_end_time = new Date(updated_date+" "+updated_start_time);
-    updated_end_time.setMinutes(updated_end_time.getMinutes() + duration);
-    updated_end_time = updated_end_time.toTimeString().split(" ")[0];
-    if (updated_date == null || updated_start_time == null) {
-        updated_end_time = null;
+    const {batch_id, updated_date, updated_start_time, previous_start_date, previous_end_time, previous_start_time, type } = input_data;
+    if (type == 'canceled') {
+        let canceled_class = await models.Reschedule.create({
+            batch_id,
+            previous_start_date,
+            previous_start_time,
+            previous_end_time,
+            type
+        })
+        return { message: "class canceled", data: canceled_class}
     }
-    if(!batch_id){
-        throw new Api400Error("batch_id is required");
+    const  updated_end_time =  await calculate_updated_end_time(previous_start_time, previous_end_time , updated_start_time)
+    const is_time_slot_conflict = await check_time_slot_conflict({batch_id , updated_date ,updated_start_time ,updated_end_time , previous_start_date, previous_start_time , previous_end_time });
+    if (is_time_slot_conflict == true) {
+        throw new Api400Error("time slot conflict")
     }
-    rescheduled_class = await models.Reschedule.create({
+    const rescheduled_class = await models.Reschedule.create({
         batch_id,
-        updated_date,
+        updated_date ,
         updated_start_time,
         updated_end_time,
         previous_start_date,
         previous_start_time,
+        previous_end_time,
         type: "rescheduled"
     })
-    if(type=='canceled'){
-        await models.Reschedule.update({
-            type: "canceled"
-        }, {
-            where: {
-                id: rescheduled_class.id
-            }
-        })
-        rescheduled_class = await models.Reschedule.findOne({
-            where: {
-                id: rescheduled_class.id
-            }
-        })
-        return { status: "success", message: "Class Cancelled", data: rescheduled_class}
-    }
-    
-    const batches = await models.Batch.findAll({
-        where: {
-           coach_id: coach_id, 
-        }
-    })
-    for(var each_batch of batches){
-        each_batch = each_batch.dataValues;
-        actual_class_days = JSON.parse(each_batch.days)
-
-        days = ["Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"] 
-        js_days = ["Sun","Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"]
-
-        actual_class_days = actual_class_days.map((day, index) => {
-            if(day == 1){
-                return days[index]
-            }
-        })
-
-        if ((each_batch.start_date <= new Date(updated_date) && new Date(updated_date) <=each_batch.end_date) && actual_class_days.includes(js_days[(new Date(updated_date)).getDay()])){
-           if((each_batch.start_time <= updated_start_time && updated_start_time <= each_batch.end_time) || (each_batch.start_time <= updated_end_time && updated_end_time <= each_batch.end_time)){
-                await models.Reschedule.destroy({
-                    where: {
-                        id: rescheduled_class.id
-                    }
-                })
-                throw new Api400Error("Time Slot Conflict")
-            }
-    }
-}   
-    return { status: "success", message: "Class Rescheduled", data: rescheduled_class}
+    return { message: "class rescheduled", data:rescheduled_class }
 }
 
-exports.post_process_reschedule = async (reschedule, resp) => {
-    resp.status(200).send({ status: reschedule.status, message: reschedule.message,data:reschedule.data})
+exports.post_process_reschedule = async (data, resp) => {
+    resp.status(201).send({ status: 'success', message: data.message,data:data.data})
 }
 
 exports.pre_process_getReschedule = async (req) => {
@@ -117,4 +75,90 @@ exports.post_process_getReschedule = async (reschedule, resp) => {
     resp.status(200).send({status:"success",message:"reschedule data retrieved successfully",data:reschedule})
 }
 
+async function IN_to_UTC_date(indianDateString){
+    const UTC_date_string = indianDateString.split("/").reverse().join("-");
+    return new Date(UTC_date_string)
+}
 
+async function calculate_updated_end_time(previous_start_time, previous_end_time, updated_start_time) {
+    const previousStart = new Date("1970-01-01 " + previous_start_time)
+    const previousEnd = new Date("1970-01-01 " + previous_end_time);
+    const previousDifference = previousEnd - previousStart;
+    const updatedStart = new Date("1970-01-01 " + updated_start_time);
+    const updatedEnd = new Date(updatedStart.getTime() + previousDifference);
+    return updatedEnd.toTimeString().slice(0, 8);
+}
+
+async function check_time_slot_conflict(input_data){
+    const { batch_id, updated_date, updated_start_time, updated_end_time, previous_start_date } = input_data
+    const updated_date_str = updated_date.toLocaleDateString("en-IN").substring(0, 10)
+    const batch = await models.Batch.findByPk(batch_id)
+    const rescheduled_classes = await models.Reschedule.findAll({
+        where: {
+            batch_id,
+            type: 'rescheduled',
+            [Op.or]: [
+                {updated_date: updated_date},
+                {previous_start_date : previous_start_date},
+            ]
+        }
+    })
+    const canceled_classes = await models.Reschedule.findAll({
+        where: {
+            batch_id,
+            type: 'canceled',
+            previous_start_date : updated_date
+        }
+    })
+    let updated_day_classes = []
+    const batch_days_arr = JSON.parse(batch['days'])
+    const get_updated_day_index = updated_date.getDay()
+    let j = ((get_updated_day_index % 7) + 6) % 7
+    if (batch_days_arr[j] == 1) {
+        updated_day_classes.push({
+            start_time: batch['start_time'],
+            end_time: batch['end_time'],
+            createdAt : batch['createdAt']
+        })
+    }
+    for (let rsdld_cls of rescheduled_classes) {
+        const rsdld_cls_previous_start_date = new Date(rsdld_cls['previous_start_date'])
+        const rsdld_cls_previous_start_date_str =   rsdld_cls_previous_start_date.toLocaleDateString("en-IN").substring(0, 10)      
+        if (rsdld_cls_previous_start_date_str == updated_date_str) {
+            updated_day_classes  =  updated_day_classes.filter((item) => item['start_time'] != rsdld_cls['previous_start_time'])
+        }
+        const rsdld_cls_updated_date = new Date(rsdld_cls['updated_date'])
+        const rsdld_cls_updated_date_str = rsdld_cls_updated_date.toLocaleDateString("en-IN").substring(0, 10)
+        if (rsdld_cls_updated_date_str == updated_date_str) {
+            updated_day_classes.push({
+                start_time: rsdld_cls['updated_start_time'],
+                end_time: rsdld_cls['updated_end_time'],
+                createdAt : rsdld_cls['createdAt']
+            })
+        }
+    }
+    for (let cncld_class of canceled_classes) {
+        const cncld_class_previous_start_date = new Date(cncld_class['previous_start_date'])
+        const cncld_class_previous_start_date_str =   cncld_class_previous_start_date.toLocaleDateString("en-IN").substring(0, 10)
+        if (cncld_class_previous_start_date_str == updated_date_str) {
+            updated_day_classes  =  updated_day_classes.filter((item) => item['start_time'] != cncld_class['previous_start_time']  || cncld_class['createdAt'] < item['createdAt'] )
+        }
+    }
+    for (let i = 0; i < updated_day_classes.length; i++){
+        if (updated_day_classes[i]['start_time'] <= updated_start_time  &&  updated_start_time <= updated_day_classes[i]['end_time'] || updated_day_classes[i]['start_time'] <= updated_end_time  &&  updated_end_time <= updated_day_classes[i]['end_time'] ) {
+          return true
+        }   
+    }
+    return false
+} 
+
+async function convert_to_ddmmyyyy (date_str) {
+    let [dd, mm, yyyy] = date_str.split("/")
+    if (dd < 10) {
+        dd = '0' + dd;
+    }
+    if (mm < 10) {
+        mm = '0' + mm;
+    }
+    return [dd, mm, yyyy].join('/')
+}

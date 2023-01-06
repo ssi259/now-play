@@ -27,6 +27,9 @@ module.exports = {
       previous_start_time: {
         type: Sequelize.TIME
       },
+      previous_end_time: {
+        type: Sequelize.TIME
+      },
       type: {
         type: Sequelize.STRING
       },
