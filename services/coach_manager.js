@@ -670,3 +670,17 @@ exports.process_pay_reminder = async (input_data) => {
 exports.post_process_pay_reminder = async (resp) => {
   resp.status(200).send({ status: "success", message: "payment reminder sent successfully", data: {} })
 }
+
+exports.pre_process_get_total_enrollments_count = async (req) => {
+  return {coach_id:req.user.coach_id}
+}
+
+exports.process_get_total_enrollments_count = async (input_data) => {
+  const {coach_id} = input_data
+  const total_enrollment_count = await models.Enrollment.count({where:{coach_id:coach_id}})
+  return total_enrollment_count
+}
+
+exports.post_process_get_total_enrollments_count = async (resp, data) => {
+  resp.status(200).send({ status: "success", message: "retrieved data successfully", data: data })
+}
