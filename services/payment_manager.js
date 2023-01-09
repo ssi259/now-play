@@ -114,3 +114,16 @@ exports.process_all_payments_input_req = async(input_response)=>{
 exports.post_all_payments_process = async(resp,input_response)=>{
   resp.status(200).send({status:"Success",data:input_response})
 }
+
+exports.pre_process_get_count_of_payments = async(req,resp)=>{
+  return {coach_id: req.body.coach_id,status: req.query.status}
+}
+
+exports.process_get_count_of_payments_input_req = async(input_response)=>{
+  let count_of_payment = await models.Payment.count({where: {status: input_response.status}})
+  return count_of_payment
+}
+
+exports.post_get_count_of_payments_process = async(resp,input_response)=>{
+  resp.status(200).send({status:"Success",data:input_response})
+}
