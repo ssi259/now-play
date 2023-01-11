@@ -45,5 +45,5 @@ exports.process_update_notifications = async (input_response) => {
 }
 
 exports.post_process_update_notifications = async (resp , data) => {
-resp.status(200).send({ status: "success", message: "updated successfully", data: data });
+  resp.status(200).send({ status: "success", message: "updated successfully", data: data });
 }
