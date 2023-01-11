@@ -7,8 +7,10 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Notification.init({
-    user_id:DataTypes.INTEGER,
-    user_type: DataTypes.STRING,
+    sender_id:DataTypes.INTEGER,
+    sender_type: DataTypes.STRING,
+    receiver_id:DataTypes.INTEGER,
+    receiver_type: DataTypes.STRING,
     type: DataTypes.STRING,
     title: DataTypes.TEXT,
     body: DataTypes.TEXT,

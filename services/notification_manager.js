@@ -6,20 +6,22 @@ exports.pre_process_notifications = async (req) => {
   
 exports.process_notifications = async (user) => { 
   if (user.type == 'player') {
-    return await models.Notification.findAll({
+    const notifications =  await models.Notification.findAll({
       where: {
-        user_id: user.user_id,
-        user_type: 'player'
+        receiver_id: user.user_id,
+        receiver_type: 'player'
       }
     })
+    return notifications
   }
   else if (user.type == 'coach') {
-    return await models.Notification.findAll({
+    const notifications =  await models.Notification.findAll({
       where: {
-        user_id: user.coach_id,
-        user_type: 'coach'
+        receiver_id: user.coach_id,
+        receiver_type: 'coach'
       }
     })
+    return notifications
   }
 }
 

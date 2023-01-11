@@ -10,12 +10,22 @@ module.exports = {
     await queryInterface.removeColumn('Notifications', 'userId');
     await queryInterface.removeColumn('Notifications', 'channelType');
     await queryInterface.removeColumn('Notifications', 'NotificationType');
-    await queryInterface.addColumn('Notifications', 'user_id',
+    await queryInterface.addColumn('Notifications', 'sender_id',
       {
       type:Sequelize.INTEGER
       }
     );
-    await queryInterface.addColumn('Notifications', 'user_type',
+    await queryInterface.addColumn('Notifications', 'sender_type',
+      {
+      type:Sequelize.STRING
+      }
+    );
+    await queryInterface.addColumn('Notifications', 'receiver_id',
+      {
+      type:Sequelize.INTEGER
+      }
+    );
+    await queryInterface.addColumn('Notifications', 'receiver_type',
       {
       type:Sequelize.STRING
       }
@@ -53,8 +63,10 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.removeColumn('Notifications', 'user_id');
-    await queryInterface.removeColumn('Notifications', 'user_type');
+    await queryInterface.removeColumn('Notifications', 'sender_id');
+    await queryInterface.removeColumn('Notifications', 'sender_type');
+    await queryInterface.removeColumn('Notifications', 'receiver_id');
+    await queryInterface.removeColumn('Notifications', 'receiver_type');
     await queryInterface.removeColumn('Notifications', 'type');
     await queryInterface.removeColumn('Notifications', 'title');
     await queryInterface.removeColumn('Notifications', 'body');
