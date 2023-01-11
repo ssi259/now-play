@@ -1,35 +1,31 @@
 const models = require("../models");
 const Api500Error = require('../error/api500Error')
+const create_send_notification = require('../utilities/Notification/create_send_notification')
+
 function addDays(date, days) {
   var result = new Date(date);
   result.setDate(result.getDate() + days);
   return result;
 }
-exports.pre_process_create = async(req,resp)=>{
-  var plan = await models.SubscriptionPlan.findOne({
-    where: {
-        id: req.body.plan_id
-    }
-  })
-  return {plan}
+exports.pre_process_create = async (req) => {
+  const {batch_id, plan_id, coach_id} = req.body
+  return {user_id: req.user.user_id, batch_id, plan_id, coach_id}
 }
-exports.process_create_input_req = async(req,input_response)=>{
-  const {plan} = input_response;
+exports.process_create_input_req = async(input_response)=>{
+  const {user_id, batch_id, plan_id, coach_id} = input_response;
+  const plan = await models.SubscriptionPlan.findByPk(plan_id)
   var enrollent_type = plan.price==0?"free":"paid";
-  await models.Enrollment.update({status: "inactive"}, {where: {user_id: req.user.user_id,batch_id:req.body.batch_id, status: "pending"}})
-  await models.Payment.update({status: "failed"}, {where: {user_id: req.user.user_id, coach_id: req.body.coach_id, batch_id:req.body.batch_id,status: "pending"}})
-  await models.Payment.create({plan_id: req.body.plan_id,status: "pending",batch_id:req.body.batch_id, user_id: req.user.user_id,coach_id: req.body.coach_id, price: plan.price, payment_mode: "Cash"})
-  await models.Enrollment.create({batch_id:req.body.batch_id,user_id: req.user.user_id, subscription_id: req.body.plan_id, status: "pending", type:enrollent_type, coach_id: req.body.coach_id})
-  return {user_id: req.user.user_id , dataValues:req.body, price: plan.price}
+  await models.Enrollment.update({status: "inactive"}, {where: {user_id, batch_id, status: "pending"}})
+  await models.Payment.update({status: "failed"}, {where: {user_id , coach_id , batch_id,status: "pending"}})
+  const payment = await models.Payment.create({plan_id,status: "pending",batch_id, user_id, coach_id, price: plan['price'], payment_mode: "Cash"})
+  await models.Enrollment.create({ batch_id, user_id, subscription_id: plan_id, status: "pending", type: enrollent_type, coach_id })
+  await create_send_notification.new_enrollment({ user_id, batch_id, plan_id, coach_id, payment_id: payment['id'] })
+  return {user_id, dataValues: { batch_id, plan_id, coach_id }, price: plan['price'] }
 }
-exports.post_create_process = async(req,resp,input_response)=>{
-  var formatted_response = {}
-  formatted_response["status"]="success"
-  formatted_response["message"]="payment request created"
-  delete input_response.dataValues.user_id
-  formatted_response["data"]=input_response
-  resp.status(200).send(formatted_response)
+exports.post_create_process = async(resp,input_response)=>{
+  resp.status(200).send({status:"success",message:"payment request created", data:input_response})
 }
+
 exports.pre_process_update = async(req,resp)=>{
   var payment_data = await models.Payment.findOne({
     where: {

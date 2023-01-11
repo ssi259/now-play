@@ -59,8 +59,8 @@ app.use('/reschedule', rescheduleRouter)
 app.use('/leads', leadRouter);
 
 
-next_payment_reminder();
-upcoming_class_reminder();
+// next_payment_reminder();
+// upcoming_class_reminder();
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
