@@ -407,7 +407,17 @@ exports.process_get_coach_enrolled_students = async (input_data) => {
       status:"pending"
     }
   })
-  return {"students_enrolled":student_enrolled.length , "pending_payments_total":payments[0].dataValues.pending_payments_total};
+
+  const current_date = new Date()
+  const current_date_string = current_date.toISOString().split('T')[0]
+  const enrollment_count = await models.Enrollment.count({
+    where: {
+      coach_id: coach_id,
+      createdAt: current_date_string,
+      status: 'pending'
+    }
+  })
+  return {"students_enrolled":student_enrolled.length , "pending_payments_total":payments[0].dataValues.pending_payments_total , "enrollment_count":enrollment_count};
 }
 
 exports.post_process_get_coach_enrolled_students = async (resp,data) => {
