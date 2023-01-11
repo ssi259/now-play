@@ -28,3 +28,22 @@ exports.process_notifications = async (user) => {
 exports.post_process_notifications = async (data, resp) => {
   resp.status(200).send({ status: "success", message: "retrieved data successfully", data: data });
 }
+
+exports.pre_process_update_notifications = async (req) => {
+  return  {notification_id: req.query.id, data : req.body}
+}
+
+exports.process_update_notifications = async (input_response) => { 
+  const {notification_id , data } = input_response
+  await models.Notification.update(data,{
+    where: {
+      id:notification_id
+    }
+  })
+  const notification = models.Notification.findByPk(notification_id)
+  return notification
+}
+
+exports.post_process_update_notifications = async (resp , data) => {
+resp.status(200).send({ status: "success", message: "updated successfully", data: data });
+}
