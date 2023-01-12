@@ -5,24 +5,30 @@ exports.pre_process_notifications = async (req) => {
 }
   
 exports.process_notifications = async (user) => { 
+  let notifications;
   if (user.type == 'player') {
-    const notifications =  await models.Notification.findAll({
+    notifications =  await models.Notification.findAll({
       where: {
         receiver_id: user.user_id,
         receiver_type: 'player'
       }
     })
-    return notifications
   }
   else if (user.type == 'coach') {
-    const notifications =  await models.Notification.findAll({
+    notifications =  await models.Notification.findAll({
       where: {
         receiver_id: user.coach_id,
         receiver_type: 'coach'
       }
     })
-    return notifications
   }
+  const response_data = []
+  for (let notification of notifications) {
+    const data_obj = notification.dataValues;
+    data_obj['data'] = JSON.parse(data_obj['data'])
+    response_data.push(data_obj)
+  }
+  return response_data
 }
 
 exports.post_process_notifications = async (data, resp) => {
