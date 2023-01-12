@@ -26,7 +26,7 @@ exports.new_enrollment = async (input_data) => {
           },
           batch: {
             id: batch['id'],
-            thumbnail_image: batch['thumbnail_img'],
+            thumbnail_img: batch['thumbnail_img'],
           },
           plan: {
             id: plan['id'],
