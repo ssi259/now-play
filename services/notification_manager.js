@@ -44,6 +44,8 @@ exports.process_update_notifications = async (input_response) => {
   return notification
 }
 
-exports.post_process_update_notifications = async (resp , data) => {
-  resp.status(200).send({ status: "success", message: "updated successfully", data: data });
+exports.post_process_update_notifications = async (resp, data) => {
+  const data_obj = data
+  data_obj['data'] = JSON.parse(data_obj['data'])
+  resp.status(200).send({ status: "success", message: "updated successfully", data: data_obj });
 }

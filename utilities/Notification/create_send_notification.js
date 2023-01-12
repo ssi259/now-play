@@ -22,11 +22,11 @@ exports.new_enrollment = async (input_data) => {
             id: user['id'],
             name: user['name'],
             phone_number: user['phoneNumber'],
-            profile_pic:user['profile_pic'],
+            profile_pic:user['profilePic'],
           },
           batch: {
             id: batch['id'],
-            thumbnail_image: batch['thumbnail_image'],
+            thumbnail_img: batch['thumbnail_img'],
           },
           plan: {
             id: plan['id'],
