@@ -643,7 +643,8 @@ exports.process_get_attendance = async (input_data) => {
     attendance_details.push({
       user_id: attendance_detail.user_id,
       name: user.name,
-      attendance: attendance_detail.attendance
+      attendance: attendance_detail.attendance,
+      status: attendance_detail.status
     })
   }
   return attendance_details
