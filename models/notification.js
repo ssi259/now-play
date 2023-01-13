@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
     body: DataTypes.TEXT,
     data: DataTypes.JSON,
     is_marketing: DataTypes.BOOLEAN,
-    is_read: DataTypes.BOOLEAN
+    is_read: DataTypes.BOOLEAN,
+    payment_id:DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Notification',
