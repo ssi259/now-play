@@ -624,23 +624,35 @@ exports.post_process_get_player_details = (resp, data) => {
 }
 
 exports.pre_process_get_attendance = async (req) => {
-  return {coach_id:req.user.coach_id,date:req.body.date,batch_id:req.body.batch_id};
+  return {coach_id:req.user.coach_id, batch_id:req.body.batch_id, date:req.body.date}
 }
 
 exports.process_get_attendance = async (input_data) => {
+  const {coach_id, batch_id, date} = input_data
+  attendance_details = []
   const attendance = await models.Attendance.findAll({
-    where: {coach_id: input_data.coach_id,
-            batch_id: input_data.batch_id,
-            date: input_data.date,
-          }
+    where: {
+      [sequelize.Op.and]: [
+        sequelize.where(sequelize.fn('DATE', sequelize.col('createdAt')), date),
+        {coach_id: coach_id, batch_id: batch_id}
+      ]
+    }
   })
-  return attendance;
+  for(let attendance_detail of attendance){
+    const user = await models.User.findOne({where:{id:attendance_detail.user_id}})
+    attendance_details.push({
+      user_id: attendance_detail.user_id,
+      name: user.name,
+      attendance: attendance_detail.attendance,
+      status: attendance_detail.status
+    })
+  }
+  return attendance_details
 }
 
-exports.post_process_get_attendance = async (resp, data) => {
-  resp.status(200).send({status:"success",message:"retrieved data successfully", data: data})
+exports.post_process_get_attendance = async (resp,data) => {
+  resp.status(200).send({status:"success",message:"retrieved data successfully", data})
 }
-
 
 
 exports.pre_process_add_fcm_token = async (req) => {
