@@ -59,7 +59,16 @@ exports.process_update_input_req = async(req,input_response)=>{
     await models.Enrollment.update({status: "active", end_date:new_end_date}, {where: {id: enrollment_data.id}})
     await models.Payment.update({status: "success"}, {where: {id: payment_data.id}})
   }
+  await mark_notification_read(payment_data.id)
   return {payment_id: payment_data.id, enrollment_id: enrollment_data.id, dataValues:req.body, coach_resp: coach_resp}
+}
+
+async function mark_notification_read(payment_id) {
+  await models.Notification.update({is_read:true},{
+    where: {
+      payment_id
+    }
+  })
 }
 
 exports.post_update_process = async(req,resp,input_response)=>{

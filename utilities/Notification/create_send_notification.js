@@ -8,7 +8,6 @@ exports.new_enrollment = async (input_data) => {
     const batch = await models.Batch.findByPk(batch_id)
     const arena = await models.Academy.findByPk(batch['arena_id'])
     const plan = await models.SubscriptionPlan.findByPk(plan_id)
-    const payment = await models.Payment.findByPk(payment_id)
     const notification = await models.Notification.create({
         sender_id: user['id'],
         sender_type: "player",
@@ -36,9 +35,10 @@ exports.new_enrollment = async (input_data) => {
             type:plan['type']
           },
           payment: {
-            id:payment['id']
+            id:payment_id
           }
         },
+        payment_id:payment_id,
         is_marketing: false,
         is_read:false
     })
