@@ -684,21 +684,21 @@ exports.pre_process_add_attendance = async (req) => {
 }
  
 exports.process_add_attendance = async (input_data) => {
-  const {coach_id, batch_id, date, players,status} = input_data
+ const {coach_id, batch_id, date, players,status} = input_data
  user_details = []
-  for(let each_player of players){
-const user_detail = await models.User.findOne({where: {id: each_player.id}})
-const enrollment_details = await models.Enrollment.findOne({where: {user_id: each_player.id}})
-const subscription_details = await models.SubscriptionPlan.findOne({where: {id: enrollment_details.dataValues.subscription_id}})
-const subscription_data = { "subscription_type": subscription_details.type}
-const user_data = { "user_name": user_detail.name, "user_id": user_detail.id}
-const attendance = await models.Attendance.create({
-    coach_id: coach_id,
-    batch_id: batch_id,
-    date: date,
-    user_id: each_player.id,
-    status: each_player.status
-  })
+ for(let each_player of players){
+ const user_detail = await models.User.findOne({where: {id: each_player.id}})
+ const enrollment_details = await models.Enrollment.findOne({where: {user_id: each_player.id}})
+ const subscription_details = await models.SubscriptionPlan.findOne({where: {id: enrollment_details.dataValues.subscription_id}})
+ const subscription_data = { "subscription_type": subscription_details.type}
+ const user_data = { "user_name": user_detail.name, "user_id": user_detail.id}
+ const attendance = await models.Attendance.create({
+  coach_id: coach_id,
+  batch_id: batch_id,
+  date: date,
+  user_id: each_player.id,
+  status: each_player.status
+ })
   user_details.push({...user_data,...subscription_data, ...attendance.dataValues})
 };
   return user_details;
