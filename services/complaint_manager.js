@@ -35,16 +35,19 @@ exports.pre_process_get = async (req) => {
 }
 
 exports.process_get = async() => {
-    const complaints = await models.Complaint.findAll()
-    const resp_complaints = await Promise.all(complaints.map(async (complaint) => {
-        complaint = complaint.toJSON()
-        await models.User.findByPk(complaint.complainant_id).then(user => {
-            complaint.complainant_name=user.name,
-            complaint.complainant_PhoneNumber=user.phoneNumber
-        })
-        return complaint
-    }))
-    return resp_complaints
+ const complaints = await models.Complaint.findAll() 
+ var complaints_data = []
+  for (each_complaint of complaints) {
+  user_details = await models.User.findOne({where:{id:each_complaint.complainant_id}})
+  console.log(user_details.dataValues)
+    user_data = { 
+      name: user_details.name,
+      phoneNumber: user_details.phone_number
+    } 
+   Object.assign(each_complaint.dataValues,  user_data)
+  complaints_data.push(each_complaint.dataValues)
+ }
+  return complaints_data
 }
 
 exports.post_process_get = async (data, resp) => {
