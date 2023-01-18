@@ -17,57 +17,64 @@ const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.p
 });
 
 exports.pre_process_params = async (req, resp) => {
-    if (req.query.sports_id != null) {
-        const results = await sequelize.query(`SELECT batches.id , batches.status ,batches.price ,batches.start_time, batches.end_time, batches.start_date, batches.end_date, batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,arena.lat,arena.lng,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id) where sports.id = ${req.query.sports_id};`, { type: Sequelize.QueryTypes.SELECT }).then((result) => {            return result;
-        }).catch(() => {
-            throw new Api500Error(`Error in batch search`)
-        })
-        return results;
-
-    } else {const results = await sequelize.query("SELECT batches.id , batches.status ,batches.price ,batches.start_time, batches.end_time, batches.start_date, batches.end_date, batches.days , academy.id AS academy_id, academy.name AS academy_name, arena.name AS arena_name,arena.locality,arena.city,arena.state,arena.lat,arena.lng,coaches.id AS coach_id, coaches.name AS coach_name , coaches.experience, sports.id AS sport_id, sports.name AS sport_name,batches.thumbnail_img AS batch_thumbnail,sports.type FROM ((((Batches batches INNER JOIN Arenas arena on batches.arena_id = arena.id) INNER JOIN Coaches coaches ON batches.coach_id = coaches.id) INNER JOIN Sports sports ON batches.sports_id = sports.id) LEFT JOIN Academies academy on batches.academy_id = academy.id);", { type: Sequelize.QueryTypes.SELECT }).then((result) => {
-            return result;
-        }).catch((e) => {
-            console.log(e)
-            throw new Api500Error(`Error in batch search`)
-        })
-        return results;
+    const results = await models.Batch.findAll()
+    if (results) {
+        resp.send(results);
     }
+    else {
+        resp.status(400).send('Error in fetching batch details');
+    }
+   return results
+
 }
-exports.process_batch_search_input_req = async (req,resp,input_response) => {
+exports.process_batch_search_input_req = async (req,resp,results) => {
     var processed_response = [], overall_ratings = 0, ratings;
-    if (input_response == null) {
-        return input_response
+    if (results == null) {
+        return results
     }
-    for (each_input_response of input_response) {
-        const plan = await models.SubscriptionPlan.findOne({where:{batch_id:each_input_response["id"]}})
-        if(plan || req.query.type === "admin"){
-            overall_ratings = 0;
-            ratings = await models.Review.findAll({
-                where: {
-                    coach_id: each_input_response["coach_id"]
-                }
-            }).then((ratings) => {
-                ratings.forEach((rating) => {
-                    overall_ratings = overall_ratings + rating["rating"]
-                })
-
-                const data2 = { "rating_count": ratings.length, "average_rating": overall_ratings / ratings.length };
-                Object.assign(each_input_response , { "distance": range(req.query.lat, req.query.lng,each_input_response["lat"],each_input_response["lng"] ,"k.m.")})
-                Object.assign(each_input_response, data2)
-                Object.assign(each_input_response, { "address": { "city": each_input_response["city"], "locality": each_input_response["locality"], "state": each_input_response["state"] } })
-                delete each_input_response["city"]
-                delete each_input_response["locality"]
-                delete each_input_response["state"]
-                processed_response.push(each_input_response)
-
-            }).catch((error) => {
-                console.log(error)
+    for (each_result of results) {
+        const batch_details = await models.Batch.findOne({where: {id: each_result.dataValues["id"]}})
+        const arena_details = await models.Arena.findOne({where:{id:each_result.dataValues["arena_id"]}})
+        const coach_details = await models.Coach.findOne({where:{id:each_result.dataValues["coach_id"]}})
+        const academy_details = await models.Academy.findOne({where:{id:each_result.dataValues["academy_id"]}})
+        const sports_details = await models.Sports.findOne({where:{id:each_result.dataValues["sports_id"]}})
+        const plan = await models.SubscriptionPlan.findOne({where:{batch_id:each_result.dataValues["id"]}})
+        const batch_data = batch_details != null ? {"batch_id":batch_details.dataValues["id"],"batch_start_time":batch_details.dataValues["start_time"],"batch_end_time":batch_details.dataValues["end_time"],"batch_start_date":batch_details.dataValues["start_date"],"batch_end_date":batch_details.dataValues["end_date"],"batch_price":batch_details.dataValues["price"],"batch_status":batch_details.dataValues["status"],"batch_days":batch_details.dataValues["days"]} : null
+        const arena_data = arena_details != null ? {"arena_name":arena_details.dataValues["name"],"lat":arena_details.dataValues["lat"],"lng":arena_details.dataValues["lng"]} : null
+        const coach_data = coach_details !=null ? {"coach_name":coach_details.dataValues["name"],"coach_experience":coach_details.dataValues["experience"],} : null
+        const academy_data =  academy_details != null ? {"academy_name":academy_details.dataValues["name"],"academy_phone_number":academy_details.dataValues["phone_number"]} : null
+        const sports_data =  sports_details !=null ? {"sports_name":sports_details.dataValues["name"],"sports_type":sports_details.dataValues["type"],"sports_about":sports_details.dataValues["about"]} : null
+        const plan_data = plan != null ? {"plan_id":plan.dataValues["id"],"plan_name":plan.dataValues["name"],"plan_duration":plan.dataValues["duration"],"plan_description":plan.dataValues["description"]} : null
+        overall_ratings = 0;
+        ratings = await models.Review.findAll({
+            where: {
+                coach_id: each_result.dataValues["coach_id"]
+            }
+        }).then((ratings) => {
+            ratings.forEach((rating) => {
+                overall_ratings = overall_ratings + rating["rating"]
             })
-        }
+            const data2 = { "rating_count": ratings.length, "average_rating": overall_ratings / ratings.length };
+            Object.assign(each_result.dataValues, batch_data)
+            Object.assign(each_result.dataValues, arena_data)
+            Object.assign(each_result.dataValues, plan_data)
+            Object.assign(each_result.dataValues, coach_data)
+            Object.assign(each_result.dataValues, academy_data)
+            Object.assign(each_result.dataValues, sports_data)
+            Object.assign(each_result.dataValues , { "distance": range(req.query.lat, req.query.lng,each_result.dataValues["lat"],each_result.dataValues["lng"] ,"k.m.")})
+            Object.assign(each_result.dataValues, data2)
+            Object.assign(each_result, { "address": { "city": each_result.dataValues["city"], "locality": each_result.dataValues["locality"], "state": each_result.dataValues["state"] } })
+            delete each_result.dataValues["city"]
+            delete each_result.dataValues["locality"]
+            delete each_result.dataValues["state"]
+            processed_response.push(each_result.dataValues)    
+        }).catch((error) => {
+            console.log(error)
+        })
     }
     return processed_response;
 }
-exports.post_process_search_batch = async (req, resp, input_response) => {
+exports.post_process_search_batch = async (req, resp, processed_reponse) => {
     var formatted_response = {}
     var lat = req.query.lat
     var lng = req.query.lng
@@ -75,7 +82,8 @@ exports.post_process_search_batch = async (req, resp, input_response) => {
     const revgeocode_address_label = revgeocode_data.data.items.length > 0 ? revgeocode_data.data.items[0].address.label : ""
     const revgeocode_address_district = revgeocode_data.data.items.length > 0 ? revgeocode_data.data.items[0].address.district : ""    
     formatted_response["address"] = {label:revgeocode_address_label,district:revgeocode_address_district}
-    formatted_response["batchList"] = input_response
+    formatted_response["batchList"] = processed_reponse
+    console.log(formatted_response)
     resp.send(formatted_response)
 }
 
