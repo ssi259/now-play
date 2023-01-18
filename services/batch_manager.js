@@ -33,13 +33,11 @@ exports.process_batch_search_input_req = async (req,resp,results) => {
         return results
     }
     for (each_result of results) {
-        const batch_details = await models.Batch.findOne({where: {id: each_result.dataValues["id"]}})
         const arena_details = await models.Arena.findOne({where:{id:each_result.dataValues["arena_id"]}})
         const coach_details = await models.Coach.findOne({where:{id:each_result.dataValues["coach_id"]}})
         const academy_details = await models.Academy.findOne({where:{id:each_result.dataValues["academy_id"]}})
         const sports_details = await models.Sports.findOne({where:{id:each_result.dataValues["sports_id"]}})
         const plan = await models.SubscriptionPlan.findOne({where:{batch_id:each_result.dataValues["id"]}})
-        const batch_data = batch_details != null ? {"batch_id":batch_details.dataValues["id"],"batch_start_time":batch_details.dataValues["start_time"],"batch_end_time":batch_details.dataValues["end_time"],"batch_start_date":batch_details.dataValues["start_date"],"batch_end_date":batch_details.dataValues["end_date"],"batch_price":batch_details.dataValues["price"],"batch_status":batch_details.dataValues["status"],"batch_days":batch_details.dataValues["days"]} : null
         const arena_data = arena_details != null ? {"arena_name":arena_details.dataValues["name"],"lat":arena_details.dataValues["lat"],"lng":arena_details.dataValues["lng"]} : null
         const coach_data = coach_details !=null ? {"coach_name":coach_details.dataValues["name"],"coach_experience":coach_details.dataValues["experience"],} : null
         const academy_data =  academy_details != null ? {"academy_name":academy_details.dataValues["name"],"academy_phone_number":academy_details.dataValues["phone_number"]} : null
@@ -55,7 +53,6 @@ exports.process_batch_search_input_req = async (req,resp,results) => {
                 overall_ratings = overall_ratings + rating["rating"]
             })
             const data2 = { "rating_count": ratings.length, "average_rating": overall_ratings / ratings.length };
-            Object.assign(each_result.dataValues, batch_data)
             Object.assign(each_result.dataValues, arena_data)
             Object.assign(each_result.dataValues, plan_data)
             Object.assign(each_result.dataValues, coach_data)
