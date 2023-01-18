@@ -39,7 +39,6 @@ exports.process_get = async() => {
  var complaints_data = []
   for (each_complaint of complaints) {
   user_details = await models.User.findOne({where:{id:each_complaint.complainant_id}})
-  console.log(user_details.dataValues)
     user_data = { 
       name: user_details.name,
       phoneNumber: user_details.phone_number
