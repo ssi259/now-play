@@ -42,12 +42,14 @@ exports.new_enrollment = async (input_data) => {
         is_marketing: false,
         is_read:false
     })
+  if (coach['fcm_token'] != null) {
     await send_push_notifications(coach['fcm_token'],
-        {
+      {
         title: notification.title,
-        body:notification.body
-        }
+        body: notification.body
+      }
     )
+  }
 }
 
 async function convert24to12(time_string) {
