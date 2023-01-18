@@ -18,12 +18,6 @@ const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.p
 
 exports.pre_process_params = async (req, resp) => {
     const results = await models.Batch.findAll()
-    if (results) {
-        resp.send(results);
-    }
-    else {
-        resp.status(400).send('Error in fetching batch details');
-    }
    return results
 
 }
@@ -80,7 +74,6 @@ exports.post_process_search_batch = async (req, resp, processed_reponse) => {
     const revgeocode_address_district = revgeocode_data.data.items.length > 0 ? revgeocode_data.data.items[0].address.district : ""    
     formatted_response["address"] = {label:revgeocode_address_label,district:revgeocode_address_district}
     formatted_response["batchList"] = processed_reponse
-    console.log(formatted_response)
     resp.send(formatted_response)
 }
 
