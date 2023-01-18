@@ -417,7 +417,7 @@ exports.process_get_coach_enrolled_students = async (input_data) => {
       status: 'pending'
     }
   })
-  return {"students_enrolled":student_enrolled.length , "pending_payments_total":payments[0].dataValues.pending_payments_total , "enrollment_count":enrollment_count};
+  return {"students_enrolled":student_enrolled.length , "pending_payments_total":payments[0].dataValues.pending_payments_total || 0 , "enrollment_count":enrollment_count};
 }
 
 exports.post_process_get_coach_enrolled_students = async (resp,data) => {
