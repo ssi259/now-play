@@ -386,6 +386,9 @@ async function batch_detials_fun(batch_id) {
   }
   return data
 }
+exports.post_process_get_coach_batches = async (resp,batches) => {
+  resp.status(200).send({status:"Success",data:batches})
+}
 
 exports.pre_process_get_coach_enrolled_students = async (req) => {
   return {"coach_id":req.user.coach_id}
