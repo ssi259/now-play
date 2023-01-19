@@ -36,6 +36,7 @@ exports.get_coaches = async (req, resp) => {
         var process_response = await coachManager.process_get_coaches_input_req(input_response)
         var post_process_response = await coachManager.post_get_coaches_process(resp,process_response)
     } catch (e) {
+        console.log(e)
         const status_code = e.statusCode ? e.statusCode : 500
         resp.status(status_code).send({status:"Failure",message:e.name})
     }
