@@ -15,7 +15,7 @@ exports.new_enrollment = async (input_data) => {
         receiver_type: "coach",
         type: "new_enrollment",
         title: "New Enrollment",
-        body: `${user['name'] != null ? user['name'] : 'New Player'} just requested for enrollment in the ${await convert24to12(batch['start_time'])}-${await convert24to12(batch['end_time'])} batch at ${academy['name']}`,
+        body: `${user['name'] != null ? user['name'] : 'New Player'} just requested for enrollment in ${plan['type']} plan in the ${await convert24to12(batch['start_time'])}-${await convert24to12(batch['end_time'])} batch at ${academy['name']}`,
         data: {
           sender: {
             id: user['id'],
