@@ -73,7 +73,7 @@ exports.process_get_all_users = async (req,query) => {
     return users
 }
  else{users = await models.User.findAll({where:{status: "active"}})}
-
+ return users
 }
 
 exports.post_process_get_all_users = async (users, resp) => {
