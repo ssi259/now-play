@@ -264,7 +264,7 @@ exports.process_get_payments_by_status = async (input_data) => {
       status : 'active'
     }
   })
-  return await Promise.all(coach_batches.map(async (batch) => {
+  const data_response =  await Promise.all(coach_batches.map(async (batch) => {
     const batch_data = await batch_detials_fun(batch.id)
     if (status == 'upcoming') {
       const seven_days_after = await date_with_days_gap(7)
@@ -278,6 +278,7 @@ exports.process_get_payments_by_status = async (input_data) => {
           }
         }
       })
+      if(enrollments.length == 0 ) return null
       batch_data.payments = await collection_detail(enrollments , status)
     }
     else {
@@ -287,10 +288,12 @@ exports.process_get_payments_by_status = async (input_data) => {
           status: status
         }
       })
+      if(payments.length == 0) return null
       batch_data.payments = await collection_detail(payments , status)
     }
     return batch_data
   }))
+  return await data_response.filter(item => item != null)
 }
 
 async function date_with_days_gap(days) {
