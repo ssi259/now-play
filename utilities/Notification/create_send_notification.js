@@ -6,7 +6,7 @@ exports.new_enrollment = async (input_data) => {
     const user = await models.User.findByPk(user_id)
     const coach = await models.Coach.findByPk(coach_id)
     const batch = await models.Batch.findByPk(batch_id)
-    const arena = await models.Academy.findByPk(batch['arena_id'])
+    const academy = await models.Academy.findByPk(batch['academy_id'])
     const plan = await models.SubscriptionPlan.findByPk(plan_id)
     const notification = await models.Notification.create({
         sender_id: user['id'],
@@ -15,7 +15,7 @@ exports.new_enrollment = async (input_data) => {
         receiver_type: "coach",
         type: "new_enrollment",
         title: "New Enrollment",
-        body: `${user['name'] != null ? user['name'] : user['phoneNumber']} just requested for enrollment in the ${await convert24to12(batch['start_time'])}-${await convert24to12(batch['end_time'])} batch at ${arena['name']}`,
+        body: `${user['name'] != null ? user['name'] : 'New Player'} just requested for enrollment in ${plan['type']} plan in the ${await convert24to12(batch['start_time'])}-${await convert24to12(batch['end_time'])} batch at ${academy['name']}`,
         data: {
           sender: {
             id: user['id'],
