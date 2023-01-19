@@ -124,9 +124,6 @@ exports.process_get_coaches= async () => {
   return coaches;
 }
 
-exports.post_process_get_coaches = async ( coaches, resp) => {
-  resp.status(200).send({status:"Success",data:coaches})
-}
 
 exports.pre_process_get_coach_by_id = (req) => {
   if (req.params == null || req.params.id == null) {

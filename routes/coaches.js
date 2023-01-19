@@ -15,7 +15,7 @@ routes.post('/', coach_controller.createCoach);
 routes.post('/reminders/payment', auth, coach_controller.send_payment_reminder);
 routes.post('/upload_images',coach_controller.uploadCoachImages);
 routes.post('/upload_documents',coach_controller.uploadCoachDocuments);
-routes.get('/', coach_controller.getCoaches)
+routes.get('/', coach_controller.get_coaches)
 routes.get('/batches/:id',auth,coach_controller.get_batch_details)
 routes.get('/player/:id',auth,coach_controller.get_player_details)
 routes.get('/batches', auth, coach_controller.getCoachBatches)
