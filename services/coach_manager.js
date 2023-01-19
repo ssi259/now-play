@@ -108,6 +108,7 @@ async function upload_and_create_document_data(document, coach_id,document_type)
 
 
 exports.process_get_coaches= async () => {
+<<<<<<< HEAD
   const coaches = await Coach.findAll()
   let awards = []
   let team_affiliations = []
@@ -121,6 +122,10 @@ exports.process_get_coaches= async () => {
     each_coach["awards"] = awards
     each_coach["team_affiliations"] = team_affiliations
   }
+=======
+  const host = req.get('host')
+  const coaches = await Coach.findAll((host === "http://65.0.72.215:3000") ? {} : {where: {status: 'active'}})
+>>>>>>> b981928 (finalcommit)
   return coaches;
 }
 
