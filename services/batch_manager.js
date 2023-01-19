@@ -34,9 +34,9 @@ exports.process_batch_search_input_req = async (req,resp,results) => {
         const plan = await models.SubscriptionPlan.findOne({where:{batch_id:each_result.dataValues["id"]}})
         const arena_data = arena_details != null ? {"arena_name":arena_details.dataValues["name"],"lat":arena_details.dataValues["lat"],"lng":arena_details.dataValues["lng"]} : null
         const coach_data = coach_details !=null ? {"coach_name":coach_details.dataValues["name"],"coach_experience":coach_details.dataValues["experience"],} : null
-        const academy_data =  academy_details != null ? {"academy_name":academy_details.dataValues["name"],"academy_phone_number":academy_details.dataValues["phone_number"]} : null
-        const sports_data =  sports_details !=null ? {"sports_name":sports_details.dataValues["name"],"sports_type":sports_details.dataValues["type"],"sports_about":sports_details.dataValues["about"]} : null
-        const plan_data = plan != null ? {"plan_id":plan.dataValues["id"],"plan_name":plan.dataValues["name"],"plan_duration":plan.dataValues["duration"],"plan_description":plan.dataValues["description"]} : null
+        const academy_data =  academy_details != null ? {"academy_name":academy_details.dataValues["name"]} : null
+        const sports_data =  sports_details !=null ? {"sports_name":sports_details.dataValues["name"],"type":sports_details.dataValues["type"]} : null
+        const plan_data = plan != null ? {"plan_name":plan.dataValues["name"]} : null
         overall_ratings = 0;
         ratings = await models.Review.findAll({
             where: {
