@@ -46,5 +46,15 @@ exports.post_process_get_all_enrollments_details = async (data, resp) => {
 }
 
 exports.pre_process_update_user_enrollment = async (req) => {
-    return { user_id: req.user.user_id }
+    const enrollments = await models.Enrollment.findAll()
+    return enrollments
+}
+
+exports.process_update_user_enrollment = async (input_response, req) => {
+    // for (each_input_response of input_response) {
+    //     user_enrollemnt = await models.User.update({enrolled:"status".each_input_response.datavalues["status"]}, {
+    //         where: {
+    //             id: each_input_response["user_id"]}
+    //             })
+    // }
 }
