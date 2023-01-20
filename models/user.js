@@ -21,7 +21,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       defaultValue: 'active'
     },
-    dob:DataTypes.STRING
+    dob:DataTypes.STRING,
+    enrolled:DataTypes.STRING
   }, {
     sequelize,
     modelName: 'User',

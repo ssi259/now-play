@@ -63,12 +63,23 @@ exports.post_process_upload_profile_pic = async (data,resp) => {
 }
 
 exports.pre_process_get_all_users = async (req) => {
-    return req.query
-}
-
-exports.process_get_all_users = async (query) => {
     const users = await models.User.findAll()   
     return users
+}
+
+exports.process_get_all_users = async (input_response) => {
+    for (each_input_response of input_response){
+    const enrolled_or_not = await models.Enrollment.findOne({where:{user_id:each_input_response["id"]}})
+    if(enrolled_or_not){
+        each_input_response["enrolled"] = true
+    }else{
+        each_input_response["enrolled"] = false
+    }
+    console.log(each_input_response["enrolled"])
+    Object.assign(each_input_response.dataValues, { "enrolled": enrolled_or_not ? true : false })
+    }
+    return input_response
+   
 }
 
 exports.post_process_get_all_users = async (users, resp) => {
