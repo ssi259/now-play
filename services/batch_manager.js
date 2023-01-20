@@ -33,10 +33,12 @@ exports.process_batch_search_input_req = async (req,resp,results) => {
         const sports_details = await models.Sports.findOne({where:{id:each_result.dataValues["sports_id"]}})
         const plan = await models.SubscriptionPlan.findOne({where:{batch_id:each_result.dataValues["id"]}})
         const arena_data = arena_details != null ? {"arena_name":arena_details.dataValues["name"],"lat":arena_details.dataValues["lat"],"lng":arena_details.dataValues["lng"]} : null
-        const coach_data = coach_details !=null ? {"coach_name":coach_details.dataValues["name"],"coach_experience":coach_details.dataValues["experience"],} : null
+        const coach_data = coach_details !=null ? {"coach_name":coach_details.dataValues["name"],"experience":coach_details.dataValues["experience"],} : null
         const academy_data =  academy_details != null ? {"academy_name":academy_details.dataValues["name"]} : null
-        const sports_data =  sports_details !=null ? {"sports_name":sports_details.dataValues["name"],"type":sports_details.dataValues["type"]} : null
+        const sports_data =  sports_details !=null ? {"sport_name":sports_details.dataValues["name"],"type":sports_details.dataValues["type"]} : null
         const plan_data = plan != null ? {"plan_name":plan.dataValues["name"]} : null
+        const batch_data =  {"batch_thumbnail":each_result.dataValues["thumbnail_img"],"sport_id":each_result.dataValues["sports_id"]} 
+        const arena_address = {"state":arena_details.dataValues["state"],"city":arena_details.dataValues["city"],"locality":arena_details.dataValues["locality"]}
         overall_ratings = 0;
         ratings = await models.Review.findAll({
             where: {
@@ -54,10 +56,14 @@ exports.process_batch_search_input_req = async (req,resp,results) => {
             Object.assign(each_result.dataValues, sports_data)
             Object.assign(each_result.dataValues , { "distance": range(req.query.lat, req.query.lng,each_result.dataValues["lat"],each_result.dataValues["lng"] ,"k.m.")})
             Object.assign(each_result.dataValues, data2)
-            Object.assign(each_result, { "address": { "city": each_result.dataValues["city"], "locality": each_result.dataValues["locality"], "state": each_result.dataValues["state"] } })
-            delete each_result.dataValues["city"]
-            delete each_result.dataValues["locality"]
-            delete each_result.dataValues["state"]
+            Object.assign(each_result.dataValues, batch_data)
+            Object.assign(each_result.dataValues, { "address": arena_address })
+            delete each_result.dataValues["arena_id"]
+            delete each_result.dataValues["createdAt"]
+            delete each_result.dataValues["updatedAt"]
+            delete each_result.dataValues["banner_img"]
+            delete each_result.dataValues["thumbnail_img"]
+            delete each_result.dataValues["sports_id"]
             processed_response.push(each_result.dataValues)    
         }).catch((error) => {
             console.log(error)
