@@ -44,3 +44,7 @@ exports.process_get_all_enrollments_details = async () => {
 exports.post_process_get_all_enrollments_details = async (data, resp) => {
     resp.status(200).send({ status: "success", message: "retrieved enrollments successfully", data: data })
 }
+
+exports.pre_process_update_user_enrollment = async (req) => {
+    return { user_id: req.user.user_id }
+}

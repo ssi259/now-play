@@ -22,3 +22,14 @@ exports.get_all_enrollments_details = async (req, resp) => {
         return resp.status(status_code).send({ status: "failure", message: e.name })
     }
 }
+
+exports.update_user_enrollment = async (req, resp) => {
+    try {
+        var input_response = await enrollment_manager.pre_process_update_user_enrollment(req)
+        var process_response = await enrollment_manager.process_update_user_enrollment(input_response,resp)
+        var processed_response = await enrollment_manager.post_process_update_user_enrollment(process_response, resp)
+    } catch (e) {
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name })
+    }
+}
