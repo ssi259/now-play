@@ -411,13 +411,21 @@ exports.process_get_coach_enrolled_students = async (input_data) => {
     }
   })
 
-  const current_date = new Date()
-  const current_date_string = current_date.toISOString().split('T')[0]
+  let date = new Date();
+ let dateString = date.toISOString().slice(0,10);
+ const [year, month, day] = dateString.split('-');
   const enrollment_count = await models.Enrollment.count({
     where: {
       coach_id: coach_id,
-      createdAt: current_date_string,
-      status: 'pending'
+      status: 'active',
+      status: 'pending',
+      [sequelize.Op.and]: [
+        sequelize.where(sequelize.fn('DAY', sequelize.col('createdAt')), day),
+        sequelize.where(sequelize.fn('MONTH', sequelize.col('createdAt')), month),
+        sequelize.where(sequelize.fn('YEAR', sequelize.col('createdAt')), year),
+        
+      ]
+        
     }
   })
   return {"students_enrolled":student_enrolled.length , "pending_payments_total":payments[0].dataValues.pending_payments_total || 0 , "enrollment_count":enrollment_count};
