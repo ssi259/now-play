@@ -478,7 +478,7 @@ exports.process_upcoming_classes = async (user) => {
         result.push({
             day:date_weekday[date],
             date: date,
-            classes:upcoming_classes[date]
+            classes: await date_after_gap(0) == date ? upcoming_classes[date].filter((class_item) => class_item['end_time'] > get_curr_time_hhmmss()) : upcoming_classes[date]
         })
     }
     return result
