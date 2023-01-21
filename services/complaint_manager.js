@@ -38,10 +38,9 @@ exports.process_get = async() => {
     const complaints = await models.Complaint.findAll()
     const resp_complaints = await Promise.all(complaints.map(async (complaint) => {
         complaint = complaint.toJSON()
-        await models.User.findByPk(complaint.complainant_id).then(user => {
-            complaint.complainant_name=user.name,
-            complaint.complainant_PhoneNumber=user.phoneNumber
-        })
+        await models.User.findByPk(complaint.complainant_id).then(user => { complaint.complainant_name=user.name,complaint.complainant_PhoneNumber=user.phoneNumber})
+        if(complaint.complainant_name==null) complaint.complainant_name="null" 
+        if(complaint.complainant_PhoneNumber==null) complaint.complainant_PhoneNumber="null"
         return complaint
     }))
     return resp_complaints
