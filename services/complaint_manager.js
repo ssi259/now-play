@@ -31,7 +31,7 @@ exports.post_process_create = async (data, resp) => {
 
 
 exports.pre_process_get = async (req) => {
-    return req
+    return {}
 }
 
 exports.process_get = async() => {
@@ -39,9 +39,10 @@ exports.process_get = async() => {
     const resp_complaints = await Promise.all(complaints.map(async (complaint) => {
         complaint = complaint.toJSON()
         await models.User.findByPk(complaint.complainant_id).then(user => {
-            complaint.complainant_name=user.name,
+            complaint.complainant_name=user.name
             complaint.complainant_PhoneNumber=user.phoneNumber
         })
+        console.log(user.name)
         if(complaint.complainant_name==null) complaint.complainant_name="null" 
         if(complaint.complainant_PhoneNumber==null) complaint.complainant_PhoneNumber="null"
         return complaint
