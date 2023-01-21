@@ -432,8 +432,9 @@ exports.process_get_coach_enrolled_students = async (input_data) => {
   const enrollment_count = await models.Enrollment.count({
     where: {
       coach_id: coach_id,
-      status: 'active',
-      status: 'pending',
+      status: {
+        [Op.or]: ["active", "pending"]
+      },
       [sequelize.Op.and]: [
         sequelize.where(sequelize.fn('DAY', sequelize.col('createdAt')), day),
         sequelize.where(sequelize.fn('MONTH', sequelize.col('createdAt')), month),
