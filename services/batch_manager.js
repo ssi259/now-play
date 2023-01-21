@@ -17,8 +17,13 @@ const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.p
 });
 
 exports.pre_process_params = async (req, resp) => {
+    if(req.query.type == "admin"){
     const results = await models.Batch.findAll()
-   return results
+    return results
+    }else{
+        const results = await models.Batch.findAll({where:{status:"active"}})
+        return results
+    }
 
 }
 exports.process_batch_search_input_req = async (req,resp,results) => {
