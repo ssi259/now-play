@@ -42,6 +42,8 @@ exports.process_get = async() => {
             complaint.complainant_name=user.name,
             complaint.complainant_PhoneNumber=user.phoneNumber
         })
+        if(complaint.complainant_name==null) complaint.complainant_name="null" 
+        if(complaint.complainant_PhoneNumber==null) complaint.complainant_PhoneNumber="null"
         return complaint
     }))
     return resp_complaints
