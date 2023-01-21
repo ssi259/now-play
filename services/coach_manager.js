@@ -239,7 +239,7 @@ exports.process_get_coach_batches = async (input_data) => {
     }
   })
   
-  const reviews = await models.Review.findAll({ where: coach_id })
+  const reviews = await models.Review.findAll({ where: {coach_id: coach_id} })
   const ratings_sum =  reviews.reduce((total , review) => {
     return total + review['rating']
   }, 0)
@@ -527,7 +527,7 @@ exports.process_get_batch_details = async (input_data) => {
   }))
   batch.enrolled_players = enrolled_players
 
-  const reviews = await models.Review.findAll({ where:coach_id }) 
+  const reviews = await models.Review.findAll({ where:{coach_id: coach_id} }) 
   const reviews_list = []
   for(let review of reviews){
     const user = await models.User.findOne({where:{id: review['user_id']}})
