@@ -17,6 +17,7 @@ exports.get = async (req, resp) => {
         const processed_response = await complaint_manager.process_get()
         await complaint_manager.post_process_get(processed_response,resp)
     } catch (e) {
+        console.log(e)
         const status_code = e.statusCode ? e.statusCode : 500
         return resp.status(status_code).send({ status: "failure", message: e.name,data:{}})
     }
