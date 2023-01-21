@@ -88,7 +88,8 @@ exports.pre_process_get_all_plans = async (req) => {
         allPlans = await models.SubscriptionPlan.findAll()
     return allPlans}
  else{
-    allPlans = await models.Sequelize.findAll({where: {status: 'active'}})
+    allPlans = await models.SubscriptionPlan.findAll({where: {status: 'active'}})
+    return allPlans
  }
 
 }
