@@ -106,9 +106,19 @@ async function upload_and_create_document_data(document, coach_id,document_type)
   await CoachDocument.create({ coachId: coach_id,document_url,document_type})
 }
 
+exports.pre_process_get_coaches = async(req,resp)=>{
+  if (req.query.type == "admin"){
+    const coaches = await Coach.findAll()
+    return coaches
+  }
+  else { const coaches = await Coach.findAll({where:{status:"active"}})
+    return coaches  
+  }
 
-exports.process_get_coaches= async () => {
-  const coaches = await Coach.findAll()
+}
+
+exports.process_get_coaches_input_req= async (input_reponse) => {
+  const coaches = input_reponse
   let awards = []
   let team_affiliations = []
   for (each_coach of coaches) {
@@ -124,9 +134,10 @@ exports.process_get_coaches= async () => {
   return coaches;
 }
 
-exports.post_process_get_coaches = async ( coaches, resp) => {
-  resp.status(200).send({status:"Success",data:coaches})
+exports.post_get_coaches_process = async (  resp, process_response) => {
+  resp.status(200).send({status:"Success",data:process_response})
 }
+
 
 exports.pre_process_get_coach_by_id = (req) => {
   if (req.params == null || req.params.id == null) {
@@ -223,7 +234,8 @@ exports.process_get_coach_batches = async (input_data) => {
   const {coach_id} = input_data
   const batches = await models.Batch.findAll({
     where: {
-      coach_id: coach_id
+      coach_id: coach_id,
+      status: 'active'
     }
   })
   
@@ -387,6 +399,9 @@ async function batch_detials_fun(batch_id) {
     "img_list":batch_images
   }
   return data
+}
+exports.post_process_get_coach_batches = async (resp,batches) => {
+  resp.status(200).send({status:"Success",data:batches})
 }
 
 exports.pre_process_get_coach_enrolled_students = async (req) => {

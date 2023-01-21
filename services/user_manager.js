@@ -66,9 +66,14 @@ exports.pre_process_get_all_users = async (req) => {
     return req.query
 }
 
-exports.process_get_all_users = async (query) => {
-    const users = await models.User.findAll()   
+exports.process_get_all_users = async (req,query) => {
+    let users = []
+    if(req.query.type == "admin"){
+     users = await models.User.findAll() 
     return users
+}
+ else{users = await models.User.findAll({where:{status: "active"}})}
+ return users
 }
 
 exports.post_process_get_all_users = async (users, resp) => {

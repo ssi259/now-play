@@ -51,7 +51,12 @@ async function upload_and_create_data(image, arena_id) {
 }
 
 exports.pre_process_arena_details = async(req,resp)=>{
-  const arena_details = await  models.Arena.findAll()
+  let arena_details = []
+  if(req.query.type =="admin"){
+    arena_details = await  models.Arena.findAll()}
+  else{
+    arena_details = await models.Arena.findAll({where: {status: 'Active'}})}
+  
       if (arena_details) {
           return arena_details;
       } else {

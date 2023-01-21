@@ -30,15 +30,18 @@ exports.uploadCoachDocuments = async (req, resp) =>{
     }
 }
 
-exports.getCoaches = async (req, resp) => {
+exports.get_coaches = async (req, resp) => {
     try {
-        var process_response = await coachManager.process_get_coaches()
-        var post_process_response = await coachManager.post_process_get_coaches(process_response,resp)
+        var input_response = await coachManager.pre_process_get_coaches(req)
+        var process_response = await coachManager.process_get_coaches_input_req(input_response)
+        var post_process_response = await coachManager.post_get_coaches_process(resp,process_response)
     } catch (e) {
+        console.log(e)
         const status_code = e.statusCode ? e.statusCode : 500
         resp.status(status_code).send({status:"Failure",message:e.name})
     }
 }
+
 
 exports.getCoachById = async (req, resp) => {
     try {
