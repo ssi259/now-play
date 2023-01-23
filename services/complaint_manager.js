@@ -38,7 +38,7 @@ exports.process_get = async() => {
     const complaints = await models.Complaint.findAll()
     const resp_complaints = await Promise.all(complaints.map(async (complaint) => {
         complaint = complaint.toJSON()
-        if(complaint.complainant_type == "player" , complaint.complainant_id != null) {
+        if(complaint.complainant_type == "player" ) {
         await models.User.findByPk(complaint.complainant_id).then(user => {
             complaint.complainant_name=user.name !=null ? user.name : null,
             complaint.complainant_PhoneNumber=user.phoneNumber !=null ? user.phoneNumber : null
