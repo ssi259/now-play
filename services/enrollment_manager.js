@@ -35,7 +35,7 @@ exports.process_get_all_enrollments_details = async () => {
         enrollment.academy_name = (await models.Academy.findByPk(academy_id)).name;
         enrollment.sports_name = (await models.Sports.findByPk(sports_id)).name;
         enrollment.plan_name = (await models.SubscriptionPlan.findByPk(enrollment.subscription_id)).plan_name;
-        enrollment.coach_name = (await models.User.findByPk(enrollment.coach_id)).name;
+        enrollment.coach_name = (await models.Coach.findByPk(enrollment.coach_id)).name;
         return enrollment
     }))
     return userEnrollments;
