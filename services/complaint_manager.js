@@ -38,14 +38,14 @@ exports.process_get = async() => {
     const complaints = await models.Complaint.findAll()
     const resp_complaints = await Promise.all(complaints.map(async (complaint) => {
         complaint = complaint.toJSON()
-        if(complaint.complainant_type == "player") {
+        if(complaint.complainant_type == "player" , complaint.complainant_id != null) {
         await models.User.findByPk(complaint.complainant_id).then(user => {
-            complaint.complainant_name=user.name,
-            complaint.complainant_PhoneNumber=user.phoneNumber
-        })} else {
+            complaint.complainant_name=user.name !=null ? user.name : null,
+            complaint.complainant_PhoneNumber=user.phoneNumber !=null ? user.phoneNumber : null
+        })} else if (complaint.complainant_type == "coach" ){
             await models.Coach.findByPk(complaint.complainant_id).then(coach => {
-                complaint.complainant_name=coach.name,
-                complaint.complainant_PhoneNumber=coach.phoneNumber
+                complaint.complainant_name=coach.name != null ? coach.name : null,
+                complaint.complainant_PhoneNumber=coach.phoneNumber !=null ? coach.phoneNumber : null
             })
         }
         return complaint
