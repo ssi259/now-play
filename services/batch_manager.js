@@ -17,14 +17,14 @@ const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.p
 });
 
 exports.pre_process_params = async (req, resp) => {
-    if(req.query.type == "admin" && req.query.sports_id == null){
+    if(req.query.type == "admin" ){
     const results = await models.Batch.findAll()
     return results
-    }else if (req.query.type == null && req.query.sports_id != null){
+    }else if (req.query.sports_id != null){
         const results = await models.Batch.findAll({where:{status:"active",sports_id:req.query.sports_id}})
         return results
     }
-    else if (req.query.type == null && req.query.sports_id == null){
+    else {
         const results = await models.Batch.findAll({where:{status:"active"}})
         return results
     }
