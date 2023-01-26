@@ -7,18 +7,31 @@ const Api400Error = require('../error/api400Error')
 const Api500Error = require('../error/api500Error')
 
 exports.pre_process_generate = async (req) => {
-    const { phone_number } = req.body;
+    const { phone_number , type } = req.body;
     if (!phone_number) {
         throw new Api400Error("phone number not provided")
     }
     if (phone_number.length > 10) {
         throw new Api400Error("Invalide Phone Number Format")
     }
+    if (type == null) {
+        throw new Api400Error("user type not provided")
+    }
     return req.body
 }
 
 exports.process_generate = async (input) => {
-    const { phone_number } = input
+    const { phone_number , type } = input
+    if (type == 'coach') {
+        const coach = await models.Coach.findOne({
+            where: {
+                phone_number: phone_number,
+            }
+        })
+        if (!coach) {
+            throw new Api400Error("You are not registered with us")
+        }
+    }
     const now = new Date();
     const expiration_date = new Date(now.getTime() + 10 * 60000);
     let otp;
@@ -36,7 +49,7 @@ exports.process_generate = async (input) => {
         }
     });
     otp = otp_instance.otp
-    return {phone_number, otp}
+    return {phone_number, otp }
 }
 
 exports.post_process_generate = async (input, resp) => {
