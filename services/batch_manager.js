@@ -24,6 +24,10 @@ exports.pre_process_params = async (req, resp) => {
         const results = await models.Batch.findAll({where:{status:"active",sports_id:req.query.sports_id}})
         return results
     }
+    else if (req.query.type == null && req.query.sports_id == null){
+        const results = await models.Batch.findAll({where:{status:"active"}})
+        return results
+    }
 }
 exports.process_batch_search_input_req = async (req,resp,results) => {
     var processed_response = [], overall_ratings = 0, ratings;
