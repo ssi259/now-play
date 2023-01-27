@@ -734,8 +734,7 @@ exports.process_get_batch_subscription_details_of_coach = async (input_data) => 
     const subscription_details = await models.SubscriptionPlan.findAll({
       where: {batch_id: each_batch["id"]}
     })
-    const subscription_data = {"batch_id":subscription_details[0]["batch_id"],"plan_name": subscription_details[0]["plan_name"],"type": subscription_details[0]["type"],"description": subscription_details[0]["description"],"duration": subscription_details[0]["duration"],"status": subscription_details[0]["status"]}
-    subscription_detail.push(subscription_data)
+    subscription_detail.push(subscription_details)
   }
    return subscription_detail
 }
