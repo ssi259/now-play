@@ -719,3 +719,26 @@ exports.process_pay_reminder = async (input_data) => {
 exports.post_process_pay_reminder = async (resp) => {
   resp.status(200).send({ status: "success", message: "payment reminder sent successfully", data: {} })
 }
+
+exports.pre_process_get_batch_subscription_details_of_coach = async (req) => {
+  return {coach_id:req.user.coach_id}
+}
+
+exports.process_get_batch_subscription_details_of_coach = async (input_data) => {
+  var { coach_id} = input_data
+  var subscription_detail = []
+  const batch_details = await models.Batch.findAll({
+    where: {coach_id: coach_id}
+  })
+  for (each_batch of batch_details){
+    const subscription_details = await models.SubscriptionPlan.findAll({
+      where: {batch_id: each_batch["id"]}
+    })
+    subscription_detail.push(subscription_details)
+  }
+   return subscription_detail
+}
+
+exports.post_process_get_batch_subscription_details_of_coach = async (resp,data) => {
+  resp.status(200).send({status:"success",message:"retrieved data successfully", data})
+}
