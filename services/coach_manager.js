@@ -728,12 +728,21 @@ exports.pre_process_get_batch_subscription_details_of_coach = async (req) => {
 
 exports.process_get_batch_subscription_details_of_coach = async (input_data) => {
   var { coach_id, batch_id} = input_data
-  const subscription_detail = await models.SubscriptionPlan.findAll({
+  const coach_batches = await models.Batch.findOne({
+    where: {
+      coach_id:coach_id,
+      id:batch_id
+    }
+  })
+  if(!coach_batches){
+    throw new Api400Error("Batch does not exist")
+  }
+  const subscription_details = await models.SubscriptionPlan.findAll({
     where: {
       batch_id:batch_id
     }
   })
-  return subscription_detail
+  return subscription_details
 }
 
 exports.post_process_get_batch_subscription_details_of_coach = async (resp,data) => {
