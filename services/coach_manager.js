@@ -721,7 +721,7 @@ exports.post_process_pay_reminder = async (resp) => {
 }
 
 exports.pre_process_get_batch_subscription_details_of_coach = async (req) => {
-  batch_id = req.body.batch_id
+  batch_id = req.params.id
   coach_id = req.user.coach_id
   return {coach_id, batch_id}
 }
