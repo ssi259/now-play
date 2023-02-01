@@ -151,10 +151,10 @@ exports.post_process_verify = async (token,resp) => {
 function otp_generator(phone_number, type) {
     var digits = '0123456789';
     let otp = '';
-    if (type == 'player' && phone_number == '7376235783') {
+    if (type == 'player' && phone_number == '2345678901') {
         otp  = '1008'
     }
-    else if (type == 'coach' && phone_number == '9560778810') {
+    else if (type == 'coach' && phone_number == '2345678902') {
         otp = '1080'
     }
     else {
