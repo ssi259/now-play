@@ -709,7 +709,7 @@ exports.process_pay_reminder = async (input_data) => {
     where: {id: player_id}
   })
   const payment_reminder = `${user['name']}, Your coach has requested for a payment. Please proceed according or expect a discontinuation of your sevices`
-  send_push_notifications("eypvdFFQQSqKDdvVrzUwpU:APA91bHz8kUUenGSthOSU6sGD316PNJL-tQn6wQBZJnqUQu2K6Pqmhnc6xUwlzMQQNJxWf5Hdeedl1LblaOzPeYAb_eo_46nyB0inJT6ZiFxHL2LM9NCPgWPSZIKAHs2DLRI-lJwyYat", {
+  send_push_notifications(user['fcm_token'], {
     title: "Payment Reminder",
     body: payment_reminder,
   })
