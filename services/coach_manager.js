@@ -4,7 +4,7 @@ const Api400Error = require('../error/api400Error')
 const {Op} = require('sequelize')
 const models = require('../models');
 const sequelize = require('sequelize')
-const {send_push_notifications} = require('../utilities/send_push_notifications')
+const create_send_notification = require('../utilities/Notification/create_send_notification')
 
 exports.process_create_coach = async (req, resp) => {
     const {
@@ -700,20 +700,12 @@ exports.post_process_add_fcm_token = async (resp) => {
 }
 
 exports.pre_process_pay_reminder = async (req) => {
-  return {player_id:req.query.player_id}
+  return {enrollment_id:req.query.enrollment_id}
 }
 
 exports.process_pay_reminder = async (input_data) => {
-  var { player_id} = input_data
-  const user = await models.User.findOne({
-    where: {id: player_id}
-  })
-  const payment_reminder = `${user['name']}, Your coach has requested for a payment. Please proceed according or expect a discontinuation of your sevices`
-  send_push_notifications(user['fcm_token'], {
-    title: "Payment Reminder",
-    body: payment_reminder,
-  })
- return payment_reminder
+  const { enrollment_id } = input_data
+  await create_send_notification.payment_reminder(enrollment_id)
 }
 
 exports.post_process_pay_reminder = async (resp) => {
