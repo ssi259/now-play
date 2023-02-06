@@ -60,6 +60,7 @@ exports.process_update_input_req = async(req,input_response)=>{
     await models.Payment.update({status: "success"}, {where: {id: payment_data.id}})
   }
   await mark_notification_read(payment_data.id)
+  await create_send_notification.payment_status({enrollment_id: enrollment_data['id'], payment_id:payment_data['id'], coach_resp})
   return {payment_id: payment_data.id, enrollment_id: enrollment_data.id, dataValues:req.body, coach_resp: coach_resp}
 }
 
