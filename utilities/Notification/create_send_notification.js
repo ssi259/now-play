@@ -66,3 +66,36 @@ async function convert24to12(time_string) {
     }
     return time12;
 }
+
+exports.payment_reminder = async (enrollment_id) => {
+  const enrollment = await models.Enrollment.findByPk(enrollment_id)
+  const user = await models.User.findByPk(enrollment['user_id'])
+  const batch = await models.Batch.findByPk(enrollment['batch_id'])
+  const academy = await models.Academy.findByPk(batch['academy_id'])
+  const plan = await models.SubscriptionPlan.findByPk(enrollment['subscription_id'])
+  const notification = await models.Notification.create(
+    {
+      sender_id: enrollment['coach_id'],
+      sender_type: "coach",
+      receiver_id: user['id'],
+      receiver_type: "player",
+      type: "payment_reminder",
+      title: "Payment Reminder",
+      body: `Dear ${user['name'] || 'User'}, Your ${plan['type']} plan of Rs.${plan['price']} expires on ${enrollment['end_date'].toLocaleDateString('en-IN', {year:"numeric", month:"short", day:"numeric"})} for your class at ${academy['name']}.Please pay immediately to continue your enrollment`,
+      data: {
+        enrollment_id: enrollment_id,
+        batch_thumbnail_img:batch['thumbnail_img']
+      },
+      is_marketing: false,
+      is_read:false
+    }
+  )
+  if (user['fcm_token'] != null) {
+    await send_push_notifications(user['fcm_token'],
+      {
+        title: notification.title,
+        body: notification.body
+      }
+    )
+  }
+}
