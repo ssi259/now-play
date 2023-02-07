@@ -107,10 +107,11 @@ exports.payment_status = async (input_data) => {
   const user = await models.User.findByPk(enrollment['user_id'])
   const batch = await models.Batch.findByPk(enrollment['batch_id'])
   const academy = await models.Academy.findByPk(batch['academy_id'])
-  const sport = await models.Sports.findByPk(batch['sport_id'])
+  const sport = await models.Sports.findByPk(batch['sports_id'])
+  const coach = await models.Coach.findByPk(enrollment['coach_id'])
   const notification = await models.Notification.create(
     {
-      sender_id: enrollment['coach_id'],
+      sender_id: coach['id'],
       sender_type: "coach",
       receiver_id: user['id'],
       receiver_type: "player",
