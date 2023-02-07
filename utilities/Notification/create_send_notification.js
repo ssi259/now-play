@@ -99,3 +99,39 @@ exports.payment_reminder = async (enrollment_id) => {
     )
   }
 }
+
+exports.payment_status = async (input_data) => {
+  const { enrollment_id, payment_id,coach_resp } = input_data
+  const payment = await models.Payment.findByPk(payment_id)
+  const enrollment = await models.Enrollment.findByPk(enrollment_id)
+  const user = await models.User.findByPk(enrollment['user_id'])
+  const batch = await models.Batch.findByPk(enrollment['batch_id'])
+  const academy = await models.Academy.findByPk(batch['academy_id'])
+  const sport = await models.Sports.findByPk(batch['sports_id'])
+  const coach = await models.Coach.findByPk(enrollment['coach_id'])
+  const notification = await models.Notification.create(
+    {
+      sender_id: coach['id'],
+      sender_type: "coach",
+      receiver_id: user['id'],
+      receiver_type: "player",
+      type: "payment_status",
+      title: `Payment ${coach_resp ? 'Accepted' :'Declined'}`,
+      body: `Dear ${user['name'] || 'User'}, your payment of Rs. ${payment['price']} for ${sport['name']} class at ${academy['name']} ${coach_resp ? 'accepted' :'declined'} by ${coach['name']}`,
+      data: {
+        enrollment_id: enrollment_id,
+        batch_thumbnail_img:batch['thumbnail_img']
+      },
+      is_marketing: false,
+      is_read:false
+    }
+  )
+  if (user['fcm_token'] != null) {
+    await send_push_notifications(user['fcm_token'],
+      {
+        title: notification.title,
+        body: notification.body
+      }
+    )
+  }
+}
