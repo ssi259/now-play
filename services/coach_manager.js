@@ -700,12 +700,15 @@ exports.post_process_add_fcm_token = async (resp) => {
 }
 
 exports.pre_process_pay_reminder = async (req) => {
-  return {enrollment_id:req.query.enrollment_id}
+  const { player_id, enrollment_id } = req.query
+  return {enrollment_id}
 }
 
 exports.process_pay_reminder = async (input_data) => {
   const { enrollment_id } = input_data
-  await create_send_notification.payment_reminder(enrollment_id)
+  if (enrollment_id != null) {
+    await create_send_notification.payment_reminder(enrollment_id)
+  }
 }
 
 exports.post_process_pay_reminder = async (resp) => {
