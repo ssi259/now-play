@@ -135,3 +135,60 @@ exports.payment_status = async (input_data) => {
     )
   }
 }
+
+exports.class_reschedule = async (input_data) => {
+  const { class_data, class_type, coach_id } = input_data
+  const batch = await models.Batch.findByPk(class_data['batch_id'])
+  const academy = await models.Academy.findByPk(batch['academy_id'])
+  const coach = await models.Coach.findByPk(coach_id)
+  const enrollments = await models.Enrollment.findAll(
+    {
+      where: {
+        batch_id: class_data['batch_id'],
+        status : 'active'
+      },
+      attributes: ['user_id'],
+      group: ['user_id']
+    }
+  )
+  for (let enrollment of enrollments) {
+    let user = await models.User.findByPk(enrollment['user_id'])
+    const notification = await models.Notification.create(
+      {
+        sender_id: coach['id'],
+        sender_type: "coach",
+        receiver_id: user['id'],
+        receiver_type: "player",
+        type: "class_reschedule",
+        title: `Class ${class_type == 'rescheduled' ? 'Rescheduled' : 'Canceled'}`,
+        body: `Dear ${user['name'] || 'User'}, your class on ${convertTo12Hour(class_data['previous_start_time']) +", "+ convert_date_IN(class_data['previous_start_date'])} at ${academy['name']} has been ${class_type =='rescheduled' ? `reschduled to ${convertTo12Hour(class_data['updated_start_time']) +", "+ convert_date_IN(class_data['updated_date'])}` : 'canceled'}`,
+        data: {
+          batch_thumbnail_img: batch['thumbnail_img']
+        },
+        is_marketing: false,
+        is_read: false
+      }
+    )
+    if (user['fcm_token'] != null) {
+      await send_push_notifications(user['fcm_token'],
+        {
+          title: notification.title,
+          body: notification.body
+        }
+      )
+    }
+  }
+}
+
+
+function convert_date_IN(date) {
+  return date.toLocaleDateString('en-IN', {year:"numeric", month:"short", day:"numeric"})
+}
+
+function convertTo12Hour(time) {
+  let hours = parseInt(time.substr(0, 2));
+  let minutes = time.substr(3, 2);
+  let ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12;
+  return `${hours}:${minutes} ${ampm}`;
+}

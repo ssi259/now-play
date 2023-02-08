@@ -1,6 +1,7 @@
 const models = require('../models')
 const Api400Error = require('../error/api400Error');
 const { Op } = require('sequelize')
+const create_send_notification =  require('../utilities/Notification/create_send_notification')
 
 exports.pre_process_reschedule = async (req) => {
     let { batch_id, updated_date, updated_start_time, previous_start_time, previous_end_time, previous_start_date, type } = req.body
@@ -26,6 +27,7 @@ exports.process_reschedule = async (input_data) => {
             previous_end_time,
             type
         })
+        create_send_notification.class_reschedule({class_data : canceled_class.dataValues ,class_type:'canceled',coach_id})
         return { message: "class canceled", data: canceled_class}
     }
     const  updated_end_time =  await calculate_updated_end_time(previous_start_time, previous_end_time , updated_start_time)
@@ -43,6 +45,7 @@ exports.process_reschedule = async (input_data) => {
         previous_end_time,
         type: "rescheduled"
     })
+    create_send_notification.class_reschedule({class_data : rescheduled_class.dataValues , class_type : 'rescheduled',coach_id})
     return { message: "class rescheduled", data:rescheduled_class }
 }
 
