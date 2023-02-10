@@ -1,12 +1,12 @@
 const BatchManager = require("../services/batch_manager")
 
-exports.search_batch = async(req,resp)=>{
-        
+exports.search_batch = async(req,resp)=>{ 
     try{
-        var input_response =  await BatchManager.pre_process_params(req,resp)
-        var processed_reponse =  await BatchManager.process_batch_search_input_req(req,resp,input_response  )
-        var post_process_response = await BatchManager.post_process_search_batch(req,resp,processed_reponse)
-    }catch(e){
+        var input_response = await BatchManager.pre_process_params(req)
+        var processed_reponse = await BatchManager.process_batch_search_input_req(req, input_response)
+        await BatchManager.post_process_search_batch(req, resp, processed_reponse)
+    }
+    catch(e){
         const status_code = e.statusCode ? e.statusCode : 500
         console.log(e)
         return resp.status(status_code).send({ status: "Failure", message: e.name })
