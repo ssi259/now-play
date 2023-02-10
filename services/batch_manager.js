@@ -9,86 +9,55 @@ const Api500Error = require('./../error/api500Error')
 const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
     host: dbConfig.host,
     dialect: dbConfig.dialect,
-
+    logging: false,
     pool: {
         max: dbConfig.pool.max,
         min: dbConfig.pool.min
     }
 });
 
-exports.pre_process_params = async (req, resp) => {
-    if(req.query.type == "admin" ){
-    const results = await models.Batch.findAll()
-    return results
+
+exports.pre_process_params = async (req) => {
+    var sql
+    if (req.query.type == "admin") {
+        sql = "select Batches.id, Batches.arena_id, Batches.coach_id,Batches.academy_id, Batches.sports_id,Batches.days, Batches.price,Batches.status, Batches.thumbnail_img,start_time, end_time, start_date,end_date, Arenas.name as arena_name ,Arenas.lat  , Arenas.lng, Arenas.state, Arenas.city, Arenas.locality, Coaches.name as coach_name , Coaches.experience, Academies.name as academy_name, Sports.name as sport_name,Sports.type from Batches Inner Join Arenas ON Batches.arena_id = Arenas.id Inner Join Coaches On Batches.coach_id = Coaches.id Inner Join Academies On Batches.academy_id = Academies.id Inner Join Sports On Batches.sports_id = Sports.id"   
     }else if (req.query.sports_id != null){
-        const results = await models.Batch.findAll({where:{status:"active",sports_id:req.query.sports_id}})
-        return results
+        sql = `select Batches.id, Batches.arena_id, Batches.coach_id,Batches.academy_id, Batches.sports_id,Batches.days, Batches.price,Batches.status, Batches.thumbnail_img,start_time, end_time, start_date,end_date, Arenas.name as arena_name ,Arenas.lat  , Arenas.lng, Arenas.state, Arenas.city, Arenas.locality, Coaches.name as coach_name , Coaches.experience, Academies.name as academy_name, Sports.name as sport_name,Sports.type from Batches Inner Join Arenas ON Batches.arena_id = Arenas.id Inner Join Coaches On Batches.coach_id = Coaches.id Inner Join Academies On Batches.academy_id = Academies.id Inner Join Sports On Batches.sports_id = Sports.id where Batches.status='active' AND Batches.sports_id=${req.query.sports_id}`
     }
     else {
-        const results = await models.Batch.findAll({where:{status:"active"}})
-        return results
+        sql = "select Batches.id, Batches.arena_id, Batches.coach_id,Batches.academy_id, Batches.sports_id,Batches.days, Batches.price,Batches.status, Batches.thumbnail_img,start_time, end_time, start_date,end_date, Arenas.name as arena_name ,Arenas.lat  , Arenas.lng, Arenas.state, Arenas.city, Arenas.locality, Coaches.name as coach_name , Coaches.experience, Academies.name as academy_name, Sports.name as sport_name,Sports.type from Batches Inner Join Arenas ON Batches.arena_id = Arenas.id Inner Join Coaches On Batches.coach_id = Coaches.id Inner Join Academies On Batches.academy_id = Academies.id Inner Join Sports On Batches.sports_id = Sports.id where Batches.status='active'"   
     }
+    const results = await sequelize.query(sql, (err, result) => {
+        if(err) throw err
+    })
+    return  results != null && results.length > 0 ?  results[0] : null
 }
-exports.process_batch_search_input_req = async (req,resp,results) => {
+
+exports.process_batch_search_input_req = async (req, results) => {
     var processed_response = [], overall_ratings = 0, ratings;
     if (results == null) {
         return results
     }
     for (each_result of results) {
-        const arena_details = await models.Arena.findOne({where:{id:each_result.dataValues["arena_id"]}})
-        const coach_details = await models.Coach.findOne({where:{id:each_result.dataValues["coach_id"]}})
-        const academy_details = await models.Academy.findOne({where:{id:each_result.dataValues["academy_id"]}})
-        const sports_details = await models.Sports.findOne({where:{id:each_result.dataValues["sports_id"]}})
-        const plan = await models.SubscriptionPlan.findOne({where:{batch_id:each_result.dataValues["id"]}})
-        const arena_data = arena_details != null ? {"arena_name":arena_details.dataValues["name"],"lat":arena_details.dataValues["lat"],"lng":arena_details.dataValues["lng"]} : null
-        const coach_data = coach_details !=null ? {"coach_name":coach_details.dataValues["name"],"experience":coach_details.dataValues["experience"],} : null
-        const academy_data =  academy_details != null ? {"academy_name":academy_details.dataValues["name"]} : null
-        const sports_data =  sports_details !=null ? {"sport_name":sports_details.dataValues["name"],"type":sports_details.dataValues["type"]} : null
-        const plan_data = plan != null ? {"plan_name":plan.dataValues["name"]} : null
-        const batch_data =  {"batch_thumbnail":each_result.dataValues["thumbnail_img"],"sport_id":each_result.dataValues["sports_id"]} 
-        const arena_address = {"state":arena_details.dataValues["state"],"city":arena_details.dataValues["city"],"locality":arena_details.dataValues["locality"]}
-        overall_ratings = 0;
-        ratings = await models.Review.findAll({
-            where: {
-                coach_id: each_result.dataValues["coach_id"]
-            }
-        }).then((ratings) => {
-            ratings.forEach((rating) => {
-                overall_ratings = overall_ratings + rating["rating"]
-            })
-            const data2 = { "rating_count": ratings.length, "average_rating": overall_ratings / ratings.length };
-            Object.assign(each_result.dataValues, arena_data)
-            Object.assign(each_result.dataValues, plan_data)
-            Object.assign(each_result.dataValues, coach_data)
-            Object.assign(each_result.dataValues, academy_data)
-            Object.assign(each_result.dataValues, sports_data)
-            Object.assign(each_result.dataValues , { "distance": range(req.query.lat, req.query.lng,each_result.dataValues["lat"],each_result.dataValues["lng"] ,"k.m.")})
-            Object.assign(each_result.dataValues, data2)
-            Object.assign(each_result.dataValues, batch_data)
-            Object.assign(each_result.dataValues, { "address": arena_address })
-            delete each_result.dataValues["arena_id"]
-            delete each_result.dataValues["createdAt"]
-            delete each_result.dataValues["updatedAt"]
-            delete each_result.dataValues["banner_img"]
-            delete each_result.dataValues["thumbnail_img"]
-            delete each_result.dataValues["sports_id"]
-            processed_response.push(each_result.dataValues)    
-        }).catch((error) => {
-            console.log(error)
-        })
+        const sql = `SELECT SUM(rating) as tot_rating, COUNT(*) as num_ratings FROM Reviews WHERE coach_id = ${each_result['coach_id']}`
+        const [{tot_rating ,num_ratings} ] = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT })
+        each_result.rating_count = num_ratings || 0
+        each_result.average_rating = tot_rating /  num_ratings
+        each_result.address = {"state":each_result["state"],"city":each_result["city"],"locality":each_result["locality"]}
+        processed_response.push(each_result)
     }
-    return processed_response;
+    return processed_response
 }
 exports.post_process_search_batch = async (req, resp, processed_reponse) => {
-    var formatted_response = {}
     var lat = req.query.lat
     var lng = req.query.lng
     const revgeocode_data = await axios.get(`https://revgeocode.search.hereapi.com/v1/revgeocode?at=${lat}%2C${lng}&lang=en-US&apiKey=${process.env.HERE_MAP_API_KEY}`);
     const revgeocode_address_label = revgeocode_data.data.items.length > 0 ? revgeocode_data.data.items[0].address.label : ""
     const revgeocode_address_district = revgeocode_data.data.items.length > 0 ? revgeocode_data.data.items[0].address.district : ""    
-    formatted_response["address"] = {label:revgeocode_address_label,district:revgeocode_address_district}
-    formatted_response["batchList"] = processed_reponse
-    resp.send(formatted_response)
+    resp.send({
+        address: { label: revgeocode_address_label, district: revgeocode_address_district },
+        batchList : processed_reponse
+    })
 }
 
 
