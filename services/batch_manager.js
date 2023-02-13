@@ -20,12 +20,12 @@ const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.p
 exports.pre_process_params = async (req) => {
     var sql
     if (req.query.type == "admin") {
-        sql = "select Batches.id, Batches.arena_id, Batches.coach_id,Batches.academy_id, Batches.sports_id,Batches.days, Batches.price,Batches.status, Batches.thumbnail_img as batch_thumbnail,start_time, end_time, start_date,end_date, Arenas.name as arena_name ,Arenas.lat  , Arenas.lng, Arenas.state, Arenas.city, Arenas.locality, Coaches.name as coach_name , Coaches.experience, Academies.name as academy_name, Sports.name as sport_name,Sports.type from Batches Inner Join Arenas ON Batches.arena_id = Arenas.id Inner Join Coaches On Batches.coach_id = Coaches.id Inner Join Academies On Batches.academy_id = Academies.id Inner Join Sports On Batches.sports_id = Sports.id"   
+        sql = "select Batches.id, Batches.arena_id, Batches.coach_id,Batches.academy_id, Batches.sports_id as sport_id, Batches.days, Batches.price,Batches.status, Batches.thumbnail_img as batch_thumbnail,start_time, end_time, start_date,end_date, Arenas.name as arena_name ,Arenas.lat  , Arenas.lng, Arenas.state, Arenas.city, Arenas.locality, Coaches.name as coach_name , Coaches.experience, Academies.name as academy_name, Sports.name as sport_name,Sports.type from Batches Inner Join Arenas ON Batches.arena_id = Arenas.id Inner Join Coaches On Batches.coach_id = Coaches.id Inner Join Academies On Batches.academy_id = Academies.id Inner Join Sports On Batches.sports_id = Sports.id"   
     }else if (req.query.sports_id != null){
-        sql = `select Batches.id, Batches.arena_id, Batches.coach_id,Batches.academy_id, Batches.sports_id,Batches.days, Batches.price,Batches.status, Batches.thumbnail_img as batch_thumbnail,start_time, end_time, start_date,end_date, Arenas.name as arena_name ,Arenas.lat  , Arenas.lng, Arenas.state, Arenas.city, Arenas.locality, Coaches.name as coach_name , Coaches.experience, Academies.name as academy_name, Sports.name as sport_name,Sports.type from Batches Inner Join Arenas ON Batches.arena_id = Arenas.id Inner Join Coaches On Batches.coach_id = Coaches.id Inner Join Academies On Batches.academy_id = Academies.id Inner Join Sports On Batches.sports_id = Sports.id where Batches.status='active' AND Batches.sports_id=${req.query.sports_id}`
+        sql = `select Batches.id, Batches.arena_id, Batches.coach_id,Batches.academy_id, Batches.sports_id as sport_id, Batches.days, Batches.price,Batches.status, Batches.thumbnail_img as batch_thumbnail,start_time, end_time, start_date,end_date, Arenas.name as arena_name ,Arenas.lat  , Arenas.lng, Arenas.state, Arenas.city, Arenas.locality, Coaches.name as coach_name , Coaches.experience, Academies.name as academy_name, Sports.name as sport_name,Sports.type from Batches Inner Join Arenas ON Batches.arena_id = Arenas.id Inner Join Coaches On Batches.coach_id = Coaches.id Inner Join Academies On Batches.academy_id = Academies.id Inner Join Sports On Batches.sports_id = Sports.id where Batches.status='active' AND Batches.sports_id=${req.query.sports_id}`
     }
     else {
-        sql = "select Batches.id, Batches.arena_id, Batches.coach_id,Batches.academy_id, Batches.sports_id,Batches.days, Batches.price,Batches.status, Batches.thumbnail_img as batch_thumbnail ,start_time, end_time, start_date,end_date, Arenas.name as arena_name ,Arenas.lat  , Arenas.lng, Arenas.state, Arenas.city, Arenas.locality, Coaches.name as coach_name , Coaches.experience, Academies.name as academy_name, Sports.name as sport_name,Sports.type from Batches Inner Join Arenas ON Batches.arena_id = Arenas.id Inner Join Coaches On Batches.coach_id = Coaches.id Inner Join Academies On Batches.academy_id = Academies.id Inner Join Sports On Batches.sports_id = Sports.id where Batches.status='active'"   
+        sql = "select Batches.id, Batches.arena_id, Batches.coach_id,Batches.academy_id, Batches.sports_id as sport_id, Batches.days, Batches.price,Batches.status, Batches.thumbnail_img as batch_thumbnail ,start_time, end_time, start_date,end_date, Arenas.name as arena_name ,Arenas.lat  , Arenas.lng, Arenas.state, Arenas.city, Arenas.locality, Coaches.name as coach_name , Coaches.experience, Academies.name as academy_name, Sports.name as sport_name,Sports.type from Batches Inner Join Arenas ON Batches.arena_id = Arenas.id Inner Join Coaches On Batches.coach_id = Coaches.id Inner Join Academies On Batches.academy_id = Academies.id Inner Join Sports On Batches.sports_id = Sports.id where Batches.status='active'"   
     }
     const results = await sequelize.query(sql, (err, result) => {
         if(err) throw err
@@ -34,7 +34,7 @@ exports.pre_process_params = async (req) => {
 }
 
 exports.process_batch_search_input_req = async (req, results) => {
-    var processed_response = [], overall_ratings = 0, ratings;
+    var processed_response = [];
     if (results == null) {
         return results
     }
@@ -43,7 +43,8 @@ exports.process_batch_search_input_req = async (req, results) => {
         const [{tot_rating ,num_ratings} ] = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT })
         each_result.rating_count = num_ratings || 0
         each_result.average_rating = tot_rating /  num_ratings
-        each_result.address = {"state":each_result["state"],"city":each_result["city"],"locality":each_result["locality"]}
+        each_result.address = { "state": each_result["state"], "city": each_result["city"], "locality": each_result["locality"] }
+        each_result.distance = range(req.query.lat, req.query.lng,each_result["lat"],each_result["lng"] ,"k.m.")
         processed_response.push(each_result)
     }
     return processed_response
