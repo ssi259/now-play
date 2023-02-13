@@ -45,7 +45,7 @@ exports.process_get = async() => {
         })} else if (complaint.complainant_type == "coach" ){
             await models.Coach.findByPk(complaint.complainant_id).then(coach => {
                 complaint.complainant_name=coach.name != null ? coach.name : null,
-                complaint.complainant_PhoneNumber=coach.phoneNumber !=null ? coach.phoneNumber : null
+                complaint.complainant_PhoneNumber=coach.phoneNumber !=null ? coach.phone_number : null
             })
         }
         return complaint
