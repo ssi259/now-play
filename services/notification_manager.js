@@ -26,9 +26,15 @@ exports.process_notifications = async (user) => {
   for (let notification of notifications) {
     const data_obj = notification.dataValues;
     data_obj['data'] = JSON.parse(data_obj['data'])
+    data_obj['createdAt'] = ist_formate_date(data_obj['createdAt'])
     response_data.push(data_obj)
   }
   return response_data
+}
+
+function ist_formate_date (date) {
+  const local_date = new Date(date.getTime() + process.env.IN_UTC_TIMEZONE_OFFSET * 60 * 1000)
+  return local_date
 }
 
 exports.post_process_notifications = async (data, resp) => {
