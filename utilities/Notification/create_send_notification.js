@@ -81,7 +81,7 @@ exports.payment_reminder = async (enrollment_id) => {
       receiver_type: "player",
       type: "payment_reminder",
       title: "Payment Reminder",
-      body: `Dear ${user['name'] || 'User'}, Your ${plan['type']} plan of Rs.${plan['price']} expires on ${enrollment['end_date'].toLocaleDateString('en-IN', {year:"numeric", month:"short", day:"numeric"})} for your class at ${academy['name']}.Please pay immediately to continue your enrollment`,
+      body: `Dear ${user['name'] || 'User'}, your ${plan['type']} plan of Rs.${plan['price']} expires on ${enrollment['end_date'].toLocaleDateString('en-IN', {year:"numeric", month:"short", day:"numeric"})} for your class at ${academy['name']}.Please pay immediately to continue your enrollment`,
       data: {
         enrollment_id: enrollment_id,
         batch_thumbnail_img:batch['thumbnail_img']
