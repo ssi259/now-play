@@ -94,7 +94,7 @@ async function calculate_updated_end_time(previous_start_time, previous_end_time
 }
 
 async function check_time_slot_conflict(input_data){
-    const {coach_id , batch_id, updated_date, updated_start_time, updated_end_time, previous_start_date } = input_data
+    const {coach_id , batch_id, updated_date, updated_start_time, updated_end_time, previous_start_date, previous_start_time } = input_data
     const updated_date_str = updated_date.toLocaleDateString("en-IN").substring(0, 10)
     const batches = await models.Batch.findAll({
         where: {
@@ -155,8 +155,15 @@ async function check_time_slot_conflict(input_data){
             }
         }
         for (let i = 0; i < updated_day_classes.length; i++) {
+            let ans = false;
             if (updated_day_classes[i]['start_time'] <= updated_start_time && updated_start_time <= updated_day_classes[i]['end_time'] || updated_day_classes[i]['start_time'] <= updated_end_time && updated_end_time <= updated_day_classes[i]['end_time']) {
-                return true
+                ans = true
+            }
+            if ( ans && previous_start_date.toLocaleDateString() == updated_date.toLocaleDateString() && batch['id'] == batch_id && previous_start_time == updated_day_classes[i]['start_time']) {
+                ans = false
+            }
+            if (ans) {
+                return ans
             }
         }
         updated_day_classes = []
