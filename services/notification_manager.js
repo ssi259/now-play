@@ -11,7 +11,8 @@ exports.process_notifications = async (user) => {
       where: {
         receiver_id: user.user_id,
         receiver_type: 'player'
-      }
+      },
+      order: [['id', 'DESC']]
     })
   }
   else if (user.type == 'coach') {
@@ -19,7 +20,8 @@ exports.process_notifications = async (user) => {
       where: {
         receiver_id: user.coach_id,
         receiver_type: 'coach'
-      }
+      },
+      order: [['id', 'DESC']]
     })
   }
   const response_data = []
