@@ -1,25 +1,17 @@
 const models = require('../models')
 
 exports.pre_process_get_help_and_support = async (req) => {
-    return {};
-}
-
-exports.process_get_help_and_support = async (req) => {
-    const type = req.body.type;
-    if( type == "coach"){
-        const help_and_support = await models.HelpAndSupport.findAll({
-            where: {
-                type: "coach"
-            }
-        });
-    }else if( type == "player"){    
-        const help_and_support = await models.HelpAndSupport.findAll({
-            where: {
-                type: "player"
-            }
-        });
+   let help_and_support = [];
+   if(req.query.type == "coach"){
+       help_and_support = await models.Help_and_Support.findAll({where: {type: 'coach'}})
+       return help_and_support
+   }else if(req.query.type == "player"){
+       help_and_support = await models.Help_and_Support.findAll({where: {type: 'player'}})
+       return help_and_support
     }
-    return help_and_support;    
+}
+exports.process_get_help_and_support = async (input_response) => {
+    return input_response
 }
 
 exports.post_process_get_help_and_support = async (process_response, resp) => {
