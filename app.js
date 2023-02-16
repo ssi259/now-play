@@ -25,6 +25,7 @@ const leadRouter = require('./routes/leads')
 const {next_payment_reminder} = require('./schedulers/payment_scheduler')
 const notificationRouter = require('./routes/notifications')
 const {upcoming_class_reminder} = require('./schedulers/batch_scheduler')
+const help_and_support_router = require('./routes/help_and_support')
 
 var app = express();
 app.use(fileUpload());
@@ -57,6 +58,7 @@ app.use('/complaints', ComplaintRouter);
 app.use('/notifications', notificationRouter);
 app.use('/reschedule', rescheduleRouter)
 app.use('/leads', leadRouter);
+app.use('/help_and_support', help_and_support_router)
 
 
 // next_payment_reminder();
