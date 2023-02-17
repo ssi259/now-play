@@ -1,4 +1,6 @@
 const models = require('../models')
+const {send_push_notifications} =  require('../utilities/send_push_notifications')
+const {Op} = require('sequelize')
 
 exports.pre_process_notifications = async (req) => {
     return req.user
@@ -62,4 +64,47 @@ exports.post_process_update_notifications = async (resp, data) => {
   const data_obj = data
   data_obj['data'] = JSON.parse(data_obj['data'])
   resp.status(200).send({ status: "success", message: "updated successfully", data: data_obj });
+}
+
+exports.pre_process_send_notifications = async (req) => {
+  const { title, body, img_url, receiver_type } = req.body
+  return { title, body, img_url, receiver_type}
+}
+
+exports.process_send_notifications = async (input_response) => { 
+  const { title, body, img_url, receiver_type } = input_response
+  const tokens = (await get_fcm_tokens(receiver_type))  
+  const notification = {
+    title: title,
+    body: body,
+  }
+  if (img_url) notification.image = img_url;
+  send_push_notifications(tokens, notification)
+}
+
+async function get_fcm_tokens( receiver_type) {
+  if (receiver_type == 'coach') {
+    const coaches = await models.Coach.findAll({
+      where: {
+          fcm_token: {
+            [Op.not]: null,
+          },
+      },
+      attributes:['fcm_token']
+     })
+    return await coaches.map((coach) => coach.fcm_token);
+  }
+  const users = await models.User.findAll({
+    where: {
+      fcm_token: {
+      [Op.not]: null,
+      }
+    },
+    attributes:['fcm_token']
+  })
+  return await users.map((user) => user.fcm_token);
+}
+
+exports.post_process_send_notifications = async (resp) => {
+  resp.status(200).send({ status: "success", message: "successfully sent message:", data: {}});
 }

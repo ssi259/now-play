@@ -60,6 +60,7 @@ app.use('/reschedule', rescheduleRouter)
 app.use('/leads', leadRouter);
 app.use('/help_and_support', help_and_support_router)
 
+app.use('/api/v1/notifications', notificationRouter);
 
 // next_payment_reminder();
 // upcoming_class_reminder();

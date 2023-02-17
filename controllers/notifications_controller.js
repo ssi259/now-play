@@ -24,3 +24,15 @@ exports.update_notifications = async (req, resp) => {
         return resp.status(status_code).send({ status: "failure", message: e.name, data: {} })
     }
 }
+
+exports.send_notifications = async (req, resp) => {
+    try {
+        const input_response = await notification_manager.pre_process_send_notifications(req)
+        await notification_manager.process_send_notifications(input_response)
+        await notification_manager.post_process_send_notifications(resp)
+    } catch (e) {
+        console.log(e)
+        const status_code = e.statusCode ? e.statusCode : 500
+        return resp.status(status_code).send({ status: "failure", message: e.name, data: {} })
+    }
+}
